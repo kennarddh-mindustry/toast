@@ -1,0 +1,16 @@
+{
+    "name": "genesis-template",
+    "displayName": "GenesisTemplate",
+    "author": "Kennarddh",
+    "description": "Description",
+    "minGameVersion": "146",
+    "java": true,
+    "main": "kennarddh.template.core.GenesisTemplate",
+    "version": "1.0.0",
+    "repo": "kennarddh-mindustry/genesis-template",
+    "dependencies": [
+        "kotlin-runtime",
+        "genesis-core",
+        "genesis-common"
+    ]
+}
