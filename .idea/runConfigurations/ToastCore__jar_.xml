@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="GenesisCore [runMindustryServer]" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="ToastCore [jar]" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="genesis-core:runMindustryServer" />
+          <option value="toast-core:jar" />
         </list>
       </option>
       <option name="vmOptions" />

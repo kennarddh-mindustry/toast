@@ -1,10 +1,10 @@
 package kennarddh.toast.core
 
 import arc.util.Log
-import mindustry.mod.Plugin
+import kennarddh.genesis.core.commons.AbstractPlugin
 
 @SuppressWarnings("unused")
-class Toast : Plugin() {
+class Toast : AbstractPlugin() {
     override fun init() {
         Log.info("[Toast] Loaded")
     }
