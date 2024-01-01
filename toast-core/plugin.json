@@ -1,13 +1,13 @@
 {
-    "name": "genesis-template",
-    "displayName": "GenesisTemplate",
+    "name": "toast-core",
+    "displayName": "ToastCore",
     "author": "Kennarddh",
     "description": "Description",
     "minGameVersion": "146",
     "java": true,
-    "main": "kennarddh.template.core.GenesisTemplate",
+    "main": "kennarddh.toast.core.Toast",
     "version": "1.0.0",
-    "repo": "kennarddh-mindustry/genesis-template",
+    "repo": "kennarddh-mindustry/toast",
     "dependencies": [
         "kotlin-runtime",
         "genesis-core",
