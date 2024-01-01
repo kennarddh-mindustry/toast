@@ -1,6 +1,6 @@
-# Genesis Template
+# Toast
 
-Template for genesis based mindustry plugin project
+Toast Mindustry server plugin
 
 ## Dependencies
 
