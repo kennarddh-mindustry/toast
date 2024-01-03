@@ -5,7 +5,7 @@ import kennarddh.genesis.core.Genesis
 import kennarddh.genesis.core.commons.AbstractPlugin
 import kennarddh.toast.core.handlers.UserXPHandler
 
-@SuppressWarnings("unused")
+@Suppress("unused")
 class Toast : AbstractPlugin() {
     override fun init() {
         Genesis.addHandler(UserXPHandler())
