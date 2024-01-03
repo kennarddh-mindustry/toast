@@ -10,6 +10,6 @@ class Toast : AbstractPlugin() {
     override fun init() {
         Genesis.addHandler(UserXPHandler())
 
-        Log.info("[Toast] Loaded")
+        Log.info("[ToastCore] Loaded")
     }
 }
