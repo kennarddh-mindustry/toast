@@ -82,18 +82,18 @@ $schema("Users") {
           $fk("mindustryPlayerID") INTEGER
     }
 
-    Users::id --{ MindustryUser::userID
-    MindustryUserServerData::mindustryUserID --|| MindustryUser::id
+    Users::id ||--{ MindustryUser::userID
+    MindustryUserServerData::mindustryUserID ||--|| MindustryUser::id
 
-    MindustryUser::id --{ MindustryPlayerIPAddress::mindustryPlayerID
-    IPAddress::id --{ MindustryPlayerIPAddress::ipAddress
+    MindustryUser::id ||--{ MindustryPlayerIPAddress::mindustryPlayerID
+    IPAddress::id ||--{ MindustryPlayerIPAddress::ipAddress
 
-    UserKick::ipAddressID --|| IPAddress::id
-    UserBan::ipAddressID --|| IPAddress::id
-    UserKick::userID --|| Users::id
-    UserBan::userID --|| Users::id
-    UserKick::mindustryPlayerID --{ MindustryUser::id
-    UserBan::mindustryPlayerID --{ MindustryUser::id
+    UserKick::ipAddressID ||--|| IPAddress::id
+    UserKick::userID ||--|| Users::id
+    UserKick::mindustryPlayerID ||--|| MindustryUser::id
+    UserBan::ipAddressID ||--|| IPAddress::id
+    UserBan::userID ||--|| Users::id
+    UserBan::mindustryPlayerID ||--|| MindustryUser::id
 }
 
 $schema("GameHistory") {
