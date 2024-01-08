@@ -100,11 +100,18 @@ $schema("GameHistory") {
     $table("GameHistory") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $column("duration") INTEGER
+        * $column("map") VARCHAR(255)
+        * $column("winnerTeam") VARCHAR(255)
     }
 
     $table("GameHistoryPlayer") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $fk("gameHistoryID") INTEGER
+        * $fk("userID") INTEGER --In seconds
     }
+
+    GameHistoryPlayer::gameHistoryID }--|| GameHistory::id
+    GameHistoryPlayer::userID }--{ Users.Users::id
 }
 
 @enduml
