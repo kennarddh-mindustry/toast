@@ -1,0 +1,16 @@
+version: '3'
+
+# Development
+services:
+  database:
+    image: mariadb:lts
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: toast
+    volumes:
+      - data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+volumes:
+  data:

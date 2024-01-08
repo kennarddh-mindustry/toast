@@ -39,12 +39,20 @@ val metadata = ModMetadata.fromJson(project.file("plugin.json"))
 project.group = "kennarddh"
 project.version = metadata.version
 
+val exposedVersion: String = "0.46.0"
+
 dependencies {
     mindustryDependencies()
 
     compileOnly("com.xpdustry:kotlin-runtime:3.1.0-k.1.9.10")
     compileOnly("kennarddh:genesis-core:1.1.0")
     compileOnly("kennarddh:genesis-common:1.1.0")
+
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.3.1")
 }
 
 kotlin {
