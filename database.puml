@@ -32,75 +32,74 @@ left to right direction
 
 $schema("Users") {
     $table("Users") {
-        $pk("id"): INTEGER NOT NULL
-        $column("username"): VARCHAR(255) NOT NULL
-        $column("password"): VARCHAR(255) NOT NULL
-        $column("discordID"): VARCHAR(255) NULL
+        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
+        * $column("username"): VARCHAR(255)
+        * $column("password"): VARCHAR(255)
+          $column("discordID"): VARCHAR(255)
     }
 
-    $table("UserMindustryServerData") {
-        $pk("id"): INTEGER NOT NULL
-        $fk("mindustryUserID"): INTEGER NOT NULL
-        $column("serverID"): VARCHAR(255) NOT NULL
-        $column("xp"): INTEGER NOT NULL DEFAULT 0
-        $column("playTime"): INTEGER NOT NULL DEFAULT 0
+    $table("MindustryUserServerData") {
+        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
+        * $fk("mindustryUserID"): INTEGER
+        * $column("serverID"): VARCHAR(255)
+        * $column("xp"): INTEGER DEFAULT 0
+        * $column("playTime"): INTEGER DEFAULT 0
     }
 
     $table("MindustryUser") {
-        $pk("id"): INTEGER NOT NULL
-        $fk("userID"): INTEGER NULL
-        $fk("mindustryUUIDID"): INTEGER NULL
+        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
+          $fk("userID"): INTEGER
+        * $column("mindustryUUID"): VARCHAR(255) UNIQUE
     }
 
-    $table("MindustryUUID") {
-        $pk("id"): INTEGER NOT NULL
-        $column("mindustryUUID"): VARCHAR(255) NULL UNIQUE
-    }
-
-    $table("MindustryUserIPAddress") {
-        $pk("id"): INTEGER NOT NULL
-        $fk("mindustryUserID"): VARCHAR(255) NULL
-        $fk("ipAddress"): VARCHAR(255) NULL
+    $table("MindustryPlayerIPAddress") {
+        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
+        * $fk("mindustryPlayerID"): VARCHAR(255)
+        * $fk("ipAddress"): VARCHAR(255)
     }
 
     $table("IPAddress") {
-        $pk("id"): INTEGER NOT NULL
-        $column("ipAddress"): INTEGER NOT NULL
+        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
+        * $column("ipAddress"): INTEGER UNIQUE
     }
 
     $table("UserKick") {
-        $pk("id"): INTEGER NOT NULL
-        $fk("ipAddressID"): Integer NULL
-        $fk("userID"): INTEGER NULL
-        $fk("mindustryUUIDID"): INTEGER NULL
-        $column("reason"): TEXT NOT NULL
-        $column("kickedAt"): DATETIME NOT NULL
-        $column("kickEndAt"): DATETIME NOT NULL
+        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
+        * $column("reason"): TEXT
+        * $column("kickedAt"): DATETIME
+        * $column("kickEndAt"): DATETIME
+          $fk("ipAddressID"): Integer
+          $fk("userID"): INTEGER
+          $fk("mindustryPlayerID"): INTEGER
     }
 
     $table("UserBan") {
-        $pk("id"): INTEGER NOT NULL
-        $fk("ipAddressID"): INTEGER NULL
-        $fk("userID"): INTEGER NULL
-        $fk("mindustryUUIDID"): INTEGER NULL
-        $column("reason"): TEXT NOT NULL
-        $column("bannedAt"): DATETIME NOT NULL
+        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
+        * $column("reason"): TEXT
+        * $column("bannedAt"): DATETIME
+          $fk("ipAddressID"): INTEGER
+          $fk("userID"): INTEGER
+          $fk("mindustryPlayerID"): INTEGER
     }
 
     Users::id --{ MindustryUser::userID
-    UserMindustryServerData::mindustryUserID --|| MindustryUser::id
+    MindustryUserServerData::mindustryUserID --|| MindustryUser::id
 
-    MindustryUser::id --{ MindustryUserIPAddress::mindustryUserID
-    IPAddress::id --{ MindustryUserIPAddress::ipAddress
+    MindustryUser::id --{ MindustryPlayerIPAddress::mindustryPlayerID
+    IPAddress::id --{ MindustryPlayerIPAddress::ipAddress
 
     UserKick::ipAddressID --|| IPAddress::id
     UserBan::ipAddressID --|| IPAddress::id
     UserKick::userID --|| Users::id
     UserBan::userID --|| Users::id
-    UserKick::mindustryUUIDID --{ MindustryUUID::id
-    UserBan::mindustryUUIDID --{ MindustryUUID::id
+    UserKick::mindustryPlayerID --{ MindustryUser::id
+    UserBan::mindustryPlayerID --{ MindustryUser::id
+}
 
-    MindustryUser::mindustryUUIDID --{ MindustryUUID::id
+$schema("GameHistory") {
+    $table("GamePlayer") {
+        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
+    }
 }
 
 @enduml
