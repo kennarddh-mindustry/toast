@@ -10,7 +10,7 @@ package "$name" as $name <<Rectangle>>
 entity "<b>$name</b>" as $name << (T, Orange) table >>
 !endprocedure
 
-!procedure $view($name, $slug)
+!procedure $view($name)
 entity "<b>$name</b>" as $name << (V, Aquamarine) view >>
 !endprocedure
 
@@ -28,21 +28,79 @@ entity "<b>$name</b>" as $name << (V, Aquamarine) view >>
 
 title "Toast Core"
 
-$table("Users") {
-    $pk("id"): INTEGER NOT NULL
-    $column("username"): VARCHAR(255) NOT NULL
-    $column("password"): VARCHAR(255) NOT NULL
-}
+left to right direction
 
-$table("UserMindustryServerData") {
-    $pk("id"): INTEGER NOT NULL
-    $column("serverID"): VARCHAR(255) NOT NULL
-    $fk("userID"): INTEGER NULL
-    $column("discordID"): VARCHAR(255) NULL
-    $column("xp"): INTEGER NOT NULL DEFAULT 0
-    $column("playTime"): INTEGER NOT NULL DEFAULT 0
-}
+$schema("Users") {
+    $table("Users") {
+        $pk("id"): INTEGER NOT NULL
+        $column("username"): VARCHAR(255) NOT NULL
+        $column("password"): VARCHAR(255) NOT NULL
+        $column("discordID"): VARCHAR(255) NULL
+    }
 
-Users::id }-{ UserMindustryServerData::userID
+    $table("UserMindustryServerData") {
+        $pk("id"): INTEGER NOT NULL
+        $fk("mindustryUserID"): INTEGER NOT NULL
+        $column("serverID"): VARCHAR(255) NOT NULL
+        $column("xp"): INTEGER NOT NULL DEFAULT 0
+        $column("playTime"): INTEGER NOT NULL DEFAULT 0
+    }
+
+    $table("MindustryUser") {
+        $pk("id"): INTEGER NOT NULL
+        $fk("userID"): INTEGER NULL
+        $fk("mindustryUUIDID"): INTEGER NULL
+    }
+
+    $table("MindustryUUID") {
+        $pk("id"): INTEGER NOT NULL
+        $column("mindustryUUID"): VARCHAR(255) NULL UNIQUE
+    }
+
+    $table("MindustryUserIPAddress") {
+        $pk("id"): INTEGER NOT NULL
+        $fk("mindustryUserID"): VARCHAR(255) NULL
+        $fk("ipAddress"): VARCHAR(255) NULL
+    }
+
+    $table("IPAddress") {
+        $pk("id"): INTEGER NOT NULL
+        $column("ipAddress"): INTEGER NOT NULL
+    }
+
+    $table("UserKick") {
+        $pk("id"): INTEGER NOT NULL
+        $fk("ipAddressID"): Integer NULL
+        $fk("userID"): INTEGER NULL
+        $fk("mindustryUUIDID"): INTEGER NULL
+        $column("reason"): TEXT NOT NULL
+        $column("kickedAt"): DATETIME NOT NULL
+        $column("kickEndAt"): DATETIME NOT NULL
+    }
+
+    $table("UserBan") {
+        $pk("id"): INTEGER NOT NULL
+        $fk("ipAddressID"): INTEGER NULL
+        $fk("userID"): INTEGER NULL
+        $fk("mindustryUUIDID"): INTEGER NULL
+        $column("reason"): TEXT NOT NULL
+        $column("bannedAt"): DATETIME NOT NULL
+    }
+
+    Users::id --{ MindustryUser::userID
+    UserMindustryServerData::mindustryUserID --|| MindustryUser::id
+
+    MindustryUser::id --{ MindustryUserIPAddress::mindustryUserID
+    IPAddress::id --{ MindustryUserIPAddress::ipAddress
+
+    UserKick::ipAddressID --|| IPAddress::id
+    UserBan::ipAddressID --|| IPAddress::id
+    UserKick::userID --|| Users::id
+    UserBan::userID --|| Users::id
+    UserKick::mindustryUUIDID --{ MindustryUUID::id
+    UserBan::mindustryUUIDID --{ MindustryUUID::id
+
+    MindustryUser::mindustryUUIDID --{ MindustryUUID::id
+}
 
 @enduml
