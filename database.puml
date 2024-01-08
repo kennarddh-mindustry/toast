@@ -1,0 +1,48 @@
+@startuml
+
+hide empty methods
+
+!procedure $schema($name)
+package "$name" as $name <<Rectangle>>
+!endprocedure
+
+!procedure $table($name)
+entity "<b>$name</b>" as $name << (T, Orange) table >>
+!endprocedure
+
+!procedure $view($name, $slug)
+entity "<b>$name</b>" as $name << (V, Aquamarine) view >>
+!endprocedure
+
+!procedure $pk($name)
+<color:#GoldenRod><&key></color> <b>$name</b>
+!endprocedure
+
+!procedure $fk($name)
+<color:#Silver><&key></color> $name
+!endprocedure
+
+!procedure $column($name)
+{field} <color:#White><&media-record></color> $name
+!endprocedure
+
+title "Toast Core"
+
+$table("Users") {
+    $pk("id"): INTEGER NOT NULL
+    $column("username"): VARCHAR(255) NOT NULL
+    $column("password"): VARCHAR(255) NOT NULL
+}
+
+$table("UserMindustryServerData") {
+    $pk("id"): INTEGER NOT NULL
+    $column("serverID"): VARCHAR(255) NOT NULL
+    $fk("userID"): INTEGER NULL
+    $column("discordID"): VARCHAR(255) NULL
+    $column("xp"): INTEGER NOT NULL DEFAULT 0
+    $column("playTime"): INTEGER NOT NULL DEFAULT 0
+}
+
+Users::id }-{ UserMindustryServerData::userID
+
+@enduml
