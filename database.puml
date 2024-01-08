@@ -32,54 +32,54 @@ left to right direction
 
 $schema("Users") {
     $table("Users") {
-        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
-        * $column("username"): VARCHAR(255)
-        * $column("password"): VARCHAR(255)
-          $column("discordID"): VARCHAR(255)
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $column("username") VARCHAR(255)
+        * $column("password") VARCHAR(255)
+          $column("discordID") VARCHAR(255)
     }
 
     $table("MindustryUserServerData") {
-        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
-        * $fk("mindustryUserID"): INTEGER
-        * $column("serverID"): VARCHAR(255)
-        * $column("xp"): INTEGER DEFAULT 0
-        * $column("playTime"): INTEGER DEFAULT 0
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $fk("mindustryUserID") INTEGER
+        * $column("serverID") VARCHAR(255)
+        * $column("xp") INTEGER DEFAULT 0
+        * $column("playTime") INTEGER DEFAULT 0
     }
 
     $table("MindustryUser") {
-        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
-          $fk("userID"): INTEGER
-        * $column("mindustryUUID"): VARCHAR(255) UNIQUE
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+          $fk("userID") INTEGER
+        * $column("mindustryUUID") VARCHAR(255) UNIQUE
     }
 
     $table("MindustryPlayerIPAddress") {
-        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
-        * $fk("mindustryPlayerID"): VARCHAR(255)
-        * $fk("ipAddress"): VARCHAR(255)
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $fk("mindustryPlayerID") VARCHAR(255)
+        * $fk("ipAddress") VARCHAR(255)
     }
 
     $table("IPAddress") {
-        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
-        * $column("ipAddress"): INTEGER UNIQUE
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $column("ipAddress") INTEGER UNIQUE
     }
 
     $table("UserKick") {
-        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
-        * $column("reason"): TEXT
-        * $column("kickedAt"): DATETIME
-        * $column("kickEndAt"): DATETIME
-          $fk("ipAddressID"): Integer
-          $fk("userID"): INTEGER
-          $fk("mindustryPlayerID"): INTEGER
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $column("reason") TEXT
+        * $column("kickedAt") DATETIME
+        * $column("kickEndAt") DATETIME
+          $fk("ipAddressID") Integer
+          $fk("userID") INTEGER
+          $fk("mindustryPlayerID") INTEGER
     }
 
     $table("UserBan") {
-        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
-        * $column("reason"): TEXT
-        * $column("bannedAt"): DATETIME
-          $fk("ipAddressID"): INTEGER
-          $fk("userID"): INTEGER
-          $fk("mindustryPlayerID"): INTEGER
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $column("reason") TEXT
+        * $column("bannedAt") DATETIME
+          $fk("ipAddressID") INTEGER
+          $fk("userID") INTEGER
+          $fk("mindustryPlayerID") INTEGER
     }
 
     Users::id --{ MindustryUser::userID
@@ -97,8 +97,13 @@ $schema("Users") {
 }
 
 $schema("GameHistory") {
-    $table("GamePlayer") {
-        * $pk("id"): INTEGER AUTOINCREMENT UNIQUE
+    $table("GameHistory") {
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $column("duration") INTEGER
+    }
+
+    $table("GameHistoryPlayer") {
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
     }
 }
 
