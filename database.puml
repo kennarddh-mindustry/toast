@@ -115,8 +115,6 @@ $schema("Map") {
         * $column("gameMode") ENUM
     }
 
-    MapGameMode::mapID }--|| Map::id
-
     $table("MapRating") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $fk("mapID") INTEGER
@@ -129,6 +127,8 @@ $schema("Map") {
     Map::submitterUserID ||--|| Users.Users::id
     MapRating::mapID }o--|| Map::id
     MapRating::userID |o--|| Users.Users::id
+
+    MapGameMode::mapID }--|| Map::id
 }
 
 $schema("GameHistory") {
