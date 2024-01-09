@@ -55,8 +55,8 @@ $schema("Users") {
 
     $table("MindustryPlayerIPAddress") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $fk("mindustryPlayerID") VARCHAR(255)
         * $fk("ipAddress") VARCHAR(255)
+        * $fk("mindustryPlayerID") VARCHAR(255)
     }
 
     $table("IPAddress") {
@@ -83,39 +83,81 @@ $schema("Users") {
           $fk("mindustryPlayerID") INTEGER
     }
 
-    Users::id ||--{ MindustryUser::userID
-    MindustryUserServerData::mindustryUserID ||--|| MindustryUser::id
+    Users::id ||--o{ MindustryUser::userID
+    MindustryUserServerData::mindustryUserID }--|| MindustryUser::id
 
     MindustryUser::id ||--{ MindustryPlayerIPAddress::mindustryPlayerID
     IPAddress::id ||--{ MindustryPlayerIPAddress::ipAddress
 
-    UserKick::ipAddressID ||--|| IPAddress::id
-    UserKick::userID ||--|| Users::id
-    UserKick::mindustryPlayerID ||--|| MindustryUser::id
-    UserBan::ipAddressID ||--|| IPAddress::id
-    UserBan::userID ||--|| Users::id
-    UserBan::mindustryPlayerID ||--|| MindustryUser::id
+    UserKick::ipAddressID }o--|| IPAddress::id
+    UserKick::userID }o--|| Users::id
+    UserKick::mindustryPlayerID }o--|| MindustryUser::id
+    UserBan::ipAddressID }o--|| IPAddress::id
+    UserBan::userID }o--|| Users::id
+    UserBan::mindustryPlayerID }o--|| MindustryUser::id
+}
+
+$schema("Map") {
+    $table("Map") {
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $column("name") VARCHAR(255)
+        * $column("description") TEXT
+        * $column("author") VARCHAR(255)
+        * $fk("submitterUserID") INTEGER
+        * $column("width") INTEGER
+        * $column("height") INTEGER
+        * $column("file") MEDIUMBLOB
+    }
+
+    $table("MapGameMode") {
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $fk("mapID") INTEGER
+        * $column("gameMode") ENUM
+    }
+
+    MapGameMode::mapID }--|| Map::id
+
+    $table("MapRating") {
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $fk("mapID") INTEGER
+        * $fk("userID") INTEGER
+        * $fk("gameHistoryID") INTEGER
+        * $column("rating") Integer
+        * $column("description") TEXT
+    }
+
+    Map::submitterUserID ||--|| Users.Users::id
+    MapRating::mapID }o--|| Map::id
+    MapRating::userID |o--|| Users.Users::id
 }
 
 $schema("GameHistory") {
     $table("GameHistory") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $column("duration") INTEGER
-        * $column("map") VARCHAR(255)
+        * $column("playTime") INTEGER
+        * $fk("mapID") INTEGER
+        * $column("gameModeID") VARCHAR(255)
+        * $column("serverID") VARCHAR(255)
         * $column("winnerTeam") VARCHAR(255)
+        * $column("unitsCreated") INTEGER
+        * $column("enemiesKilled") INTEGER
+        * $column("wavesLasted") INTEGER
+        * $column("buildingsConstructed") INTEGER
+        * $column("buildingsDeconstructed") INTEGER
+        * $column("buildingsDestroyed") INTEGER
     }
 
     $table("GameHistoryPlayer") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $fk("gameHistoryID") INTEGER
-        * $fk("userID") INTEGER --In seconds
+        * $fk("userID") INTEGER COMMENT In seconds
     }
 
-    GameHistoryPlayer::gameHistoryID }--|| GameHistory::id
-    GameHistoryPlayer::userID }--{ Users.Users::id
+    GameHistoryPlayer::gameHistoryID }o--|| GameHistory::id
+    GameHistoryPlayer::userID }o--|| Users.Users::id
+    GameHistory::mapID }o--|| Map.Map::id
 }
 
-$schema("Map") {
-}
+Map.MapRating::gameHistoryID }o--|| GameHistory.GameHistory::id
 
 @enduml
