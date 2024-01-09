@@ -35,6 +35,7 @@ $schema("Users") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $column("username") VARCHAR(255)
         * $column("password") VARCHAR(255)
+        * $column("role") ENUM
           $column("discordID") VARCHAR(255)
     }
 
@@ -112,6 +113,9 @@ $schema("GameHistory") {
 
     GameHistoryPlayer::gameHistoryID }--|| GameHistory::id
     GameHistoryPlayer::userID }--{ Users.Users::id
+}
+
+$schema("Map") {
 }
 
 @enduml
