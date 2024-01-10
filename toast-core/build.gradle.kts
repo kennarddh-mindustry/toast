@@ -5,6 +5,7 @@ import fr.xpdustry.toxopid.task.GithubArtifactDownload
 
 plugins {
     kotlin("jvm") version "1.9.10"
+    java
     `maven-publish`
     id("fr.xpdustry.toxopid") version "3.2.0"
 }
@@ -54,6 +55,11 @@ dependencies {
 
     implementation("org.mariadb.jdbc:mariadb-java-client:3.3.1")
     implementation("com.zaxxer:HikariCP:5.1.0")
+
+    implementation("org.apache.logging.log4j:log4j-api:2.22.1")
+    implementation("org.apache.logging.log4j:log4j-core:2.22.1")
+    implementation("org.slf4j:slf4j-api:2.0.10")
+    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.22.1")
 }
 
 kotlin {
