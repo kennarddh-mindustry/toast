@@ -55,11 +55,6 @@ dependencies {
 
     implementation("org.mariadb.jdbc:mariadb-java-client:3.3.1")
     implementation("com.zaxxer:HikariCP:5.1.0")
-
-    implementation("org.apache.logging.log4j:log4j-api:2.22.1")
-    implementation("org.apache.logging.log4j:log4j-core:2.22.1")
-    implementation("org.slf4j:slf4j-api:2.0.10")
-    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.22.1")
 }
 
 kotlin {
@@ -75,6 +70,7 @@ sourceSets {
 configurations.runtimeClasspath {
     exclude(group = "org.jetbrains.kotlin")
     exclude(group = "org.jetbrains.kotlinx")
+    exclude("org.slf4j")
 }
 
 tasks {
@@ -85,6 +81,10 @@ tasks {
             metadataFile.writeText(metadata.toJson(true))
 
             from(metadataFile)
+        }
+
+        manifest {
+            attributes(mapOf("Multi-Release" to "true"))
         }
 
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -100,6 +100,14 @@ val downloadKotlinRuntime =
         repo.set("kotlin-runtime")
         name.set("kotlin-runtime.jar")
         version.set("v3.1.0-k.1.9.10")
+    }
+
+val downloadDistributorCore =
+    tasks.register<GithubArtifactDownload>("downloadDistributor") {
+        user.set("xpdustry")
+        repo.set("distributor")
+        name.set("distributor-core.jar")
+        version.set("v3.3.0")
     }
 
 val downloadGenesisCore =
@@ -123,7 +131,15 @@ tasks.runMindustryServer {
     environment("DB_USERNAME", "root")
     environment("DB_PASSWORD", "root")
 
-    mods.setFrom(setOf(tasks.jar, downloadKotlinRuntime, downloadGenesisCore, downloadGenesisCommon))
+    mods.setFrom(
+        setOf(
+            tasks.jar,
+            downloadKotlinRuntime,
+            downloadDistributorCore,
+            downloadGenesisCore,
+            downloadGenesisCommon
+        )
+    )
 }
 
 publishing {
