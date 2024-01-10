@@ -53,6 +53,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
 
     implementation("org.mariadb.jdbc:mariadb-java-client:3.3.1")
+    implementation("com.zaxxer:HikariCP:5.1.0")
 }
 
 kotlin {
@@ -112,6 +113,10 @@ val downloadGenesisCommon =
     }
 
 tasks.runMindustryServer {
+    environment("DB_HOST", "jdbc:mariadb://localhost:3307/toast")
+    environment("DB_USERNAME", "root")
+    environment("DB_PASSWORD", "root")
+
     mods.setFrom(setOf(tasks.jar, downloadKotlinRuntime, downloadGenesisCore, downloadGenesisCommon))
 }
 
