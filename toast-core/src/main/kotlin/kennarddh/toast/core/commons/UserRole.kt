@@ -1,4 +1,4 @@
-package kennarddh.toast.core
+package kennarddh.toast.core.commons
 
 enum class UserRole(val id: String) {
     Owner("Owner"),
