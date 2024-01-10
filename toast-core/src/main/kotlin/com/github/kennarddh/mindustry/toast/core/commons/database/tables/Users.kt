@@ -1,6 +1,6 @@
-package kennarddh.toast.core.commons.database.tables
+package com.github.kennarddh.mindustry.toast.core.commons.database.tables
 
-import kennarddh.toast.core.commons.UserRole
+import com.github.kennarddh.mindustry.toast.core.commons.UserRole
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 

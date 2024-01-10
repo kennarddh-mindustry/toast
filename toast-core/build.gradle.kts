@@ -37,7 +37,7 @@ toxopid {
 
 val metadata = ModMetadata.fromJson(project.file("plugin.json"))
 
-project.group = "kennarddh"
+project.group = "com.github.kennarddh.mindustry"
 project.version = metadata.version
 
 val exposedVersion: String = "0.46.0"

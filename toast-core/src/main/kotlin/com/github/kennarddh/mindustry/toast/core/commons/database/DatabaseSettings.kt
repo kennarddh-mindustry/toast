@@ -1,4 +1,4 @@
-package kennarddh.toast.core.commons.database
+package com.github.kennarddh.mindustry.toast.core.commons.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource

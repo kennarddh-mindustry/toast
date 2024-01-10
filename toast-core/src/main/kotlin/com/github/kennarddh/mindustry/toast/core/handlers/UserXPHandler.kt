@@ -1,4 +1,4 @@
-package kennarddh.toast.core.handlers
+package com.github.kennarddh.mindustry.toast.core.handlers
 
 import kennarddh.genesis.core.events.annotations.EventHandler
 import kennarddh.genesis.core.handlers.Handler
