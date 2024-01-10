@@ -33,10 +33,10 @@ left to right direction
 $schema("Users") {
     $table("Users") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $column("username") VARCHAR(255)
+        * $column("username") VARCHAR(255) UNIQUE
         * $column("password") VARCHAR(255)
         * $column("role") ENUM
-          $column("discordID") VARCHAR(255)
+          $column("discordID") VARCHAR(255) UNIQUE
     }
 
     $table("MindustryUserServerData") {
