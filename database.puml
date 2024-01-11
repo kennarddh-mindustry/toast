@@ -33,7 +33,7 @@ left to right direction
 $schema("Users") {
     $table("Users") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $column("username") VARCHAR(255) UNIQUE
+        * $column("username") VARCHAR(50) UNIQUE
         * $column("password") VARCHAR(255)
         * $column("role") ENUM
           $column("discordID") VARCHAR(255) UNIQUE
@@ -55,8 +55,8 @@ $schema("Users") {
 
     $table("MindustryPlayerIPAddress") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $fk("ipAddress") VARCHAR(255)
-        * $fk("mindustryPlayerID") VARCHAR(255)
+        * $fk("ipAddress") INTEGER
+        * $fk("mindustryPlayerID") INTEGER
     }
 
     $table("IPAddress") {
@@ -100,9 +100,9 @@ $schema("Users") {
 $schema("Map") {
     $table("Map") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $column("name") VARCHAR(255)
+        * $column("name") VARCHAR(60)
         * $column("description") TEXT
-        * $column("author") VARCHAR(255)
+        * $column("author") VARCHAR(50)
         * $fk("submitterUserID") INTEGER
         * $column("width") INTEGER
         * $column("height") INTEGER
