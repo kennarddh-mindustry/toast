@@ -6,11 +6,6 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 object Users : IntIdTable() {
     val username = varchar("username", 50)
     val password = varchar("password", 255)
-    val role =
-        customEnumeration(
-            "role",
-            "ENUM(${UserRole.entries.joinToString(", ") { "'${it.id}'" }})",
-            { value -> UserRole.entries.find { it.id == value } as UserRole },
-            { it.id })
+    val role = enumerationByName<UserRole>("role", 100)
     val discordID = varchar("discordID", 255).nullable()
 }
