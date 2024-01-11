@@ -35,7 +35,7 @@ $schema("Users") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $column("username") VARCHAR(50) UNIQUE
         * $column("password") VARCHAR(255)
-        * $column("role") ENUM
+        * $column("role") VARCHAR(100)
           $column("discordID") VARCHAR(255) UNIQUE
     }
 
@@ -115,7 +115,7 @@ $schema("Map") {
     $table("MapGameMode") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $fk("mapID") INTEGER
-        * $column("gameMode") ENUM
+        * $column("gameMode") VARCHAR(100)
     }
 
     $table("MapRating") {
