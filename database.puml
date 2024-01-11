@@ -53,13 +53,13 @@ $schema("Users") {
         * $column("mindustryUUID") VARCHAR(255) UNIQUE
     }
 
-    $table("MindustryPlayerIPAddress") {
+    $table("MindustryUserIPAddresses") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $fk("ipAddress") INTEGER
-        * $fk("mindustryPlayerID") INTEGER
+        * $fk("mindustryUserID") INTEGER
     }
 
-    $table("IPAddress") {
+    $table("IPAddresses") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $column("ipAddress") INTEGER UNIQUE
     }
@@ -86,13 +86,13 @@ $schema("Users") {
     Users::id ||--o{ MindustryUser::userID
     MindustryUserServerData::mindustryUserID }--|| MindustryUser::id
 
-    MindustryUser::id ||--{ MindustryPlayerIPAddress::mindustryPlayerID
-    IPAddress::id ||--{ MindustryPlayerIPAddress::ipAddress
+    MindustryUser::id ||--{ MindustryUserIPAddresses::mindustryUserID
+    IPAddresses::id ||--{ MindustryUserIPAddresses::ipAddress
 
-    UserKick::ipAddressID }o--|| IPAddress::id
+    UserKick::ipAddressID }o--|| IPAddresses::id
     UserKick::userID }o--|| Users::id
     UserKick::mindustryPlayerID }o--|| MindustryUser::id
-    UserBan::ipAddressID }o--|| IPAddress::id
+    UserBan::ipAddressID }o--|| IPAddresses::id
     UserBan::userID }o--|| Users::id
     UserBan::mindustryPlayerID }o--|| MindustryUser::id
 }
@@ -125,7 +125,7 @@ $schema("Map") {
         * $column("description") TEXT
     }
 
-    Map::submitterUserID ||--|| Users.Users::id
+    Map::submitterUserID ||---|| Users.Users::id
     MapRating::mapID }o--|| Map::id
     MapRating::userID |o--|| Users.Users::id
 
