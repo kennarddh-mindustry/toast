@@ -55,7 +55,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao")
     implementation("org.jetbrains.exposed:exposed-jdbc")
 
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.3.1")
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.3.2")
     implementation("com.zaxxer:HikariCP:5.1.0")
 }
 
