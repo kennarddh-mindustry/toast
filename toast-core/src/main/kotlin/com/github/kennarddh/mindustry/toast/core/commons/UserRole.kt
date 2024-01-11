@@ -5,4 +5,5 @@ enum class UserRole(val id: String) {
     CoOwner("CoOwner"),
     Admin("Admin"),
     Mod("Mod"),
+    Player("Player"),
 }
