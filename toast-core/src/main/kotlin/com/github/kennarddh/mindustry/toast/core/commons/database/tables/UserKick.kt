@@ -8,7 +8,7 @@ object UserKick : IntIdTable() {
     val reason = text("reason")
     val kickedAt = datetime("kickedAt").defaultExpression(CurrentDateTime)
     val kickEndAt = datetime("kickEndAt")
-    val ipAddressID = reference("ipAddressID", IPAddresses)
-    val userID = reference("userID", Users)
-    val mindustryUserID = reference("mindustryUserID", MindustryUser)
+    val ipAddressID = reference("ipAddressID", IPAddresses).nullable()
+    val userID = reference("userID", Users).nullable()
+    val mindustryUserID = reference("mindustryUserID", MindustryUser).nullable()
 }
