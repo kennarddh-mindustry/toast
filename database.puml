@@ -107,6 +107,7 @@ $schema("Map") {
         * $column("width") INTEGER
         * $column("height") INTEGER
         * $column("file") MEDIUMBLOB
+          $column("archivedAt") DATETIME
     }
 
     $table("MapGameMode") {
