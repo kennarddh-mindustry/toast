@@ -71,7 +71,7 @@ $schema("Users") {
         * $column("kickEndAt") DATETIME
           $fk("ipAddressID") Integer
           $fk("userID") INTEGER
-          $fk("mindustryPlayerID") INTEGER
+          $fk("mindustryUserID") INTEGER
     }
 
     $table("UserBan") {
@@ -80,7 +80,7 @@ $schema("Users") {
         * $column("bannedAt") DATETIME
           $fk("ipAddressID") INTEGER
           $fk("userID") INTEGER
-          $fk("mindustryPlayerID") INTEGER
+          $fk("mindustryUserID") INTEGER
     }
 
     Users::id ||--o{ MindustryUser::userID
@@ -91,10 +91,10 @@ $schema("Users") {
 
     UserKick::ipAddressID }o--|| IPAddresses::id
     UserKick::userID }o--|| Users::id
-    UserKick::mindustryPlayerID }o--|| MindustryUser::id
+    UserKick::mindustryUserID }o--|| MindustryUser::id
     UserBan::ipAddressID }o--|| IPAddresses::id
     UserBan::userID }o--|| Users::id
-    UserBan::mindustryPlayerID }o--|| MindustryUser::id
+    UserBan::mindustryUserID }o--|| MindustryUser::id
 }
 
 $schema("Map") {
@@ -107,6 +107,8 @@ $schema("Map") {
         * $column("width") INTEGER
         * $column("height") INTEGER
         * $column("file") MEDIUMBLOB
+        * $column("createdAt") DATETIME
+        * $column("updatedAt") DATETIME
           $column("archivedAt") DATETIME
     }
 
@@ -135,6 +137,7 @@ $schema("Map") {
 $schema("GameHistory") {
     $table("GameHistory") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $column("createdAt") DATETIME
         * $column("playTime") INTEGER
         * $fk("mapID") INTEGER
         * $column("gameModeID") VARCHAR(255)
