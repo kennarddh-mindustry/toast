@@ -49,7 +49,7 @@ $schema("Users") {
 
     $table("MindustryUser") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-          $fk("userID") INTEGER
+        * $fk("userID") INTEGER
         * $column("mindustryUUID") VARCHAR(255) UNIQUE
     }
 
