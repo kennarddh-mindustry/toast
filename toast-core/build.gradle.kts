@@ -52,7 +52,6 @@ dependencies {
     implementation(platform("org.jetbrains.exposed:exposed-bom:0.46.0"))
     implementation("org.jetbrains.exposed:exposed-java-time")
     implementation("org.jetbrains.exposed:exposed-core")
-    implementation("org.jetbrains.exposed:exposed-dao")
     implementation("org.jetbrains.exposed:exposed-jdbc")
 
     implementation("org.mariadb.jdbc:mariadb-java-client:3.3.2")
