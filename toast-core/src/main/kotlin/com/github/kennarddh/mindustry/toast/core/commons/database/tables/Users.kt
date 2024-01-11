@@ -9,7 +9,7 @@ object Users : IntIdTable() {
     val role =
         customEnumeration(
             "role",
-            "ENUM(${UserRole.entries.joinToString(", ") { "'${it.id}'" }}",
+            "ENUM(${UserRole.entries.joinToString(", ") { "'${it.id}'" }})",
             { value -> UserRole.entries.find { it.id == value } as UserRole },
             { it.id })
     val discordID = varchar("discordID", 255).nullable()
