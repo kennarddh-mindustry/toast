@@ -49,9 +49,11 @@ dependencies {
     compileOnly("kennarddh:genesis-core:1.1.0")
     compileOnly("kennarddh:genesis-common:1.1.0")
 
-    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation(platform("org.jetbrains.exposed:exposed-bom:0.46.0"))
+    implementation("org.jetbrains.exposed:exposed-java-time")
+    implementation("org.jetbrains.exposed:exposed-core")
+    implementation("org.jetbrains.exposed:exposed-dao")
+    implementation("org.jetbrains.exposed:exposed-jdbc")
 
     implementation("org.mariadb.jdbc:mariadb-java-client:3.3.1")
     implementation("com.zaxxer:HikariCP:5.1.0")
