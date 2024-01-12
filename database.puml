@@ -49,7 +49,7 @@ $schema("Users") {
 
     $table("MindustryUser") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $fk("userID") INTEGER
+          $fk("userID") INTEGER
         * $column("mindustryUUID") VARCHAR(255) UNIQUE
     }
 
@@ -59,9 +59,20 @@ $schema("Users") {
         * $fk("mindustryUserID") INTEGER
     }
 
+    $table("MindustryUserMindustryNames") {
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $fk("mindustryNameID") INTEGER
+        * $fk("mindustryUserID") INTEGER
+    }
+
     $table("IPAddresses") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $column("ipAddress") INTEGER UNIQUE
+    }
+
+    $table("MindustryNames") {
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $column("name") VARCHAR(50) UNIQUE
     }
 
     $table("UserKick") {
@@ -72,6 +83,7 @@ $schema("Users") {
           $fk("ipAddressID") Integer
           $fk("userID") INTEGER
           $fk("mindustryUserID") INTEGER
+          $fk("mindustryNameID") INTEGER
     }
 
     $table("UserBan") {
@@ -81,6 +93,7 @@ $schema("Users") {
           $fk("ipAddressID") INTEGER
           $fk("userID") INTEGER
           $fk("mindustryUserID") INTEGER
+          $fk("mindustryNameID") INTEGER
     }
 
     Users::id ||--o{ MindustryUser::userID
@@ -88,13 +101,17 @@ $schema("Users") {
 
     MindustryUser::id ||--{ MindustryUserIPAddresses::mindustryUserID
     IPAddresses::id ||--{ MindustryUserIPAddresses::ipAddressID
+    MindustryUser::id ||--{ MindustryUserMindustryNames::mindustryUserID
+    MindustryNames::id ||--{ MindustryUserMindustryNames::mindustryNameID
 
     UserKick::ipAddressID }o--|| IPAddresses::id
     UserKick::userID }o--|| Users::id
     UserKick::mindustryUserID }o--|| MindustryUser::id
+    UserKick::mindustryNameID }o--|| MindustryNames::id
     UserBan::ipAddressID }o--|| IPAddresses::id
     UserBan::userID }o--|| Users::id
     UserBan::mindustryUserID }o--|| MindustryUser::id
+    UserBan::mindustryNameID }o--|| MindustryNames::id
 }
 
 $schema("Map") {
