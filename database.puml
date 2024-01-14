@@ -73,6 +73,7 @@ $schema("Users") {
     $table("MindustryNames") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $column("name") VARCHAR(50) UNIQUE
+        * $column("rawName") VARCHAR(50)
     }
 
     $table("UserKick") {
