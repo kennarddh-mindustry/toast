@@ -10,9 +10,11 @@ class DatabaseHandler : Handler() {
         transaction {
             SchemaUtils.createMissingTablesAndColumns(Users)
             SchemaUtils.createMissingTablesAndColumns(IPAddresses)
+            SchemaUtils.createMissingTablesAndColumns(MindustryNames)
             SchemaUtils.createMissingTablesAndColumns(MindustryUser)
             SchemaUtils.createMissingTablesAndColumns(MindustryUserServerData)
             SchemaUtils.createMissingTablesAndColumns(MindustryUserIPAddresses)
+            SchemaUtils.createMissingTablesAndColumns(MindustryUserMindustryNames)
             SchemaUtils.createMissingTablesAndColumns(UserKick)
             SchemaUtils.createMissingTablesAndColumns(UserBan)
         }
