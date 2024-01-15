@@ -24,15 +24,15 @@ class UserXPHandler : Handler() {
 
     @TimerTask(0f, 10f)
     private fun saveXPDelta() {
-        transaction {
-            playersActionsCounter.forEach {
-                // It's like this for easier change if later xp can be incremented in other places
-                if (it.value >= minActionsPerWindowTimeToGetXP)
-                    playersXPDelta[it.key] = playersXPDelta[it.key]!! + xpPerWindowTime
+        playersActionsCounter.forEach {
+            // It's like this for easier change if later xp can be incremented in other places
+            if (it.value >= minActionsPerWindowTimeToGetXP)
+                playersXPDelta[it.key] = playersXPDelta[it.key]!! + xpPerWindowTime
 
-                val xpDelta = playersXPDelta[it.key]!!
+            val xpDelta = playersXPDelta[it.key]!!
 
-                if (xpDelta != 0) {
+            if (xpDelta != 0) {
+                transaction {
                     MindustryUserServerData.join(
                         MindustryUser,
                         JoinType.INNER,
