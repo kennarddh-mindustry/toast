@@ -1,6 +1,7 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
 import arc.util.Strings
+import com.github.kennarddh.mindustry.toast.core.commons.Server
 import com.github.kennarddh.mindustry.toast.core.commons.UserRole
 import com.github.kennarddh.mindustry.toast.core.commons.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commons.packIP
@@ -83,6 +84,17 @@ class UserAccountHandler : Handler() {
                 MindustryUserMindustryNames.insertIgnore {
                     it[this.mindustryUserID] = mindustryUserID
                     it[this.mindustryNameID] = mindustryNameID
+                }
+            }
+
+            val mindustryUserServerData = MindustryUserServerData.selectAll().where {
+                MindustryUserServerData.mindustryUserID eq mindustryUserID
+            }.firstOrNull()
+
+            if (mindustryUserServerData == null) {
+                MindustryUserServerData.insertIgnore {
+                    it[this.mindustryUserID] = mindustryUserID
+                    it[this.server] = Server.Survival
                 }
             }
 
