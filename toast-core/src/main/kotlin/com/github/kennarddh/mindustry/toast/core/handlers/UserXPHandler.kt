@@ -45,6 +45,7 @@ class UserXPHandler : Handler() {
                     }
 
                     playersActionsCounter[it.key] = 0
+                    playersXPDelta[it.key] = 0
                 }
             }
         }
