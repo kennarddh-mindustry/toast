@@ -1,10 +1,16 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
+import com.github.kennarddh.mindustry.toast.core.commons.database.tables.MindustryUser
+import com.github.kennarddh.mindustry.toast.core.commons.database.tables.MindustryUserServerData
 import kennarddh.genesis.core.events.annotations.EventHandler
 import kennarddh.genesis.core.handlers.Handler
 import kennarddh.genesis.core.timers.annotations.TimerTask
 import mindustry.game.EventType
 import mindustry.gen.Player
+import org.jetbrains.exposed.sql.JoinType
+import org.jetbrains.exposed.sql.SqlExpressionBuilder
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 
 class UserXPHandler : Handler() {
     // Constants
@@ -18,13 +24,29 @@ class UserXPHandler : Handler() {
 
     @TimerTask(0f, 10f)
     private fun saveXPDelta() {
-        playersActionsCounter.forEach {
-            if (it.value >= minActionsPerWindowTimeToGetXP)
-                playersXPDelta[it.key] = playersXPDelta[it.key]!! + xpPerWindowTime
+        transaction {
+            playersActionsCounter.forEach {
+                // It's like this for easier change if later xp can be incremented in other places
+                if (it.value >= minActionsPerWindowTimeToGetXP)
+                    playersXPDelta[it.key] = playersXPDelta[it.key]!! + xpPerWindowTime
 
-            println("xp: ${playersXPDelta[it.key]}")
+                val xpDelta = playersXPDelta[it.key]!!
 
-            playersActionsCounter[it.key] = 0
+                if (xpDelta != 0) {
+                    MindustryUserServerData.join(
+                        MindustryUser,
+                        JoinType.INNER,
+                        onColumn = MindustryUserServerData.mindustryUserID,
+                        otherColumn = MindustryUser.id
+                    ).update({ MindustryUser.mindustryUUID eq it.key.uuid() }) {
+                        with(SqlExpressionBuilder) {
+                            it[MindustryUserServerData.xp] = MindustryUserServerData.xp + xpDelta
+                        }
+                    }
+
+                    playersActionsCounter[it.key] = 0
+                }
+            }
         }
     }
 
