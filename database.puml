@@ -45,6 +45,7 @@ $schema("Users") {
         * $column("serverID") VARCHAR(255)
         * $column("xp") INTEGER DEFAULT 0
         * $column("playTime") BIGINT DEFAULT 0
+        * $column("activePlayTime") BIGINT DEFAULT 0
     }
 
     $table("MindustryUser") {
@@ -156,7 +157,7 @@ $schema("GameHistory") {
     $table("GameHistory") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $column("createdAt") DATETIME
-        * $column("playTime") INTEGER
+        * $column("playTime") BIGINT
         * $fk("mapID") INTEGER
         * $column("gameModeID") VARCHAR(255)
         * $column("serverID") VARCHAR(255)
@@ -173,6 +174,8 @@ $schema("GameHistory") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $fk("gameHistoryID") INTEGER
         * $fk("userID") INTEGER COMMENT In seconds
+        * $column("playTime") BIGINT
+        * $column("activePlayTime") BIGINT
     }
 
     GameHistoryPlayer::gameHistoryID }o--|| GameHistory::id
