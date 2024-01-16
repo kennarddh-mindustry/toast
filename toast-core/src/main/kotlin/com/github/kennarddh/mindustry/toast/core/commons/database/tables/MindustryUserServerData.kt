@@ -8,4 +8,5 @@ object MindustryUserServerData : IntIdTable() {
     val server = enumerationByName<Server>("server", 255)
     val xp = integer("xp").default(0)
     val playTime = long("playTime").default(0)
+    val activePlayTime = long("activePlayTime").default(0)
 }
