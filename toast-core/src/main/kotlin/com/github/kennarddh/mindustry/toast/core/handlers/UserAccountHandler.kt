@@ -25,8 +25,8 @@ class UserAccountHandler : Handler() {
     private val registerMenu = Menus(
         mapOf
             (
-            "username" to Menu("Register 1/2", "Username", 50, "", false),
-            "password" to Menu("Register 2/2", "Password", 50, "", false)
+            "username" to Menu("Register 1/2", "Username", 50),
+            "password" to Menu("Register 2/2", "Password", 50)
         )
     )
 

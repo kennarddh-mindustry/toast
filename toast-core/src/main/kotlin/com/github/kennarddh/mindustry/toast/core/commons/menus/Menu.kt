@@ -8,7 +8,13 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class Menu(val title: String, val message: String, val maxLength: Int, val default: String, val numeric: Boolean) {
+class Menu(
+    val title: String,
+    val message: String,
+    val maxLength: Int,
+    val default: String = "",
+    val numeric: Boolean = false
+) {
     private val continuations: MutableMap<Player, Continuation<String?>> = mutableMapOf()
 
     val id: Int = Menus.registerTextInput { player: Player, text: String? ->
