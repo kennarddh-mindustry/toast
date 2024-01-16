@@ -40,6 +40,7 @@ class UserStatsHandler : Handler() {
                 playersXPDelta[it] = playersXPDelta[it]!! + xpPerWindowTime
 
             val xpDelta = playersXPDelta[it]!!
+            val isPlayerActive = xpDelta > 0
 
             transaction {
                 MindustryUserServerData.join(
@@ -51,6 +52,10 @@ class UserStatsHandler : Handler() {
                     with(SqlExpressionBuilder) {
                         it[MindustryUserServerData.xp] = MindustryUserServerData.xp + xpDelta
                         it[MindustryUserServerData.playTime] = MindustryUserServerData.playTime + playTimeChanges
+
+                        if (isPlayerActive)
+                            it[MindustryUserServerData.activePlayTime] =
+                                MindustryUserServerData.activePlayTime + playTimeChanges
                     }
                 }
 
