@@ -6,13 +6,16 @@ import kennarddh.genesis.core.events.annotations.EventHandler
 import kennarddh.genesis.core.handlers.Handler
 import kennarddh.genesis.core.timers.annotations.TimerTask
 import mindustry.game.EventType
+import mindustry.gen.Groups
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import java.time.Instant
 
-class UserXPHandler : Handler() {
+
+class UserStatsHandler : Handler() {
     // Constants
     private val minActionsPerWindowTimeToGetXP: Int = 30
     private val xpPerWindowTime: Int = 10
@@ -22,31 +25,38 @@ class UserXPHandler : Handler() {
     // Unsaved xp
     private val playersXPDelta: MutableMap<Player, Int> = mutableMapOf()
 
+    private val playersLastPlayTimeSave: MutableMap<Player, Long> = mutableMapOf()
+
     @TimerTask(0f, 10f)
-    private fun saveXPDelta() {
-        playersActionsCounter.forEach {
+    private fun savePlayerDelta() {
+        Groups.player.forEach {
+            val playerActionsCount = playersActionsCounter[it]!!
+            val lastPlayTimeSave = playersLastPlayTimeSave[it]!!
+            val now = Instant.now().toEpochMilli()
+            val playTimeChanges = now - lastPlayTimeSave
+
             // It's like this for easier change if later xp can be incremented in other places
-            if (it.value >= minActionsPerWindowTimeToGetXP)
-                playersXPDelta[it.key] = playersXPDelta[it.key]!! + xpPerWindowTime
+            if (playerActionsCount >= minActionsPerWindowTimeToGetXP)
+                playersXPDelta[it] = playersXPDelta[it]!! + xpPerWindowTime
 
-            val xpDelta = playersXPDelta[it.key]!!
+            val xpDelta = playersXPDelta[it]!!
 
-            if (xpDelta != 0) {
-                transaction {
-                    MindustryUserServerData.join(
-                        MindustryUser,
-                        JoinType.INNER,
-                        onColumn = MindustryUserServerData.mindustryUserID,
-                        otherColumn = MindustryUser.id
-                    ).update({ MindustryUser.mindustryUUID eq it.key.uuid() }) {
-                        with(SqlExpressionBuilder) {
-                            it[MindustryUserServerData.xp] = MindustryUserServerData.xp + xpDelta
-                        }
+            transaction {
+                MindustryUserServerData.join(
+                    MindustryUser,
+                    JoinType.INNER,
+                    onColumn = MindustryUserServerData.mindustryUserID,
+                    otherColumn = MindustryUser.id
+                ).update({ MindustryUser.mindustryUUID eq it.uuid() }) {
+                    with(SqlExpressionBuilder) {
+                        it[MindustryUserServerData.xp] = MindustryUserServerData.xp + xpDelta
+                        it[MindustryUserServerData.playTime] = MindustryUserServerData.playTime + playTimeChanges
                     }
-
-                    playersActionsCounter[it.key] = 0
-                    playersXPDelta[it.key] = 0
                 }
+
+                playersActionsCounter[it] = 0
+                playersXPDelta[it] = 0
+                playersLastPlayTimeSave[it] = now
             }
         }
     }
@@ -59,12 +69,16 @@ class UserXPHandler : Handler() {
     private fun onPlayerJoin(event: EventType.PlayerJoin) {
         playersActionsCounter[event.player] = 0
         playersXPDelta[event.player] = 0
+
+        playersLastPlayTimeSave[event.player] = Instant.now().toEpochMilli()
     }
 
     @EventHandler
     private fun onPlayerLeave(event: EventType.PlayerLeave) {
         playersActionsCounter.remove(event.player)
         playersXPDelta.remove(event.player)
+
+        playersLastPlayTimeSave.remove(event.player)
     }
 
     /**
