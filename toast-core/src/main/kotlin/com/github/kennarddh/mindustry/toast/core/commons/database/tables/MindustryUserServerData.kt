@@ -7,5 +7,5 @@ object MindustryUserServerData : IntIdTable() {
     val mindustryUserID = reference("mindustryUserID", MindustryUser)
     val server = enumerationByName<Server>("server", 255)
     val xp = integer("xp").default(0)
-    val playTime = integer("playTime").default(0)
+    val playTime = long("playTime").default(0)
 }

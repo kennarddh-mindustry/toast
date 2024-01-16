@@ -44,7 +44,7 @@ $schema("Users") {
         * $fk("mindustryUserID") INTEGER
         * $column("serverID") VARCHAR(255)
         * $column("xp") INTEGER DEFAULT 0
-        * $column("playTime") INTEGER DEFAULT 0
+        * $column("playTime") BIGINT DEFAULT 0
     }
 
     $table("MindustryUser") {
