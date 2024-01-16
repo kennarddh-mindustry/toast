@@ -1,15 +1,19 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
+import arc.util.Log
 import arc.util.Strings
+import com.github.kennarddh.mindustry.toast.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.core.commons.Server
 import com.github.kennarddh.mindustry.toast.core.commons.UserRole
 import com.github.kennarddh.mindustry.toast.core.commons.database.tables.*
+import com.github.kennarddh.mindustry.toast.core.commons.menus.Menu
+import com.github.kennarddh.mindustry.toast.core.commons.menus.Menus
 import com.github.kennarddh.mindustry.toast.core.commons.packIP
 import kennarddh.genesis.core.commands.annotations.ClientSide
 import kennarddh.genesis.core.commands.annotations.Command
-import kennarddh.genesis.core.commands.result.CommandResult
 import kennarddh.genesis.core.events.annotations.EventHandler
 import kennarddh.genesis.core.handlers.Handler
+import kotlinx.coroutines.launch
 import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -18,6 +22,14 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserAccountHandler : Handler() {
+    private val registerMenu = Menus(
+        mapOf
+            (
+            "username" to Menu("Register 1/2", "Username", 50, "", false),
+            "password" to Menu("Register 2/2", "Password", 50, "", false)
+        )
+    )
+
     @EventHandler
     fun onPlayerJoin(event: EventType.PlayerJoin) {
         val player = event.player
@@ -121,7 +133,11 @@ class UserAccountHandler : Handler() {
 
     @Command(["register"])
     @ClientSide
-    fun register(player: Player): CommandResult {
-        return CommandResult("Test ${player.admin}")
+    fun register(player: Player) {
+        CoroutineScopes.Main.launch {
+            val output = registerMenu.open(player)
+
+            Log.info("Done register $output")
+        }
     }
 }
