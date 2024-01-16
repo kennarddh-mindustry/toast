@@ -56,6 +56,8 @@ dependencies {
 
     implementation("org.mariadb.jdbc:mariadb-java-client:3.3.2")
     implementation("com.zaxxer:HikariCP:5.1.0")
+
+    implementation("at.favre.lib:bcrypt:0.10.2")
 }
 
 kotlin {
