@@ -184,7 +184,7 @@ class UserAccountHandler : Handler() {
             val password = output["password"]!!
 
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                val mindustryUser = Users.selectOne { MindustryUser.mindustryUUID eq player.uuid() }!!
+                val mindustryUser = MindustryUser.selectOne { MindustryUser.mindustryUUID eq player.uuid() }!!
 
                 if (mindustryUser[MindustryUser.userID] != null)
                     return@newSuspendedTransaction player.infoMessage(
