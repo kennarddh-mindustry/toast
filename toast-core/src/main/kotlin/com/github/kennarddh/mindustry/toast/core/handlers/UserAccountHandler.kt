@@ -5,8 +5,11 @@ import com.github.kennarddh.mindustry.toast.core.commons.*
 import com.github.kennarddh.mindustry.toast.core.commons.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commons.menus.Menu
 import com.github.kennarddh.mindustry.toast.core.commons.menus.Menus
+import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SaltGenerator
+import com.password4j.SecureString
+import com.password4j.types.Argon2
 import kennarddh.genesis.core.commands.annotations.ClientSide
 import kennarddh.genesis.core.commands.annotations.Command
 import kennarddh.genesis.core.events.annotations.EventHandler
@@ -21,6 +24,10 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.jetbrains.exposed.sql.update
 
 class UserAccountHandler : Handler() {
+    private val argon2FunctionInstance = Argon2Function.getInstance(
+        15360, 6, 2, 64, Argon2.ID
+    )
+
     private val registerMenu = Menus(
         mapOf
             (
@@ -156,7 +163,9 @@ class UserAccountHandler : Handler() {
                         "[#ff0000]Your username is already taken."
                     )
 
-                val hashedPassword = Password.hash(password).addSalt(SaltGenerator.generate(64)).withArgon2()
+                val hashedPassword =
+                    Password.hash(SecureString(password.toCharArray())).addSalt(SaltGenerator.generate(64))
+                        .with(argon2FunctionInstance)
 
                 Users.insertIgnore {
                     it[this.username] = username
@@ -196,7 +205,8 @@ class UserAccountHandler : Handler() {
                         "[#ff0000]User not found."
                     )
 
-                if (!Password.check(password, user[Users.password]).withArgon2())
+                if (!Password.check(password, user[Users.password]).with(argon2FunctionInstance)
+                )
                     return@newSuspendedTransaction player.infoMessage(
                         "[#ff0000]Wrong password."
                     )
