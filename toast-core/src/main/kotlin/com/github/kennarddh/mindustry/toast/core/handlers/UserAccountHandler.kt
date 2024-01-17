@@ -152,7 +152,7 @@ class UserAccountHandler : Handler() {
                 }
 
                 // TODO: Genesis should still can respond even if it's like this can't return value
-                player.sendMessage("[#00ff00]Register success")
+                player.sendMessage("[#00ff00]Register success. Login with /login to use your account.")
             }
         }
     }
