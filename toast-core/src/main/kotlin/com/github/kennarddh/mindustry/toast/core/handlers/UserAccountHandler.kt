@@ -23,8 +23,9 @@ class UserAccountHandler : Handler() {
     private val registerMenu = Menus(
         mapOf
             (
-            "username" to Menu("Register 1/2", "Username", 50),
-            "password" to Menu("Register 2/2", "Password", 50)
+            "username" to Menu("Register 1/3", "Username", 50),
+            "password" to Menu("Register 2/3", "Password", 50),
+            "confirmPassword" to Menu("Register 3/3", "Confirm Password", 50)
         )
     )
 
@@ -127,10 +128,14 @@ class UserAccountHandler : Handler() {
     @ClientSide
     fun register(player: Player) {
         CoroutineScopes.Main.launch {
-            val output = registerMenu.open(player) ?: return@launch
+            val output = registerMenu.open(player)
+                ?: return@launch player.sendMessage("[#00ff00]Register canceled.")
 
             val username = output["username"]!!
             val password = output["password"]!!
+            val confirmPassword = output["confirmPassword"]!!
+
+            if (confirmPassword != password) return@launch player.sendMessage("[#00ff00]Confirm password is not same as password.")
 
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
                 if (Users.exists { Users.username eq username })
