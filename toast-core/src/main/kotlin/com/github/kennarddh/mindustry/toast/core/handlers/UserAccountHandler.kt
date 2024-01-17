@@ -18,6 +18,7 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.jetbrains.exposed.sql.update
 
 class UserAccountHandler : Handler() {
     private val registerMenu = Menus(
@@ -165,6 +166,47 @@ class UserAccountHandler : Handler() {
 
                 player.infoMessage(
                     "[#00ff00]Register success. Login with /login to use your account."
+                )
+            }
+        }
+    }
+
+    @Command(["login"])
+    @ClientSide
+    fun login(player: Player) {
+        CoroutineScopes.Main.launch {
+            val output = loginMenu.open(player)
+                ?: return@launch player.infoMessage(
+                    "[#ff0000]Login canceled."
+                )
+
+            val username = output["username"]!!
+            val password = output["password"]!!
+
+            newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                val mindustryUser = Users.selectOne { MindustryUser.mindustryUUID eq player.uuid() }!!
+
+                if (mindustryUser[MindustryUser.userID] != null)
+                    return@newSuspendedTransaction player.infoMessage(
+                        "[#ff0000]You are already registered."
+                    )
+
+                val user = Users.selectOne { Users.username eq username }
+                    ?: return@newSuspendedTransaction player.infoMessage(
+                        "[#ff0000]User not found."
+                    )
+
+                if (!Password.check(password, user[Users.password]).withArgon2())
+                    return@newSuspendedTransaction player.infoMessage(
+                        "[#ff0000]Wrong password."
+                    )
+
+                MindustryUser.update({ MindustryUser.mindustryUUID eq player.uuid() }) {
+                    it[userID] = user[Users.id]
+                }
+
+                player.infoMessage(
+                    "[#00ff00]Login success. You are now logged in as ${user[Users.username]}."
                 )
             }
         }
