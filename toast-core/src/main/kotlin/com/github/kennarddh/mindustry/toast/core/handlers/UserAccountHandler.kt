@@ -194,7 +194,7 @@ class UserAccountHandler : Handler() {
 
                 if (mindustryUser[MindustryUser.userID] != null)
                     return@newSuspendedTransaction player.infoMessage(
-                        "[#ff0000]You are already registered."
+                        "[#ff0000]You are already logged in."
                     )
 
                 val user = Users.selectOne { Users.username eq username }
