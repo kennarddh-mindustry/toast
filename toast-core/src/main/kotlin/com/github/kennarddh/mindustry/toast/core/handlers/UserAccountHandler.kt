@@ -13,7 +13,6 @@ import kennarddh.genesis.core.events.annotations.EventHandler
 import kennarddh.genesis.core.handlers.Handler
 import kotlinx.coroutines.launch
 import mindustry.game.EventType
-import mindustry.gen.Call
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.insertIgnore
@@ -130,8 +129,7 @@ class UserAccountHandler : Handler() {
     fun register(player: Player) {
         CoroutineScopes.Main.launch {
             val output = registerMenu.open(player)
-                ?: return@launch Call.infoMessage(
-                    player.con,
+                ?: return@launch player.infoMessage(
                     "[#ff0000]Register canceled."
                 )
 
@@ -139,15 +137,13 @@ class UserAccountHandler : Handler() {
             val password = output["password"]!!
             val confirmPassword = output["confirmPassword"]!!
 
-            if (confirmPassword != password) return@launch Call.infoMessage(
-                player.con,
+            if (confirmPassword != password) return@launch player.infoMessage(
                 "[#ff0000]Confirm password is not same as password."
             )
 
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
                 if (Users.exists { Users.username eq username })
-                    return@newSuspendedTransaction Call.infoMessage(
-                        player.con,
+                    return@newSuspendedTransaction player.infoMessage(
                         "[#ff0000]Your username is already taken."
                     )
 
@@ -159,8 +155,7 @@ class UserAccountHandler : Handler() {
                     it[this.role] = UserRole.Player
                 }
 
-                Call.infoMessage(
-                    player.con,
+                player.infoMessage(
                     "[#00ff00]Register success. Login with /login to use your account."
                 )
             }
