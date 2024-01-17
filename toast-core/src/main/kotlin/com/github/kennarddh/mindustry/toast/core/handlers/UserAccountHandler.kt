@@ -29,6 +29,14 @@ class UserAccountHandler : Handler() {
         )
     )
 
+    private val loginMenu = Menus(
+        mapOf
+            (
+            "username" to Menu("Register 1/3", "Username", 50),
+            "password" to Menu("Register 2/3", "Password", 50),
+        )
+    )
+
     @EventHandler
     fun onPlayerJoin(event: EventType.PlayerJoin) {
         val player = event.player
