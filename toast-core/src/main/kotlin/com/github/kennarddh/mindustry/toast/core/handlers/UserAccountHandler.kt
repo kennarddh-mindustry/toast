@@ -17,11 +17,8 @@ import kennarddh.genesis.core.handlers.Handler
 import kotlinx.coroutines.launch
 import mindustry.game.EventType
 import mindustry.gen.Player
-import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.insertIgnore
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
-import org.jetbrains.exposed.sql.update
 
 class UserAccountHandler : Handler() {
     private val argon2FunctionInstance = Argon2Function.getInstance(
@@ -217,6 +214,31 @@ class UserAccountHandler : Handler() {
 
                 player.infoMessage(
                     "[#00ff00]Login success. You are now logged in as ${user[Users.username]}."
+                )
+            }
+        }
+    }
+
+    @Command(["logout"])
+    @ClientSide
+    fun logout(player: Player) {
+        CoroutineScopes.Main.launch {
+            newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                val user =
+                    MindustryUser.join(Users, JoinType.INNER, MindustryUser.userID, Users.id)
+                        .selectOne { MindustryUser.mindustryUUID eq player.uuid() }!!
+
+                if (user[MindustryUser.userID] == null)
+                    return@newSuspendedTransaction player.infoMessage(
+                        "[#ff0000]You are not logged in."
+                    )
+
+                MindustryUser.update({ MindustryUser.id eq user[MindustryUser.id] }) {
+                    it[userID] = null
+                }
+
+                player.infoMessage(
+                    "[#00ff00]Logout success. You are now no longer logged in as ${user[Users.username]}."
                 )
             }
         }
