@@ -11,15 +11,29 @@ class Menus(private val menus: Map<String, Menu>) {
         }
     }
 
-    suspend fun open(player: Player): Map<String, String?> {
+    suspend fun open(player: Player): Map<String, String?>? {
         val output: MutableMap<String, String?> = mutableMapOf()
 
-        for ((menuID, menu) in menus) {
+        var currentMenuIndex = 0
+
+        while (true) {
+            if (currentMenuIndex >= menus.size) return output
+
+            val menuID = menus.keys.elementAt(currentMenuIndex)
+            val menu = menus[menuID]!!
+
             val value = menu.open(player)
 
-            output[menuID] = value
-        }
+            if (value == null) {
+                currentMenuIndex -= 1
 
-        return output
+                if (currentMenuIndex < 0)
+                    return null
+            } else {
+                output[menuID] = value
+
+                currentMenuIndex += 1
+            }
+        }
     }
 }

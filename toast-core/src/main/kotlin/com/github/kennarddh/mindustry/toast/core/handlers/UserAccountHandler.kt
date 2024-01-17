@@ -127,7 +127,7 @@ class UserAccountHandler : Handler() {
     @ClientSide
     fun register(player: Player) {
         CoroutineScopes.Main.launch {
-            val output = registerMenu.open(player)
+            val output = registerMenu.open(player) ?: return@launch
 
             val username = output["username"]!!
             val password = output["password"]!!
