@@ -1,14 +1,12 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
 import arc.util.Strings
-import at.favre.lib.crypto.bcrypt.BCrypt
-import com.github.kennarddh.mindustry.toast.core.commons.CoroutineScopes
-import com.github.kennarddh.mindustry.toast.core.commons.Server
-import com.github.kennarddh.mindustry.toast.core.commons.UserRole
+import com.github.kennarddh.mindustry.toast.core.commons.*
 import com.github.kennarddh.mindustry.toast.core.commons.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commons.menus.Menu
 import com.github.kennarddh.mindustry.toast.core.commons.menus.Menus
-import com.github.kennarddh.mindustry.toast.core.commons.packIP
+import com.password4j.Password
+import com.password4j.SaltGenerator
 import kennarddh.genesis.core.commands.annotations.ClientSide
 import kennarddh.genesis.core.commands.annotations.Command
 import kennarddh.genesis.core.events.annotations.EventHandler
@@ -20,7 +18,6 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
-import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserAccountHandler : Handler() {
@@ -142,26 +139,20 @@ class UserAccountHandler : Handler() {
             val username = output["username"]!!
             val password = output["password"]!!
 
-            val checkUser = suspendedTransactionAsync(CoroutineScopes.IO.coroutineContext) {
-                Users.selectAll().where {
-                    Users.username eq username
-                }.firstOrNull()
-            }
-
-            if (checkUser.await() == null) return@launch
-
-            val hashedPassword = BCrypt.withDefaults().hashToString(6, password.toCharArray())
-
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                if (Users.exists { Users.username eq username }) return@newSuspendedTransaction
+
+                val hashedPassword = Password.hash(password).addSalt(SaltGenerator.generate(64)).withArgon2()
+
                 Users.insertIgnore {
                     it[this.username] = username
-                    it[this.password] = hashedPassword
+                    it[this.password] = hashedPassword.result
                     it[this.role] = UserRole.Player
                 }
-            }
 
-            // TODO: Genesis should still can respond even if it's like this can't return value
-            player.sendMessage("[#00ff00]Register success")
+                // TODO: Genesis should still can respond even if it's like this can't return value
+                player.sendMessage("[#00ff00]Register success")
+            }
         }
     }
 }
