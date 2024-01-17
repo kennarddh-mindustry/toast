@@ -40,8 +40,8 @@ class UserAccountHandler : Handler() {
     private val loginMenu = Menus(
         mapOf
             (
-            "username" to Menu("Register 1/3", "Username", 50),
-            "password" to Menu("Register 2/3", "Password", 50),
+            "username" to Menu("Login 1/2", "Username", 50),
+            "password" to Menu("Login 2/2", "Password", 50),
         )
     )
 
