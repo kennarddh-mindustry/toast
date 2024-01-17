@@ -61,9 +61,9 @@ class UserAccountHandler : Handler() {
                 ipAddress[IPAddresses.id]
             }
 
-            val mindustryName = MindustryNames.selectAll().where {
+            val mindustryName = MindustryNames.selectOne {
                 MindustryNames.name eq name
-            }.firstOrNull()
+            }
 
             val mindustryNameID = if (mindustryName == null) {
                 MindustryNames.insertAndGetId {
