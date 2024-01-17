@@ -140,7 +140,8 @@ class UserAccountHandler : Handler() {
             val password = output["password"]!!
 
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                if (Users.exists { Users.username eq username }) return@newSuspendedTransaction
+                if (Users.exists { Users.username eq username })
+                    return@newSuspendedTransaction player.sendMessage("[#ff0000]Your username is already taken.")
 
                 val hashedPassword = Password.hash(password).addSalt(SaltGenerator.generate(64)).withArgon2()
 
