@@ -74,35 +74,27 @@ class UserAccountHandler : Handler() {
                 mindustryName[MindustryNames.id]
             }
 
-            val mindustryUserIPAddresses = MindustryUserIPAddresses.selectAll().where {
-                MindustryUserIPAddresses.mindustryUserID eq mindustryUserID
-                MindustryUserIPAddresses.ipAddressID eq ipAddressID
-            }.firstOrNull()
-
-            if (mindustryUserIPAddresses == null) {
+            if (!MindustryUserIPAddresses.exists {
+                    MindustryUserIPAddresses.mindustryUserID eq mindustryUserID
+                    MindustryUserIPAddresses.ipAddressID eq ipAddressID
+                }) {
                 MindustryUserIPAddresses.insertIgnore {
                     it[this.mindustryUserID] = mindustryUserID
                     it[this.ipAddressID] = ipAddressID
                 }
             }
 
-            val mindustryUserMindustryNames = MindustryUserMindustryNames.selectAll().where {
-                MindustryUserMindustryNames.mindustryUserID eq mindustryUserID
-                MindustryUserMindustryNames.mindustryNameID eq mindustryNameID
-            }.firstOrNull()
-
-            if (mindustryUserMindustryNames == null) {
+            if (!MindustryUserMindustryNames.exists {
+                    MindustryUserMindustryNames.mindustryUserID eq mindustryUserID
+                    MindustryUserMindustryNames.mindustryNameID eq mindustryNameID
+                }) {
                 MindustryUserMindustryNames.insertIgnore {
                     it[this.mindustryUserID] = mindustryUserID
                     it[this.mindustryNameID] = mindustryNameID
                 }
             }
 
-            val mindustryUserServerData = MindustryUserServerData.selectAll().where {
-                MindustryUserServerData.mindustryUserID eq mindustryUserID
-            }.firstOrNull()
-
-            if (mindustryUserServerData == null) {
+            if (!MindustryUserServerData.exists { MindustryUserServerData.mindustryUserID eq mindustryUserID }) {
                 MindustryUserServerData.insertIgnore {
                     it[this.mindustryUserID] = mindustryUserID
                     it[this.server] = Server.Survival
