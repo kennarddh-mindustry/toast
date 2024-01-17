@@ -13,6 +13,7 @@ import kennarddh.genesis.core.events.annotations.EventHandler
 import kennarddh.genesis.core.handlers.Handler
 import kotlinx.coroutines.launch
 import mindustry.game.EventType
+import mindustry.gen.Call
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.insertIgnore
@@ -129,17 +130,26 @@ class UserAccountHandler : Handler() {
     fun register(player: Player) {
         CoroutineScopes.Main.launch {
             val output = registerMenu.open(player)
-                ?: return@launch player.sendMessage("[#00ff00]Register canceled.")
+                ?: return@launch Call.infoMessage(
+                    player.con,
+                    "[#ff0000]Register canceled."
+                )
 
             val username = output["username"]!!
             val password = output["password"]!!
             val confirmPassword = output["confirmPassword"]!!
 
-            if (confirmPassword != password) return@launch player.sendMessage("[#00ff00]Confirm password is not same as password.")
+            if (confirmPassword != password) return@launch Call.infoMessage(
+                player.con,
+                "[#ff0000]Confirm password is not same as password."
+            )
 
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
                 if (Users.exists { Users.username eq username })
-                    return@newSuspendedTransaction player.sendMessage("[#ff0000]Your username is already taken.")
+                    return@newSuspendedTransaction Call.infoMessage(
+                        player.con,
+                        "[#ff0000]Your username is already taken."
+                    )
 
                 val hashedPassword = Password.hash(password).addSalt(SaltGenerator.generate(64)).withArgon2()
 
@@ -149,8 +159,10 @@ class UserAccountHandler : Handler() {
                     it[this.role] = UserRole.Player
                 }
 
-                // TODO: Genesis should still can respond even if it's like this can't return value
-                player.sendMessage("[#00ff00]Register success. Login with /login to use your account.")
+                Call.infoMessage(
+                    player.con,
+                    "[#00ff00]Register success. Login with /login to use your account."
+                )
             }
         }
     }
