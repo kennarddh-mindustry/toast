@@ -18,7 +18,6 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
-import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserAccountHandler : Handler() {
     private val registerMenu = Menus(
@@ -36,87 +35,89 @@ class UserAccountHandler : Handler() {
         val name = player.name
         val strippedName = Strings.stripColors(name)
 
-        transaction {
-            val mindustryUser = MindustryUser.selectAll().where {
-                MindustryUser.mindustryUUID eq player.uuid()
-            }.firstOrNull()
+        CoroutineScopes.Main.launch {
+            newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                val mindustryUser = MindustryUser.selectAll().where {
+                    MindustryUser.mindustryUUID eq player.uuid()
+                }.firstOrNull()
 
-            val mindustryUserID = if (mindustryUser == null) {
-                MindustryUser.insertAndGetId {
-                    it[this.mindustryUUID] = player.uuid()
+                val mindustryUserID = if (mindustryUser == null) {
+                    MindustryUser.insertAndGetId {
+                        it[this.mindustryUUID] = player.uuid()
+                    }
+                } else {
+                    mindustryUser[MindustryUser.id]
                 }
-            } else {
-                mindustryUser[MindustryUser.id]
-            }
 
-            val ipAddress = IPAddresses.selectAll().where {
-                IPAddresses.ipAddress eq ip
-            }.firstOrNull()
+                val ipAddress = IPAddresses.selectAll().where {
+                    IPAddresses.ipAddress eq ip
+                }.firstOrNull()
 
-            val ipAddressID = if (ipAddress == null) {
-                IPAddresses.insertAndGetId {
-                    it[this.ipAddress] = ip
+                val ipAddressID = if (ipAddress == null) {
+                    IPAddresses.insertAndGetId {
+                        it[this.ipAddress] = ip
+                    }
+                } else {
+                    ipAddress[IPAddresses.id]
                 }
-            } else {
-                ipAddress[IPAddresses.id]
-            }
 
-            val mindustryName = MindustryNames.selectOne {
-                MindustryNames.name eq name
-            }
-
-            val mindustryNameID = if (mindustryName == null) {
-                MindustryNames.insertAndGetId {
-                    it[this.name] = name
-                    it[this.strippedName] = strippedName
+                val mindustryName = MindustryNames.selectOne {
+                    MindustryNames.name eq name
                 }
-            } else {
-                mindustryName[MindustryNames.id]
-            }
 
-            if (!MindustryUserIPAddresses.exists {
-                    MindustryUserIPAddresses.mindustryUserID eq mindustryUserID
-                    MindustryUserIPAddresses.ipAddressID eq ipAddressID
-                }) {
-                MindustryUserIPAddresses.insertIgnore {
-                    it[this.mindustryUserID] = mindustryUserID
-                    it[this.ipAddressID] = ipAddressID
+                val mindustryNameID = if (mindustryName == null) {
+                    MindustryNames.insertAndGetId {
+                        it[this.name] = name
+                        it[this.strippedName] = strippedName
+                    }
+                } else {
+                    mindustryName[MindustryNames.id]
                 }
-            }
 
-            if (!MindustryUserMindustryNames.exists {
-                    MindustryUserMindustryNames.mindustryUserID eq mindustryUserID
-                    MindustryUserMindustryNames.mindustryNameID eq mindustryNameID
-                }) {
-                MindustryUserMindustryNames.insertIgnore {
-                    it[this.mindustryUserID] = mindustryUserID
-                    it[this.mindustryNameID] = mindustryNameID
+                if (!MindustryUserIPAddresses.exists {
+                        MindustryUserIPAddresses.mindustryUserID eq mindustryUserID
+                        MindustryUserIPAddresses.ipAddressID eq ipAddressID
+                    }) {
+                    MindustryUserIPAddresses.insertIgnore {
+                        it[this.mindustryUserID] = mindustryUserID
+                        it[this.ipAddressID] = ipAddressID
+                    }
                 }
-            }
 
-            if (!MindustryUserServerData.exists { MindustryUserServerData.mindustryUserID eq mindustryUserID }) {
-                MindustryUserServerData.insertIgnore {
-                    it[this.mindustryUserID] = mindustryUserID
-                    it[this.server] = Server.Survival
+                if (!MindustryUserMindustryNames.exists {
+                        MindustryUserMindustryNames.mindustryUserID eq mindustryUserID
+                        MindustryUserMindustryNames.mindustryNameID eq mindustryNameID
+                    }) {
+                    MindustryUserMindustryNames.insertIgnore {
+                        it[this.mindustryUserID] = mindustryUserID
+                        it[this.mindustryNameID] = mindustryNameID
+                    }
                 }
-            }
 
-            // TODO: Check for kick and ban
+                if (!MindustryUserServerData.exists { MindustryUserServerData.mindustryUserID eq mindustryUserID }) {
+                    MindustryUserServerData.insertIgnore {
+                        it[this.mindustryUserID] = mindustryUserID
+                        it[this.server] = Server.Survival
+                    }
+                }
 
-            val userID = mindustryUser?.get(MindustryUser.userID)
+                // TODO: Check for kick and ban
 
-            if (userID != null) {
-                val user = Users.selectAll().where {
-                    Users.id eq userID
-                }.first()
+                val userID = mindustryUser?.get(MindustryUser.userID)
 
-                // TODO: Handle more role
-                when (user[Users.role]) {
-                    UserRole.Owner -> player.admin = true
-                    UserRole.CoOwner -> player.admin = true
-                    UserRole.Admin -> player.admin = true
-                    UserRole.Mod -> TODO()
-                    UserRole.Player -> Unit
+                if (userID != null) {
+                    val user = Users.selectAll().where {
+                        Users.id eq userID
+                    }.first()
+
+                    // TODO: Handle more role
+                    when (user[Users.role]) {
+                        UserRole.Owner -> player.admin = true
+                        UserRole.CoOwner -> player.admin = true
+                        UserRole.Admin -> player.admin = true
+                        UserRole.Mod -> TODO()
+                        UserRole.Player -> Unit
+                    }
                 }
             }
         }
