@@ -91,7 +91,7 @@ class UserStatsHandler : Handler() {
 
             player.infoPopup(
                 "XP: ${xp}\nRank: Duo 1\nPlay Time: ${playTimeMillis / 1000}s",
-                Float.MAX_VALUE, Align.topRight, 200, 0, 0, 10
+                10.5f, Align.topRight, 200, 0, 0, 10
             )
         }
     }
