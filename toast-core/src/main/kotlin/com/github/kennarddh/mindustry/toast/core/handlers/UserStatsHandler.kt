@@ -1,16 +1,21 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
+import arc.util.Align
+import com.github.kennarddh.mindustry.toast.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.core.commons.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.core.commons.database.tables.MindustryUserServerData
+import com.github.kennarddh.mindustry.toast.core.commons.infoPopup
+import com.github.kennarddh.mindustry.toast.core.commons.selectOne
 import kennarddh.genesis.core.events.annotations.EventHandler
 import kennarddh.genesis.core.handlers.Handler
 import kennarddh.genesis.core.timers.annotations.TimerTask
+import kotlinx.coroutines.launch
 import mindustry.game.EventType
 import mindustry.gen.Groups
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
 import java.time.Instant
 
@@ -32,6 +37,7 @@ class UserStatsHandler : Handler() {
         Groups.player.forEach {
             val playerActionsCount = playersActionsCounter[it]!!
             val lastPlayTimeSave = playersLastPlayTimeSave[it]!!
+
             val now = Instant.now().toEpochMilli()
             val playTimeChanges = now - lastPlayTimeSave
 
@@ -42,27 +48,51 @@ class UserStatsHandler : Handler() {
             val xpDelta = playersXPDelta[it]!!
             val isPlayerActive = xpDelta > 0
 
-            transaction {
+            CoroutineScopes.Main.launch {
+                newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                    MindustryUserServerData.join(
+                        MindustryUser,
+                        JoinType.INNER,
+                        onColumn = MindustryUserServerData.mindustryUserID,
+                        otherColumn = MindustryUser.id
+                    ).update({ MindustryUser.mindustryUUID eq it.uuid() }) {
+                        with(SqlExpressionBuilder) {
+                            it[MindustryUserServerData.xp] = MindustryUserServerData.xp + xpDelta
+                            it[MindustryUserServerData.playTime] = MindustryUserServerData.playTime + playTimeChanges
+
+                            if (isPlayerActive)
+                                it[MindustryUserServerData.activePlayTime] =
+                                    MindustryUserServerData.activePlayTime + playTimeChanges
+                        }
+                    }
+
+                    updateStatsPopup(it)
+
+                    playersActionsCounter[it] = 0
+                    playersXPDelta[it] = 0
+                    playersLastPlayTimeSave[it] = now
+                }
+            }
+        }
+    }
+
+    private suspend fun updateStatsPopup(player: Player) {
+        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            val mindustryUserServerData =
                 MindustryUserServerData.join(
                     MindustryUser,
                     JoinType.INNER,
                     onColumn = MindustryUserServerData.mindustryUserID,
                     otherColumn = MindustryUser.id
-                ).update({ MindustryUser.mindustryUUID eq it.uuid() }) {
-                    with(SqlExpressionBuilder) {
-                        it[MindustryUserServerData.xp] = MindustryUserServerData.xp + xpDelta
-                        it[MindustryUserServerData.playTime] = MindustryUserServerData.playTime + playTimeChanges
+                ).selectOne { MindustryUser.mindustryUUID eq player.uuid() }!!
 
-                        if (isPlayerActive)
-                            it[MindustryUserServerData.activePlayTime] =
-                                MindustryUserServerData.activePlayTime + playTimeChanges
-                    }
-                }
+            val xp = mindustryUserServerData[MindustryUserServerData.xp]
+            val playTimeMillis = mindustryUserServerData[MindustryUserServerData.playTime]
 
-                playersActionsCounter[it] = 0
-                playersXPDelta[it] = 0
-                playersLastPlayTimeSave[it] = now
-            }
+            player.infoPopup(
+                "XP: ${xp}\nRank: Duo 1\nPlay Time: ${playTimeMillis / 1000}s",
+                Float.MAX_VALUE, Align.topRight, 200, 0, 0, 10
+            )
         }
     }
 
@@ -76,6 +106,10 @@ class UserStatsHandler : Handler() {
         playersXPDelta[event.player] = 0
 
         playersLastPlayTimeSave[event.player] = Instant.now().toEpochMilli()
+
+        CoroutineScopes.Main.launch {
+            updateStatsPopup(event.player)
+        }
     }
 
     @EventHandler
