@@ -58,6 +58,8 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.1.0")
 
     implementation("com.password4j:password4j:1.7.3")
+
+    implementation("com.rabbitmq:amqp-client:5.20.0")
 }
 
 kotlin {
