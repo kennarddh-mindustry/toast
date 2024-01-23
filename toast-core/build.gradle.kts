@@ -61,6 +61,8 @@ dependencies {
     implementation("com.password4j:password4j:1.7.3")
 
     implementation("com.rabbitmq:amqp-client:5.20.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 }
 
 kotlin {
@@ -74,8 +76,12 @@ sourceSets {
 }
 
 configurations.runtimeClasspath {
-    exclude(group = "org.jetbrains.kotlin")
-    exclude(group = "org.jetbrains.kotlinx")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
+    exclude("org.jetbrains.kotlin", "kotlin-reflect")
+    exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
+    exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")
     exclude("org.slf4j")
 }
 
