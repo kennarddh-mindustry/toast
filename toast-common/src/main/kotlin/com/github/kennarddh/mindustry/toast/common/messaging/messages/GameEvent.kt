@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.core.commons.messaging.messages
+package com.github.kennarddh.mindustry.toast.common.messaging.messages
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName

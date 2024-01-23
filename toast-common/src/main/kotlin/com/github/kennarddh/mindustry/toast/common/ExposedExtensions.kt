@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.core.commons
+package com.github.kennarddh.mindustry.toast.common
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob

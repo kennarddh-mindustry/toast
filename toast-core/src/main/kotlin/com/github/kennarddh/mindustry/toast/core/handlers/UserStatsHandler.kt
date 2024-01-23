@@ -1,11 +1,11 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
 import arc.util.Align
-import com.github.kennarddh.mindustry.toast.core.commons.CoroutineScopes
-import com.github.kennarddh.mindustry.toast.core.commons.database.tables.MindustryUser
-import com.github.kennarddh.mindustry.toast.core.commons.database.tables.MindustryUserServerData
+import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
+import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
+import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
+import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.core.commons.infoPopup
-import com.github.kennarddh.mindustry.toast.core.commons.selectOne
 import kennarddh.genesis.core.events.annotations.EventHandler
 import kennarddh.genesis.core.handlers.Handler
 import kennarddh.genesis.core.timers.annotations.TimerTask

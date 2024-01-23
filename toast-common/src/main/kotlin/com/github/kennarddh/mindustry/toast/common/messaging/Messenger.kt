@@ -1,6 +1,6 @@
-package com.github.kennarddh.mindustry.toast.core.commons.messaging
+package com.github.kennarddh.mindustry.toast.common.messaging
 
-import com.github.kennarddh.mindustry.toast.core.commons.messaging.messages.GameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.rabbitmq.client.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

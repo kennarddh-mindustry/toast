@@ -1,6 +1,6 @@
-package com.github.kennarddh.mindustry.toast.core.commons.database.tables
+package com.github.kennarddh.mindustry.toast.common.database.tables
 
-import com.github.kennarddh.mindustry.toast.core.commons.UserRole
+import com.github.kennarddh.mindustry.toast.common.UserRole
 import org.jetbrains.exposed.dao.id.IntIdTable
 
 object Users : IntIdTable() {

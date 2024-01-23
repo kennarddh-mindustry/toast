@@ -1,8 +1,9 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
 import arc.util.Strings
+import com.github.kennarddh.mindustry.toast.common.*
+import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commons.*
-import com.github.kennarddh.mindustry.toast.core.commons.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commons.menus.Menu
 import com.github.kennarddh.mindustry.toast.core.commons.menus.Menus
 import com.password4j.Argon2Function

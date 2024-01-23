@@ -11,3 +11,4 @@ plugins {
 
 rootProject.name = "toast"
 include(":toast-core")
+include(":toast-common")

@@ -4,7 +4,7 @@ import fr.xpdustry.toxopid.spec.ModPlatform
 import fr.xpdustry.toxopid.task.GithubArtifactDownload
 
 plugins {
-    kotlin("jvm") version "1.9.10"
+    kotlin("jvm")
     kotlin("plugin.serialization") version "1.9.10"
     java
     `maven-publish`
@@ -45,6 +45,8 @@ val exposedVersion: String = "0.46.0"
 
 dependencies {
     mindustryDependencies()
+
+    implementation(project(":toast-common"))
 
     compileOnly("com.xpdustry:kotlin-runtime:3.1.0-k.1.9.10")
     compileOnly("kennarddh:genesis-core:1.1.0")
@@ -146,6 +148,7 @@ tasks.runMindustryServer {
 
     mods.setFrom(
         setOf(
+            project(":toast-common").tasks.jar,
             tasks.jar,
             downloadKotlinRuntime,
             downloadDistributorCore,
