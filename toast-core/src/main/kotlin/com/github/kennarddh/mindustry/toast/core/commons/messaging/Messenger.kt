@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.core.commons.messaging.messages
+package com.github.kennarddh.mindustry.toast.core.commons.messaging
 
 import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
