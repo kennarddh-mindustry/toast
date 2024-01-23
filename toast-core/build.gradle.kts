@@ -142,7 +142,7 @@ tasks.runMindustryServer {
     environment("DB_HOST", "jdbc:mariadb://localhost:3307/toast")
     environment("DB_USERNAME", "root")
     environment("DB_PASSWORD", "root")
-    environment("RABBITMQ_URI", "amqp://root:root@localhost:5672/")
+    environment("RABBITMQ_URI", "amqp://root:root@localhost:5672")
 
     mods.setFrom(
         setOf(
