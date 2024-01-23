@@ -22,7 +22,7 @@ object Messenger {
 
         channel = connection.createChannel()
 
-        channel.exchangeDeclare(GAME_EVENTS_EXCHANGE_NAME, BuiltinExchangeType.FANOUT)
+        channel.exchangeDeclare(GAME_EVENTS_EXCHANGE_NAME, BuiltinExchangeType.FANOUT, true)
     }
 
     fun publishGameEvent(gameEvent: GameEvent) {
