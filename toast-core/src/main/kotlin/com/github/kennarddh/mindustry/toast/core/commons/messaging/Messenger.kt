@@ -4,7 +4,7 @@ import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
 
 object Messenger {
-    const val GameEventsQueueName = "GameEvents"
+    const val GAME_EVENTS_QUEUE_NAME = "GameEvents"
     val connection: Connection
 
     init {
@@ -18,6 +18,6 @@ object Messenger {
 
         val channel = connection.createChannel()
 
-        channel.queueDeclare(GameEventsQueueName, true, false, false, null)
+        channel.queueDeclare(GAME_EVENTS_QUEUE_NAME, true, false, false, null)
     }
 }
