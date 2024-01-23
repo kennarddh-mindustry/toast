@@ -5,6 +5,7 @@ import fr.xpdustry.toxopid.task.GithubArtifactDownload
 
 plugins {
     kotlin("jvm") version "1.9.10"
+    kotlin("plugin.serialization") version "1.9.10"
     java
     `maven-publish`
     id("fr.xpdustry.toxopid") version "3.2.0"
