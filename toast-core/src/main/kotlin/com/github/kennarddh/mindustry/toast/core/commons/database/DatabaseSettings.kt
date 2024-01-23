@@ -1,11 +1,13 @@
 package com.github.kennarddh.mindustry.toast.core.commons.database
 
+import com.github.kennarddh.mindustry.toast.core.commons.CoroutineScopes
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 object DatabaseSettings {
     lateinit var database: Database
@@ -24,8 +26,10 @@ object DatabaseSettings {
 
         database = Database.connect(dataSource)
 
-        transaction {
-            addLogger(StdOutSqlLogger)
+        CoroutineScopes.Main.launch {
+            newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                addLogger(StdOutSqlLogger)
+            }
         }
     }
 }
