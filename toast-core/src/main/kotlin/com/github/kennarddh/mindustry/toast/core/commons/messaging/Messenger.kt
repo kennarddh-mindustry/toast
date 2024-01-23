@@ -1,11 +1,15 @@
 package com.github.kennarddh.mindustry.toast.core.commons.messaging
 
-import com.rabbitmq.client.Connection
-import com.rabbitmq.client.ConnectionFactory
+import com.github.kennarddh.mindustry.toast.core.commons.messaging.messages.GameEvent
+import com.rabbitmq.client.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
 
 object Messenger {
-    const val GAME_EVENTS_QUEUE_NAME = "GameEvents"
+    const val GAME_EVENTS_EXCHANGE_NAME = "GameEvents"
     val connection: Connection
+    val channel: Channel
 
     init {
         val uri = System.getenv("RABBITMQ_URI")
@@ -16,8 +20,29 @@ object Messenger {
 
         connection = connectionFactory.newConnection()
 
-        val channel = connection.createChannel()
+        channel = connection.createChannel()
 
-        channel.queueDeclare(GAME_EVENTS_QUEUE_NAME, true, false, false, null)
+        channel.exchangeDeclare(GAME_EVENTS_EXCHANGE_NAME, BuiltinExchangeType.FANOUT)
+    }
+
+    fun publishGameEvent(gameEvent: GameEvent) {
+        val data = Json.encodeToString(gameEvent)
+
+        channel.basicPublish(GAME_EVENTS_EXCHANGE_NAME, "", null, data.toByteArray())
+    }
+
+    fun listenGameEvent(callback: (GameEvent) -> Unit) {
+        val queueName = channel.queueDeclare().queue
+
+        channel.queueBind(queueName, GAME_EVENTS_EXCHANGE_NAME, "")
+
+        val deliverCallback = DeliverCallback { _, delivery ->
+            val message = delivery.body.toString(Charsets.UTF_8)
+            val data = Json.decodeFromString<GameEvent>(message)
+
+            callback(data)
+        }
+
+        channel.basicConsume(queueName, true, deliverCallback) { _ -> }
     }
 }
