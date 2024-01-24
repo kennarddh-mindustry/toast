@@ -31,8 +31,8 @@ object Messenger {
         channel.basicPublish(GAME_EVENTS_EXCHANGE_NAME, "", null, data.toByteArray())
     }
 
-    fun listenGameEvent(callback: (GameEvent) -> Unit) {
-        val queueName = channel.queueDeclare().queue
+    fun listenGameEvent(queueName: String, callback: (GameEvent) -> Unit) {
+        channel.queueDeclare(queueName, false, true, true, mapOf("x-queue-type" to "quorum"))
 
         channel.queueBind(queueName, GAME_EVENTS_EXCHANGE_NAME, "")
 
