@@ -1,6 +1,7 @@
 package com.github.kennarddh.mindustry.toast.discord
 
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerChatGameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerJoinGameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerLeaveGameEvent
 import net.dv8tion.jda.api.JDA
@@ -29,6 +30,7 @@ class ReadyListener : ListenerAdapter() {
             val message = when (it.data) {
                 is PlayerJoinGameEvent -> "${(it.data as PlayerJoinGameEvent).playerMindustryName} joined."
                 is PlayerLeaveGameEvent -> "${(it.data as PlayerLeaveGameEvent).playerMindustryName} left."
+                is PlayerChatGameEvent -> "[${(it.data as PlayerChatGameEvent).playerMindustryName}]: ${(it.data as PlayerChatGameEvent).message}"
             }
 
             channel.sendMessage(message).queue()
