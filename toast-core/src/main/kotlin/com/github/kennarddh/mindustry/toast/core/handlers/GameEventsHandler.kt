@@ -2,6 +2,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers
 
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerChatGameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerJoinGameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerLeaveGameEvent
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
@@ -22,5 +23,17 @@ class GameEventsHandler : Handler() {
         val player = event.player
 
         Messenger.publishGameEvent(GameEvent(ToastVars.server, PlayerLeaveGameEvent(player.name, player.uuid())))
+    }
+
+    @EventHandler
+    fun onPlayerChat(event: EventType.PlayerChatEvent) {
+        val player = event.player
+
+        Messenger.publishGameEvent(
+            GameEvent(
+                ToastVars.server,
+                PlayerChatGameEvent(player.name, player.uuid(), event.message)
+            )
+        )
     }
 }
