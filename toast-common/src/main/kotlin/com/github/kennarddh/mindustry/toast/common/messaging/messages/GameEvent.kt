@@ -29,6 +29,8 @@ data class PlayerChatGameEvent(val playerMindustryName: String, val playerMindus
 //@SerialName("MapStart")
 //data class MapStartGameEvent() : GameEventBase()
 
+// TODO: Server start, server stop, server restart events.
+
 @Serializable
 data class GameEvent(val server: Server, val data: GameEventBase)
 
