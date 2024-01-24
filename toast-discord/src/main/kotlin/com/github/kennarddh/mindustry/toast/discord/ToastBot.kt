@@ -26,10 +26,12 @@ class ReadyListener : ListenerAdapter() {
         Messenger.listenGameEvent("DiscordBot") {
             val channel = toastMindustryGuild.getTextChannelById(it.server.discordChannelID)!!
 
-            when (it.data) {
-                is PlayerJoinGameEvent -> channel.sendMessage("${(it.data as PlayerJoinGameEvent).playerMindustryName} joined.")
-                is PlayerLeaveGameEvent -> channel.sendMessage("${(it.data as PlayerLeaveGameEvent).playerMindustryName} left.")
+            val message = when (it.data) {
+                is PlayerJoinGameEvent -> "${(it.data as PlayerJoinGameEvent).playerMindustryName} joined."
+                is PlayerLeaveGameEvent -> "${(it.data as PlayerLeaveGameEvent).playerMindustryName} left."
             }
+
+            channel.sendMessage(message).queue()
         }
     }
 }
