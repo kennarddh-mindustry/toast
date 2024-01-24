@@ -32,7 +32,7 @@ object Messenger {
     }
 
     fun listenGameEvent(queueName: String, callback: (GameEvent) -> Unit) {
-        channel.queueDeclare(queueName, false, true, true, mapOf("x-queue-type" to "quorum"))
+        channel.queueDeclare(queueName, true, false, false, mapOf("x-queue-type" to "quorum"))
 
         channel.queueBind(queueName, GAME_EVENTS_EXCHANGE_NAME, "")
 
