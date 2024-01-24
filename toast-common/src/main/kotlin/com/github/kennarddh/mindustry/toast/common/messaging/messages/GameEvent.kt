@@ -20,5 +20,15 @@ data class PlayerJoinGameEvent(val playerMindustryName: String, val playerMindus
 data class PlayerLeaveGameEvent(val playerMindustryName: String, val playerMindustryUUID: String) : GameEventBase()
 
 @Serializable
+@SerialName("PlayerChat")
+data class PlayerChatGameEvent(val playerMindustryName: String, val playerMindustryUUID: String, val message: String) :
+    GameEventBase()
+
+// TODO: Implement map in database first. MapStart, MapEnd.
+//@Serializable
+//@SerialName("MapStart")
+//data class MapStartGameEvent() : GameEventBase()
+
+@Serializable
 data class GameEvent(val server: Server, val data: GameEventBase)
 
