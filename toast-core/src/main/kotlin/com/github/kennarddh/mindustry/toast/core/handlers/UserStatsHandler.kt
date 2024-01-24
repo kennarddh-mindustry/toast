@@ -106,10 +106,6 @@ class UserStatsHandler : Handler() {
         playersXPDelta[event.player] = 0
 
         playersLastPlayTimeSave[event.player] = Instant.now().toEpochMilli()
-
-        CoroutineScopes.Main.launch {
-            updateStatsPopup(event.player)
-        }
     }
 
     @EventHandler
