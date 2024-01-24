@@ -98,6 +98,11 @@ tasks.register("getArtifactPath") {
 }
 
 tasks.register<JavaExec>("runBot") {
+    environment("DB_HOST", "jdbc:mariadb://localhost:3307/toast")
+    environment("DB_USERNAME", "root")
+    environment("DB_PASSWORD", "root")
+    environment("RABBITMQ_URI", "amqp://root:root@localhost:5672")
+    
     doFirst {
         file(project.file(".env")).readLines().forEach {
             val (key, value) = it.split('=')
