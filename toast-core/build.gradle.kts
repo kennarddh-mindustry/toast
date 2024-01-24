@@ -145,6 +145,7 @@ tasks.runMindustryServer {
     environment("DB_USERNAME", "root")
     environment("DB_PASSWORD", "root")
     environment("RABBITMQ_URI", "amqp://root:root@localhost:5672")
+    environment("SERVER", "Survival")
 
     mods.setFrom(
         setOf(
