@@ -1,5 +1,8 @@
 package com.github.kennarddh.mindustry.toast.discord
 
+import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerJoinGameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerLeaveGameEvent
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
@@ -19,6 +22,15 @@ class ReadyListener : ListenerAdapter() {
         println("[ToastDiscord] Bot Ready")
 
         toastMindustryGuild = jda.getGuildById(TOAST_MINDUSTRY_GUILD_ID)!!
+
+        Messenger.listenGameEvent {
+            val channel = toastMindustryGuild.getTextChannelById(it.server.discordChannelID)!!
+
+            when (it.data) {
+                is PlayerJoinGameEvent -> channel.sendMessage("${(it.data as PlayerJoinGameEvent).playerMindustryName} joined.")
+                is PlayerLeaveGameEvent -> channel.sendMessage("${(it.data as PlayerLeaveGameEvent).playerMindustryName} left.")
+            }
+        }
     }
 }
 
