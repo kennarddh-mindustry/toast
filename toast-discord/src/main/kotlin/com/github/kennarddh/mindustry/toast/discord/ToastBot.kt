@@ -23,7 +23,7 @@ class ReadyListener : ListenerAdapter() {
 
         toastMindustryGuild = jda.getGuildById(TOAST_MINDUSTRY_GUILD_ID)!!
 
-        Messenger.listenGameEvent {
+        Messenger.listenGameEvent("DiscordBot") {
             val channel = toastMindustryGuild.getTextChannelById(it.server.discordChannelID)!!
 
             when (it.data) {
