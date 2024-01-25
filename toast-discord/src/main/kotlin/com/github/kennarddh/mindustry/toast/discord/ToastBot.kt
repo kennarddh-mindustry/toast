@@ -42,7 +42,7 @@ class ReadyListener : ListenerAdapter() {
 fun main() {
     println("[ToastDiscord] Loaded")
 
-    AddShutdownHook()
+    addShutdownHook()
 
     jda = JDABuilder.createDefault(System.getenv("BOT_TOKEN"))
         .setActivity(Activity.playing("Toast Mindustry Server"))
