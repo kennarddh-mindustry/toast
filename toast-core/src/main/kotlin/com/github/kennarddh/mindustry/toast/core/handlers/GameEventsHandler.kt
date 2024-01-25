@@ -5,6 +5,7 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerChatGameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerJoinGameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerLeaveGameEvent
+import com.github.kennarddh.mindustry.toast.common.stripFooMessageInvisibleCharacters
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kennarddh.genesis.core.events.annotations.EventHandler
 import kennarddh.genesis.core.handlers.Handler
@@ -32,7 +33,7 @@ class GameEventsHandler : Handler() {
         Messenger.publishGameEvent(
             GameEvent(
                 ToastVars.server,
-                PlayerChatGameEvent(player.name, player.uuid(), event.message)
+                PlayerChatGameEvent(player.name, player.uuid(), event.message.stripFooMessageInvisibleCharacters())
             )
         )
     }
