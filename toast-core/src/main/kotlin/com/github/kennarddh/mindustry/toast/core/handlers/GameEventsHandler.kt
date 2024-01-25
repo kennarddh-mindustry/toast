@@ -10,20 +10,33 @@ import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kennarddh.genesis.core.events.annotations.EventHandler
 import kennarddh.genesis.core.handlers.Handler
 import mindustry.game.EventType
+import java.time.Instant
 
 class GameEventsHandler : Handler() {
     @EventHandler
     fun onPlayerJoin(event: EventType.PlayerJoin) {
         val player = event.player
 
-        Messenger.publishGameEvent(GameEvent(ToastVars.server, PlayerJoinGameEvent(player.name, player.uuid())))
+        Messenger.publishGameEvent(
+            GameEvent(
+                ToastVars.server,
+                Instant.now().toEpochMilli(),
+                PlayerJoinGameEvent(player.name, player.uuid())
+            )
+        )
     }
 
     @EventHandler
     fun onPlayerLeave(event: EventType.PlayerLeave) {
         val player = event.player
 
-        Messenger.publishGameEvent(GameEvent(ToastVars.server, PlayerLeaveGameEvent(player.name, player.uuid())))
+        Messenger.publishGameEvent(
+            GameEvent(
+                ToastVars.server,
+                Instant.now().toEpochMilli(),
+                PlayerLeaveGameEvent(player.name, player.uuid())
+            )
+        )
     }
 
     @EventHandler
@@ -32,7 +45,7 @@ class GameEventsHandler : Handler() {
 
         Messenger.publishGameEvent(
             GameEvent(
-                ToastVars.server,
+                ToastVars.server, Instant.now().toEpochMilli(),
                 PlayerChatGameEvent(player.name, player.uuid(), event.message.stripFooMessageInvisibleCharacters())
             )
         )
