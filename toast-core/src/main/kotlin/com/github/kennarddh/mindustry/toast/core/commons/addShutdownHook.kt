@@ -8,8 +8,8 @@ import kotlinx.coroutines.runBlocking
 import java.time.Instant
 
 fun addShutdownHook() {
-    Runtime.getRuntime().addShutdownHook(object : Thread() {
-        override fun run() = runBlocking {
+    Runtime.getRuntime().addShutdownHook(Thread {
+        runBlocking {
             Log.info("Gracefully shutting down")
 
             Messenger.publishGameEvent(
