@@ -7,7 +7,7 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStop
 import kotlinx.coroutines.runBlocking
 import java.time.Instant
 
-fun AddShutdownHook() {
+fun addShutdownHook() {
     Runtime.getRuntime().addShutdownHook(object : Thread() {
         override fun run() = runBlocking {
             Log.info("Gracefully shutting down")

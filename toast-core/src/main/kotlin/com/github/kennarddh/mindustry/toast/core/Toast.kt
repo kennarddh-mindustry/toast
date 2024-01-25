@@ -2,7 +2,7 @@ package com.github.kennarddh.mindustry.toast.core
 
 import arc.util.Log
 import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
-import com.github.kennarddh.mindustry.toast.core.commons.AddShutdownHook
+import com.github.kennarddh.mindustry.toast.core.commons.addShutdownHook
 import com.github.kennarddh.mindustry.toast.core.handlers.GameEventsHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.UserAccountHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.UserStatsHandler
@@ -14,7 +14,7 @@ class Toast : AbstractPlugin() {
     override fun init() {
         DatabaseSettings.init()
 
-        AddShutdownHook()
+        addShutdownHook()
 
         Genesis.addHandler(UserAccountHandler())
         Genesis.addHandler(UserStatsHandler())
