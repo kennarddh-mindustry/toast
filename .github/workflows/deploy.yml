@@ -41,6 +41,21 @@ jobs:
       - name: Get artifact path
         run: |
           echo "TOAST_CORE_ARTIFACT_PATH=$(./gradlew :toast-core:getArtifactPath -q)" >> $GITHUB_ENV
+          echo "TOAST_COMMON_ARTIFACT_PATH=$(./gradlew :toast-common:getArtifactPath -q)" >> $GITHUB_ENV
+          echo "TOAST_DISCORD_ARTIFACT_PATH=$(./gradlew :toast-common:getArtifactPath -q)" >> $GITHUB_ENV
+
+      - name: Update Core plugin.json Version
+        uses: jossef/action-set-json-field@v2.1
+        with:
+          file: ./toast-core/plugin.json
+          field: version
+          value: ${{ github.event.inputs.version }}
+
+      - name: Update Common Version
+        run: echo "${{ github.event.inputs.version }}" > ./toast-common/version.txt
+
+      - name: Update Discord Version
+        run: echo "${{ github.event.inputs.version }}" > ./toast-discord/version.txt
 
       - name: Publish
         run: |
