@@ -1,18 +1,15 @@
 package com.github.kennarddh.mindustry.toast.discord
 
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
-import kotlinx.coroutines.runBlocking
 
 fun addShutdownHook() {
     Runtime.getRuntime().addShutdownHook(Thread {
-        runBlocking {
-            println("Gracefully shutting down")
+        println("Gracefully shutting down")
 
-            Messenger.close()
+        Messenger.close()
 
-            jda.shutdown()
+        jda.shutdown()
 
-            println("Stopped")
-        }
+        println("Stopped")
     })
 }

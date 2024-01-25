@@ -4,24 +4,21 @@ import arc.util.Log
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStopGameEvent
-import kotlinx.coroutines.runBlocking
 import java.time.Instant
 
 fun addShutdownHook() {
     Runtime.getRuntime().addShutdownHook(Thread {
-        runBlocking {
-            Log.info("Gracefully shutting down")
+        Log.info("Gracefully shutting down")
 
-            Messenger.publishGameEvent(
-                GameEvent(
-                    ToastVars.server, Instant.now().toEpochMilli(),
-                    ServerStopGameEvent()
-                )
+        Messenger.publishGameEvent(
+            GameEvent(
+                ToastVars.server, Instant.now().toEpochMilli(),
+                ServerStopGameEvent()
             )
+        )
 
-            Messenger.close()
+        Messenger.close()
 
-            Log.info("Stopped")
-        }
+        Log.info("Stopped")
     })
 }
