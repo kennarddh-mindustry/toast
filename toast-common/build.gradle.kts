@@ -17,7 +17,7 @@ repositories {
 }
 
 project.group = "com.github.kennarddh.mindustry"
-project.version = "1.0.0"
+project.version = project.file("version.txt").readLines()[0]
 
 val exposedVersion: String = "0.46.0"
 

@@ -16,7 +16,7 @@ repositories {
 }
 
 project.group = "com.github.kennarddh.mindustry"
-project.version = "1.0.0"
+project.version = project.file("version.txt").readLines()[0]
 
 val exposedVersion: String = "0.46.0"
 
@@ -102,7 +102,7 @@ tasks.register<JavaExec>("runBot") {
     environment("DB_USERNAME", "root")
     environment("DB_PASSWORD", "root")
     environment("RABBITMQ_URI", "amqp://root:root@localhost:5672")
-    
+
     doFirst {
         file(project.file(".env")).readLines().forEach {
             val (key, value) = it.split('=')
