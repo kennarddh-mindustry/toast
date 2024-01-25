@@ -40,16 +40,16 @@ data class PlayerChatGameEvent(
 
 @Serializable
 @SerialName("ServerStart")
-data class ServerStartGameEvent(val time: Long) : GameEventBase()
+sealed class ServerStartGameEvent : GameEventBase()
 
 @Serializable
 @SerialName("ServerStop")
-data class ServerStopGameEvent(val time: Long) : GameEventBase()
+sealed class ServerStopGameEvent : GameEventBase()
 
 @Serializable
 @SerialName("ServerRestart")
-data class ServerRestartGameEvent(val time: Long) : GameEventBase()
+sealed class ServerRestartGameEvent : GameEventBase()
 
 @Serializable
-data class GameEvent(val server: Server, val data: GameEventBase)
+data class GameEvent(val server: Server, val time: Long, val data: GameEventBase)
 
