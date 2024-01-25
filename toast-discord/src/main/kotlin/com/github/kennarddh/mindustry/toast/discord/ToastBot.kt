@@ -1,9 +1,7 @@
 package com.github.kennarddh.mindustry.toast.discord
 
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerChatGameEvent
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerJoinGameEvent
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerLeaveGameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
@@ -31,6 +29,9 @@ class ReadyListener : ListenerAdapter() {
                 is PlayerJoinGameEvent -> "${(it.data as PlayerJoinGameEvent).playerMindustryName} joined."
                 is PlayerLeaveGameEvent -> "${(it.data as PlayerLeaveGameEvent).playerMindustryName} left."
                 is PlayerChatGameEvent -> "[${(it.data as PlayerChatGameEvent).playerMindustryName}]: ${(it.data as PlayerChatGameEvent).message}"
+                is ServerStartGameEvent -> "Server start."
+                is ServerStopGameEvent -> "Server stop."
+                is ServerRestartGameEvent -> "Server restart."
             }
 
             channel.sendMessage(message).queue()
