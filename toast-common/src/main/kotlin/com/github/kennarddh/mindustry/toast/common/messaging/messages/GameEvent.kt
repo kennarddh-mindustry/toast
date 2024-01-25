@@ -13,18 +13,17 @@ sealed class GameEventBase
 
 @Serializable
 @SerialName("PlayerJoin")
-data class PlayerJoinGameEvent(val time: Long, val playerMindustryName: String, val playerMindustryUUID: String) :
+data class PlayerJoinGameEvent(val playerMindustryName: String, val playerMindustryUUID: String) :
     GameEventBase()
 
 @Serializable
 @SerialName("PlayerLeave")
-data class PlayerLeaveGameEvent(val time: Long, val playerMindustryName: String, val playerMindustryUUID: String) :
+data class PlayerLeaveGameEvent(val playerMindustryName: String, val playerMindustryUUID: String) :
     GameEventBase()
 
 @Serializable
 @SerialName("PlayerChat")
 data class PlayerChatGameEvent(
-    val time: Long,
     val playerMindustryName: String,
     val playerMindustryUUID: String,
     val message: String
