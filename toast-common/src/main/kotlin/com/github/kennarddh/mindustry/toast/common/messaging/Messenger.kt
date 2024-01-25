@@ -25,6 +25,11 @@ object Messenger {
         channel.exchangeDeclare(GAME_EVENTS_EXCHANGE_NAME, BuiltinExchangeType.FANOUT, true)
     }
 
+    fun close() {
+        channel.close()
+        connection.close()
+    }
+
     fun publishGameEvent(gameEvent: GameEvent) {
         val data = Json.encodeToString(gameEvent)
 

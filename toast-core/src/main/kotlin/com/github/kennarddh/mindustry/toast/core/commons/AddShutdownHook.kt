@@ -19,6 +19,8 @@ fun AddShutdownHook() {
                 )
             )
 
+            Messenger.close()
+
             Log.info("Stopped")
         }
     })
