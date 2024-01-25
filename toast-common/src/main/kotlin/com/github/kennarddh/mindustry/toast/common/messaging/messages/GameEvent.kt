@@ -35,8 +35,6 @@ data class PlayerChatGameEvent(
 //@SerialName("MapStart")
 //data class MapStartGameEvent() : GameEventBase()
 
-// TODO: Server start, server stop, server restart events.
-
 @Serializable
 @SerialName("ServerStart")
 class ServerStartGameEvent : GameEventBase()
