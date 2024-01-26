@@ -11,6 +11,6 @@
     "dependencies": [
         "kotlin-runtime",
         "genesis-core",
-        "genesis-common"
+        "genesis-standard"
     ]
 }
