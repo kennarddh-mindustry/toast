@@ -20,7 +20,7 @@ class ReadyListener : ListenerAdapter() {
     private lateinit var toastMindustryGuild: Guild
 
     override fun onReady(event: ReadyEvent) {
-        Logger.info("[ToastDiscord] Bot Ready")
+        Logger.info("Bot Ready")
 
         toastMindustryGuild = jda.getGuildById(TOAST_MINDUSTRY_GUILD_ID)!!
 
@@ -43,7 +43,7 @@ class ReadyListener : ListenerAdapter() {
 
 fun main() {
     runBlocking {
-        Logger.info("[ToastDiscord] Loaded")
+        Logger.info("Loaded")
 
         Messenger.init()
 
