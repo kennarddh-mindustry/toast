@@ -65,6 +65,8 @@ dependencies {
     implementation("com.rabbitmq:amqp-client:5.20.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+    implementation("org.slf4j:slf4j-api:2.0.11")
 }
 
 kotlin {
@@ -84,7 +86,6 @@ configurations.runtimeClasspath {
     exclude("org.jetbrains.kotlin", "kotlin-reflect")
     exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
     exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")
-    exclude("org.slf4j")
 }
 
 tasks {
@@ -116,14 +117,6 @@ val downloadKotlinRuntime =
         version.set("v3.1.0-k.1.9.10")
     }
 
-val downloadDistributorCore =
-    tasks.register<GithubArtifactDownload>("downloadDistributor") {
-        user.set("xpdustry")
-        repo.set("distributor")
-        name.set("distributor-core.jar")
-        version.set("v3.3.0")
-    }
-
 val downloadGenesisCore =
     tasks.register<GithubArtifactDownload>("downloadGenesisCore") {
         user.set("kennarddh-mindustry")
@@ -151,7 +144,6 @@ tasks.runMindustryServer {
         setOf(
             tasks.jar,
             downloadKotlinRuntime,
-            downloadDistributorCore,
             downloadGenesisCore,
             downloadGenesisCommon
         )

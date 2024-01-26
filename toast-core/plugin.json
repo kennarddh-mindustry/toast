@@ -10,7 +10,6 @@
     "repo": "kennarddh-mindustry/toast",
     "dependencies": [
         "kotlin-runtime",
-        "distributor-core",
         "genesis-core",
         "genesis-common"
     ]
