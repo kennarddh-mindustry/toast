@@ -1,7 +1,10 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerChatGameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerJoinGameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerLeaveGameEvent
 import com.github.kennarddh.mindustry.toast.common.stripFooMessageInvisibleCharacters
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kennarddh.genesis.core.events.annotations.EventHandler
@@ -44,16 +47,6 @@ class GameEventsHandler : Handler() {
             GameEvent(
                 ToastVars.server, Instant.now().toEpochMilli(),
                 PlayerChatGameEvent(player.name, player.uuid(), event.message.stripFooMessageInvisibleCharacters())
-            )
-        )
-    }
-
-    @EventHandler
-    fun onServerStart(event: EventType.ServerLoadEvent) {
-        Messenger.publishGameEvent(
-            GameEvent(
-                ToastVars.server, Instant.now().toEpochMilli(),
-                ServerStartGameEvent()
             )
         )
     }

@@ -8,10 +8,10 @@ import kotlinx.serialization.json.Json
 
 object Messenger {
     const val GAME_EVENTS_EXCHANGE_NAME = "GameEvents"
-    val connection: Connection
-    val channel: Channel
+    private lateinit var connection: Connection
+    private lateinit var channel: Channel
 
-    init {
+    fun init() {
         val uri = System.getenv("RABBITMQ_URI")
 
         val connectionFactory = ConnectionFactory()
