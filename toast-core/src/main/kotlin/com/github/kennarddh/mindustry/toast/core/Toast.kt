@@ -2,6 +2,8 @@ package com.github.kennarddh.mindustry.toast.core
 
 import arc.ApplicationListener
 import arc.Core
+import com.github.kennarddh.mindustry.genesis.core.Genesis
+import com.github.kennarddh.mindustry.genesis.core.commons.AbstractPlugin
 import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
@@ -13,8 +15,6 @@ import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.handlers.GameEventsHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.UserAccountHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.UserStatsHandler
-import kennarddh.genesis.core.Genesis
-import kennarddh.genesis.core.commons.AbstractPlugin
 import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import java.time.Instant
@@ -26,9 +26,9 @@ class Toast : AbstractPlugin() {
             DatabaseSettings.init()
             Messenger.init()
 
-            Genesis.addHandler(UserAccountHandler())
-            Genesis.addHandler(UserStatsHandler())
-            Genesis.addHandler(GameEventsHandler())
+            Genesis.registerHandler(UserAccountHandler())
+            Genesis.registerHandler(UserStatsHandler())
+            Genesis.registerHandler(GameEventsHandler())
 
             Messenger.publishGameEvent(
                 GameEvent(

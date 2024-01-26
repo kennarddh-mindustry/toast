@@ -49,8 +49,8 @@ dependencies {
     implementation(project(":toast-common"))
 
     compileOnly("com.xpdustry:kotlin-runtime:3.1.1-k.1.9.22")
-    compileOnly("kennarddh:genesis-core:1.1.0")
-    compileOnly("kennarddh:genesis-common:1.1.0")
+    compileOnly("com.github.kennarddh.mindustry:genesis-core:2.0.0")
+    compileOnly("com.github.kennarddh.mindustry:genesis-standard:2.0.0")
 
     implementation(platform("org.jetbrains.exposed:exposed-bom:0.46.0"))
     implementation("org.jetbrains.exposed:exposed-java-time")
@@ -121,16 +121,16 @@ val downloadGenesisCore =
     tasks.register<GithubArtifactDownload>("downloadGenesisCore") {
         user.set("kennarddh-mindustry")
         repo.set("genesis")
-        name.set("genesis-core-1.1.0.jar")
-        version.set("v1.1.0")
+        name.set("genesis-core-2.0.0.jar")
+        version.set("v2.0.0")
     }
 
-val downloadGenesisCommon =
-    tasks.register<GithubArtifactDownload>("downloadGenesisCommon") {
+val downloadGenesisStandard =
+    tasks.register<GithubArtifactDownload>("downloadGenesisStandard") {
         user.set("kennarddh-mindustry")
         repo.set("genesis")
-        name.set("genesis-common-1.1.0.jar")
-        version.set("v1.1.0")
+        name.set("genesis-standard-2.0.0.jar")
+        version.set("v2.0.0")
     }
 
 tasks.runMindustryServer {
@@ -145,7 +145,7 @@ tasks.runMindustryServer {
             tasks.jar,
             downloadKotlinRuntime,
             downloadGenesisCore,
-            downloadGenesisCommon
+            downloadGenesisStandard
         )
     )
 }

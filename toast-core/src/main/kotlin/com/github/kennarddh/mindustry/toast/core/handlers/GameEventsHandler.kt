@@ -1,5 +1,7 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
+import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
+import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerChatGameEvent
@@ -7,8 +9,6 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerJoin
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerLeaveGameEvent
 import com.github.kennarddh.mindustry.toast.common.stripFooMessageInvisibleCharacters
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
-import kennarddh.genesis.core.events.annotations.EventHandler
-import kennarddh.genesis.core.handlers.Handler
 import mindustry.game.EventType
 import java.time.Instant
 
