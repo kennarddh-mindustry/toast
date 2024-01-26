@@ -3,7 +3,6 @@ package com.github.kennarddh.mindustry.toast.discord
 import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
-import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
@@ -41,26 +40,24 @@ class ReadyListener : ListenerAdapter() {
     }
 }
 
-fun main() {
-    runBlocking {
-        Logger.info("Loaded")
+suspend fun main() {
+    Logger.info("Loaded")
 
-        Messenger.init()
+    Messenger.init()
 
-        DatabaseSettings.init()
+    DatabaseSettings.init()
 
-        addShutdownHook()
+    addShutdownHook()
 
-        jda = JDABuilder.createDefault(System.getenv("BOT_TOKEN"))
-            .setActivity(Activity.playing("Toast Mindustry Server"))
-            .addEventListeners(ReadyListener())
-            .enableIntents(
-                GatewayIntent.GUILD_MESSAGES,
-                GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
-                GatewayIntent.GUILD_MEMBERS,
-                GatewayIntent.GUILD_PRESENCES,
-                GatewayIntent.GUILD_MESSAGE_REACTIONS
-            )
-            .build()
-    }
+    jda = JDABuilder.createDefault(System.getenv("BOT_TOKEN"))
+        .setActivity(Activity.playing("Toast Mindustry Server"))
+        .addEventListeners(ReadyListener())
+        .enableIntents(
+            GatewayIntent.GUILD_MESSAGES,
+            GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
+            GatewayIntent.GUILD_MEMBERS,
+            GatewayIntent.GUILD_PRESENCES,
+            GatewayIntent.GUILD_MESSAGE_REACTIONS
+        )
+        .build()
 }
