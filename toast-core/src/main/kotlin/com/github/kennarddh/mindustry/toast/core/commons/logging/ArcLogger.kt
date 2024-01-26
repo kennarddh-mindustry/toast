@@ -8,18 +8,16 @@ import org.slf4j.event.Level
 import org.slf4j.helpers.AbstractLogger
 import org.slf4j.helpers.MessageFormatter
 
-class ArcLogger(val loggerName: String?, val plugin: String?) : AbstractLogger() {
+class ArcLogger(private val loggerName: String?) : AbstractLogger() {
     init {
         name = loggerName
     }
-
-    constructor(name: String?) : this(name, null)
 
     companion object {
         private val WRITE_LOCK = Any()
         private val TRACE = Administration.Config("trace", "Enable trace logging when debug is enabled.", false)
     }
-    
+
     override fun isTraceEnabled(): Boolean {
         return isArcLogLevelAtLeast(Log.LogLevel.debug) && TRACE.bool()
     }
@@ -77,15 +75,6 @@ class ArcLogger(val loggerName: String?, val plugin: String?) : AbstractLogger()
         val builder = StringBuilder()
 
         if (loggerName != ROOT_LOGGER_NAME) {
-            if (plugin != null)
-                builder
-                    .append(getColorCode(level))
-                    .append('[')
-                    .append(plugin)
-                    .append(']')
-                    .append(ColorCodes.reset)
-                    .append(' ')
-
             builder
                 .append(getColorCode(level))
                 .append('[')
