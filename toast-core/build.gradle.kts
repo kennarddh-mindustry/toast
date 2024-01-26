@@ -149,7 +149,6 @@ tasks.runMindustryServer {
 
     mods.setFrom(
         setOf(
-            project(":toast-common").tasks.jar,
             tasks.jar,
             downloadKotlinRuntime,
             downloadDistributorCore,
