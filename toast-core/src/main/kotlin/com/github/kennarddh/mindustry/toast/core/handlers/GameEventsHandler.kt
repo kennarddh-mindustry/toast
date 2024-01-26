@@ -2,12 +2,12 @@ package com.github.kennarddh.mindustry.toast.core.handlers
 
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
+import com.github.kennarddh.mindustry.genesis.standard.extensions.stripFooMessageInvisibleCharacters
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerChatGameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerJoinGameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerLeaveGameEvent
-import com.github.kennarddh.mindustry.toast.common.stripFooMessageInvisibleCharacters
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import mindustry.game.EventType
 import java.time.Instant
