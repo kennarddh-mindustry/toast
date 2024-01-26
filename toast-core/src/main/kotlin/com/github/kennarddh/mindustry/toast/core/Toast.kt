@@ -2,13 +2,13 @@ package com.github.kennarddh.mindustry.toast.core
 
 import arc.ApplicationListener
 import arc.Core
-import arc.util.Log
 import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStartGameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStopGameEvent
+import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.handlers.GameEventsHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.UserAccountHandler
@@ -37,12 +37,12 @@ class Toast : AbstractPlugin() {
                 )
             )
 
-            Log.info("[ToastCore] Loaded")
+            Logger.info("Loaded")
         }
 
         Core.app.addListener(object : ApplicationListener {
             override fun dispose() {
-                Log.info("Gracefully shutting down")
+                Logger.info("Gracefully shutting down")
 
                 Messenger.publishGameEvent(
                     GameEvent(
@@ -55,7 +55,7 @@ class Toast : AbstractPlugin() {
 
                 TransactionManager.closeAndUnregister(DatabaseSettings.database)
 
-                Log.info("Stopped")
+                Logger.info("Stopped")
             }
         })
     }
