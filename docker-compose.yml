@@ -11,6 +11,15 @@ services:
       - data:/var/lib/mysql
     ports:
       - "3307:3306"
+    healthcheck:
+      test:
+        [
+          'CMD',
+          '/usr/local/bin/healthcheck.sh',
+          '--su-mysql',
+          '--connect',
+          '--innodb_initialized',
+        ]
   rabbitMQ:
     image: rabbitmq:3.12-management
     ports:
