@@ -5,7 +5,7 @@ import fr.xpdustry.toxopid.task.GithubArtifactDownload
 
 plugins {
     kotlin("jvm")
-    kotlin("plugin.serialization") version "1.9.10"
+    kotlin("plugin.serialization") version "1.9.22"
     java
     `maven-publish`
     id("fr.xpdustry.toxopid") version "3.2.0"
@@ -48,7 +48,7 @@ dependencies {
 
     implementation(project(":toast-common"))
 
-    compileOnly("com.xpdustry:kotlin-runtime:3.1.0-k.1.9.10")
+    compileOnly("com.xpdustry:kotlin-runtime:3.1.1-k.1.9.22")
     compileOnly("kennarddh:genesis-core:1.1.0")
     compileOnly("kennarddh:genesis-common:1.1.0")
 
@@ -114,7 +114,7 @@ val downloadKotlinRuntime =
         user.set("xpdustry")
         repo.set("kotlin-runtime")
         name.set("kotlin-runtime.jar")
-        version.set("v3.1.0-k.1.9.10")
+        version.set("v3.1.1-k.1.9.22")
     }
 
 val downloadGenesisCore =
