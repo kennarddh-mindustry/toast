@@ -86,6 +86,7 @@ configurations.runtimeClasspath {
     exclude("org.jetbrains.kotlin", "kotlin-reflect")
     exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
     exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")
+    exclude("org.slf4j")
 }
 
 tasks {
