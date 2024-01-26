@@ -1,7 +1,5 @@
 package com.github.kennarddh.mindustry.toast.core
 
-import arc.ApplicationListener
-import arc.Core
 import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.commons.AbstractPlugin
 import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
@@ -39,24 +37,18 @@ class Toast : AbstractPlugin() {
 
             Logger.info("Loaded")
         }
+    }
 
-        Core.app.addListener(object : ApplicationListener {
-            override fun dispose() {
-                Logger.info("Gracefully shutting down")
+    override fun dispose() {
+        Messenger.publishGameEvent(
+            GameEvent(
+                ToastVars.server, Instant.now().toEpochMilli(),
+                ServerStopGameEvent()
+            )
+        )
 
-                Messenger.publishGameEvent(
-                    GameEvent(
-                        ToastVars.server, Instant.now().toEpochMilli(),
-                        ServerStopGameEvent()
-                    )
-                )
+        Messenger.close()
 
-                Messenger.close()
-
-                TransactionManager.closeAndUnregister(DatabaseSettings.database)
-
-                Logger.info("Stopped")
-            }
-        })
+        TransactionManager.closeAndUnregister(DatabaseSettings.database)
     }
 }
