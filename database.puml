@@ -88,6 +88,24 @@ $schema("Users") {
           $fk("mindustryNameID") INTEGER
     }
 
+    $table("UserVoteKick") {
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $column("reason") TEXT
+        * $column("kickedAt") DATETIME
+        * $column("kickEndAt") DATETIME
+        * $fk("voteKickStarterUserID") INTEGER
+        * $fk("userID") INTEGER
+        * $fk("mindustryUserID") INTEGER
+        * $column("requiredVotes") SHORT
+    }
+
+    $table("UserVoteKickVotes") {
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $fk("userVoteKickID") INTEGER
+        * $fk("mindustryUserID") INTEGER
+        * $column("vote") BOOLEAN
+    }
+
     $table("UserBan") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $column("reason") TEXT
@@ -110,6 +128,14 @@ $schema("Users") {
     UserKick::userID }o--|| Users::id
     UserKick::mindustryUserID }o--|| MindustryUser::id
     UserKick::mindustryNameID }o--|| MindustryNames::id
+
+    UserVoteKick::voteKickStarterUserID }o--|| Users::id
+    UserVoteKick::userID }o--|| Users::id
+    UserVoteKick::mindustryUserID }o--|| MindustryUser::id
+
+    UserVoteKickVotes::userVoteKickID }o--|| UserVoteKick::id
+    UserVoteKickVotes::mindustryUserID }o--|| MindustryUser::id
+
     UserBan::ipAddressID }o--|| IPAddresses::id
     UserBan::userID }o--|| Users::id
     UserBan::mindustryUserID }o--|| MindustryUser::id
