@@ -154,7 +154,7 @@ $schema("Map") {
         * $column("file") MEDIUMBLOB
         * $column("createdAt") DATETIME
         * $column("updatedAt") DATETIME
-          $column("archivedAt") DATETIME
+        * $column("isActive") BOOLEAN
     }
 
     $table("MapGameMode") {
