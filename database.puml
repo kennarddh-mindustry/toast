@@ -94,7 +94,7 @@ $schema("Users") {
         * $column("kickedAt") DATETIME
         * $column("kickEndAt") DATETIME
         * $fk("voteKickStarterUserID") INTEGER
-        * $fk("userID") INTEGER
+          $fk("userID") INTEGER
         * $fk("mindustryUserID") INTEGER
         * $column("requiredVotes") SHORT
     }
