@@ -26,6 +26,9 @@ class UserAccountHandler : Handler() {
         15360, 6, 2, 64, Argon2.ID
     )
 
+    val usernameRegex = """[a-zA-Z0-9_]{1,50}""".toRegex()
+    val passwordRegex = """[a-zA-Z0-9 !@#$%^&*()-_+=\[\]{};:'",.<>/?|`~]{8,}""".toRegex()
+    
     private val registerMenu = Menus(
         mapOf
             (
@@ -151,6 +154,21 @@ class UserAccountHandler : Handler() {
             val password = output["password"]!!
             val confirmPassword = output["confirmPassword"]!!
 
+            if (!username.matches(usernameRegex))
+                return@launch player.infoMessage(
+                    "[#ff0000]Invalid username. Username may only contains lowercase, uppercase, and numbers."
+                )
+
+            if (!password.matches(passwordRegex))
+                return@launch player.infoMessage(
+                    "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers."
+                )
+
+            if (!confirmPassword.matches(passwordRegex))
+                return@launch player.infoMessage(
+                    "[#ff0000]Invalid confirm password. Confirm password may only contains lowercase, uppercase, symbols, and numbers."
+                )
+
             if (confirmPassword != password) return@launch player.infoMessage(
                 "[#ff0000]Confirm password is not same as password."
             )
@@ -189,6 +207,16 @@ class UserAccountHandler : Handler() {
 
             val username = output["username"]!!
             val password = output["password"]!!
+
+            if (!username.matches(usernameRegex))
+                return@launch player.infoMessage(
+                    "[#ff0000]Invalid username. Username may only contains lowercase, uppercase, and numbers."
+                )
+
+            if (!password.matches(passwordRegex))
+                return@launch player.infoMessage(
+                    "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers."
+                )
 
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
                 val mindustryUser = MindustryUser.selectOne { MindustryUser.mindustryUUID eq player.uuid() }!!
