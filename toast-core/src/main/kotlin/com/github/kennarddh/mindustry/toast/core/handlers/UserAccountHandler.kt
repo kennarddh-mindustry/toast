@@ -203,7 +203,8 @@ class UserAccountHandler : Handler() {
                         "[#ff0000]User not found."
                     )
 
-                if (!Password.check(password, user[Users.password]).with(argon2FunctionInstance)
+                if (
+                    !Password.check(password, user[Users.password]).with(argon2FunctionInstance)
                 )
                     return@newSuspendedTransaction player.infoMessage(
                         "[#ff0000]Wrong password."
