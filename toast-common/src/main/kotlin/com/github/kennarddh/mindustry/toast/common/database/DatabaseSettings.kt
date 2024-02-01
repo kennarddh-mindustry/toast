@@ -30,12 +30,12 @@ object DatabaseSettings {
         newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             addLogger(StdOutSqlLogger)
 
-
             SchemaUtils.createMissingTablesAndColumns(Users)
             SchemaUtils.createMissingTablesAndColumns(IPAddresses)
             SchemaUtils.createMissingTablesAndColumns(MindustryNames)
             SchemaUtils.createMissingTablesAndColumns(MindustryUser)
             SchemaUtils.createMissingTablesAndColumns(MindustryUserServerData)
+            SchemaUtils.createMissingTablesAndColumns(MindustryUserUSID)
             SchemaUtils.createMissingTablesAndColumns(MindustryUserIPAddresses)
             SchemaUtils.createMissingTablesAndColumns(MindustryUserMindustryNames)
             SchemaUtils.createMissingTablesAndColumns(UserKick)
