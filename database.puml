@@ -89,7 +89,7 @@ $schema("Users") {
         * $column("kickedAt") DATETIME
         * $column("kickEndAt") DATETIME
         * $column("kickType") VARCHAR(50) COMMENT Kick, VoteKick
-        * $fk("userID") INTEGER
+          $fk("mindustryUserID") INTEGER
           $fk("targetUserID") INTEGER
         * $fk("targetMindustryUserID") INTEGER
     }
@@ -99,6 +99,7 @@ $schema("Users") {
         * $fk("userKickID") INTEGER
         * $fk("voteKickStarterUserID") INTEGER
         * $column("requiredVotes") SHORT
+        * $column("result") VARCHAR(50)
     }
 
     $table("UserVoteKickVotes") {
@@ -127,7 +128,7 @@ $schema("Users") {
     MindustryUser::id ||--{ MindustryUserMindustryNames::mindustryUserID
     MindustryNames::id ||--{ MindustryUserMindustryNames::mindustryNameID
 
-    UserKick::userID }--|| Users::id
+    UserKick::mindustryUserID }o--|| MindustryUser::id
     UserKick::targetUserID }o--|| Users::id
     UserKick::targetMindustryUserID }--|| MindustryUser::id
 
