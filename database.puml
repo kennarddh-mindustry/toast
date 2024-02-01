@@ -89,8 +89,9 @@ $schema("Users") {
         * $column("kickedAt") DATETIME
         * $column("kickEndAt") DATETIME
         * $column("kickType") VARCHAR(50) COMMENT Kick, VoteKick
-          $fk("userID") INTEGER
-        * $fk("mindustryUserID") INTEGER
+        * $fk("userID") INTEGER
+          $fk("targetUserID") INTEGER
+        * $fk("targetMindustryUserID") INTEGER
     }
 
     $table("UserVoteKick") {
@@ -111,8 +112,9 @@ $schema("Users") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $column("reason") TEXT
         * $column("bannedAt") DATETIME
-          $fk("userID") INTEGER
-        * $fk("mindustryUserID") INTEGER
+        * $fk("userID") INTEGER
+          $fk("targetUserID") INTEGER
+        * $fk("targetMindustryUserID") INTEGER
     }
 
     Users::id ||--o{ MindustryUser::userID
@@ -125,8 +127,9 @@ $schema("Users") {
     MindustryUser::id ||--{ MindustryUserMindustryNames::mindustryUserID
     MindustryNames::id ||--{ MindustryUserMindustryNames::mindustryNameID
 
-    UserKick::userID }o--|| Users::id
-    UserKick::mindustryUserID }o--|| MindustryUser::id
+    UserKick::userID }--|| Users::id
+    UserKick::targetUserID }o--|| Users::id
+    UserKick::targetMindustryUserID }--|| MindustryUser::id
 
     UserVoteKick::voteKickStarterUserID }o--|| Users::id
     UserVoteKick::userKickID }o--|| UserKick::id
@@ -134,8 +137,9 @@ $schema("Users") {
     UserVoteKickVotes::userVoteKickID }o--|| UserVoteKick::id
     UserVoteKickVotes::mindustryUserID }o--|| MindustryUser::id
 
-    UserBan::userID }o--|| Users::id
-    UserBan::mindustryUserID }o--|| MindustryUser::id
+    UserBan::userID }--|| Users::id
+    UserBan::targetUserID }o--|| Users::id
+    UserBan::targetMindustryUserID }--|| MindustryUser::id
 }
 
 $schema("Map") {
