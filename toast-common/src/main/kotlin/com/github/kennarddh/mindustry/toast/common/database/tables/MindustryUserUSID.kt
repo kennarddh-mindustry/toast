@@ -4,5 +4,5 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 
 object MindustryUserUSID : IntIdTable() {
     val mindustryUserServerDataID = reference("mindustryUserServerDataID", MindustryUserServerData)
-    val mindustryUSID = varchar("mindustryUUID", 64)
+    val mindustryUSID = varchar("mindustryUSID", 64)
 }
