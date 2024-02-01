@@ -57,6 +57,15 @@ data class PlayerVoteKickVoteGameEvent(
     val vote: Boolean
 ) : GameEventBase()
 
+@Serializable
+@SerialName("PlayerVoteKickCancel")
+data class PlayerVoteKickCancelGameEvent(
+    val playerMindustryName: String,
+    val playerMindustryUUID: String,
+    val targetPlayerMindustryName: String,
+    val targetPlayerMindustryUUID: String,
+) : GameEventBase()
+
 // TODO: Implement map in database first. MapStart, MapEnd.
 //@Serializable
 //@SerialName("MapStart")
