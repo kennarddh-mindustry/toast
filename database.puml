@@ -88,20 +88,15 @@ $schema("Users") {
         * $column("reason") TEXT
         * $column("kickedAt") DATETIME
         * $column("kickEndAt") DATETIME
-          $fk("ipAddressID") Integer
+        * $column("kickType") VARCHAR(50) COMMENT Kick, VoteKick
           $fk("userID") INTEGER
-          $fk("mindustryUserID") INTEGER
-          $fk("mindustryNameID") INTEGER
+        * $fk("mindustryUserID") INTEGER
     }
 
     $table("UserVoteKick") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $column("reason") TEXT
-        * $column("kickedAt") DATETIME
-        * $column("kickEndAt") DATETIME
+        * $fk("userKickID") INTEGER
         * $fk("voteKickStarterUserID") INTEGER
-          $fk("userID") INTEGER
-        * $fk("mindustryUserID") INTEGER
         * $column("requiredVotes") SHORT
     }
 
@@ -116,10 +111,8 @@ $schema("Users") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $column("reason") TEXT
         * $column("bannedAt") DATETIME
-          $fk("ipAddressID") INTEGER
           $fk("userID") INTEGER
           $fk("mindustryUserID") INTEGER
-          $fk("mindustryNameID") INTEGER
     }
 
     Users::id ||--o{ MindustryUser::userID
@@ -132,22 +125,17 @@ $schema("Users") {
     MindustryUser::id ||--{ MindustryUserMindustryNames::mindustryUserID
     MindustryNames::id ||--{ MindustryUserMindustryNames::mindustryNameID
 
-    UserKick::ipAddressID }o--|| IPAddresses::id
     UserKick::userID }o--|| Users::id
     UserKick::mindustryUserID }o--|| MindustryUser::id
-    UserKick::mindustryNameID }o--|| MindustryNames::id
 
     UserVoteKick::voteKickStarterUserID }o--|| Users::id
-    UserVoteKick::userID }o--|| Users::id
-    UserVoteKick::mindustryUserID }o--|| MindustryUser::id
+    UserVoteKick::userKickID }o--|| UserKick::id
 
     UserVoteKickVotes::userVoteKickID }o--|| UserVoteKick::id
     UserVoteKickVotes::mindustryUserID }o--|| MindustryUser::id
 
-    UserBan::ipAddressID }o--|| IPAddresses::id
     UserBan::userID }o--|| Users::id
     UserBan::mindustryUserID }o--|| MindustryUser::id
-    UserBan::mindustryNameID }o--|| MindustryNames::id
 }
 
 $schema("Map") {
