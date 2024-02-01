@@ -112,7 +112,7 @@ $schema("Users") {
         * $column("reason") TEXT
         * $column("bannedAt") DATETIME
           $fk("userID") INTEGER
-          $fk("mindustryUserID") INTEGER
+        * $fk("mindustryUserID") INTEGER
     }
 
     Users::id ||--o{ MindustryUser::userID
