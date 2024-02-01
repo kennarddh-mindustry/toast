@@ -10,6 +10,7 @@ object UserKick : IntIdTable() {
     val kickedAt = datetime("kickedAt").defaultExpression(CurrentDateTime)
     val kickEndAt = datetime("kickEndAt")
     val kickType = enumerationByName<UserRole>("kickType", 50)
-    val userID = reference("userID", Users).nullable()
-    val mindustryUserID = reference("mindustryUserID", MindustryUser)
+    val mindustryUserID = reference("mindustryUserID", MindustryUser).nullable()
+    val targetUserID = reference("targetUserID", Users).nullable()
+    val targetMindustryUserID = reference("targetMindustryUserID", MindustryUser)
 }

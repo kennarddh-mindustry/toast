@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.javatime.datetime
 object UserBan : IntIdTable() {
     val reason = text("reason")
     val bannedAt = datetime("bannedAt").defaultExpression(CurrentDateTime)
-    val userID = reference("userID", Users).nullable()
-    val mindustryUserID = reference("mindustryUserID", MindustryUser)
+    val userID = reference("userID", Users)
+    val targetUserID = reference("targetUserID", Users).nullable()
+    val targetMindustryUserID = reference("targetMindustryUserID", MindustryUser)
 }
