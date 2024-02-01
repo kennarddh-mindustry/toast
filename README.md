@@ -7,3 +7,8 @@ Toast Mindustry server plugin
 - Kotlin Runtime
 - Genesis Core
 - Genesis Common
+
+## Todo
+
+- IP Ban
+- Bad word filter
