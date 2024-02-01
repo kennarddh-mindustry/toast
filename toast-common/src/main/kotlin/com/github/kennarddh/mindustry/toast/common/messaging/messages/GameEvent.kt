@@ -32,11 +32,17 @@ data class PlayerChatGameEvent(
 
 @Serializable
 @SerialName("PlayerKicked")
-data class PlayerKickedGameEvent(val userKickID: Int) : GameEventBase()
+data class PlayerKickedGameEvent(
+    val userKickID: Int,
+    val targetPlayerMindustryName: String,
+) : GameEventBase()
 
 @Serializable
 @SerialName("PlayerKicked")
-data class PlayerBannedGameEvent(val userBanID: Int) : GameEventBase()
+data class PlayerBannedGameEvent(
+    val userBanID: Int,
+    val targetPlayerMindustryName: String,
+) : GameEventBase()
 
 @Serializable
 @SerialName("PlayerVoteKickStart")
