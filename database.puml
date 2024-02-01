@@ -54,6 +54,12 @@ $schema("Users") {
         * $column("mindustryUUID") VARCHAR(255) UNIQUE
     }
 
+    $table("MindustryUserUSID") {
+        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $column("mindustryUSID") VARCHAR(255) UNIQUE
+        * $fk("mindustryUserID") INTEGER
+    }
+
     $table("MindustryUserIPAddresses") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $fk("ipAddressID") INTEGER
@@ -101,8 +107,8 @@ $schema("Users") {
 
     $table("UserVoteKickVotes") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $fk("userVoteKickID") INTEGER
         * $fk("mindustryUserID") INTEGER
+        * $fk("userVoteKickID") INTEGER
         * $column("vote") BOOLEAN
     }
 
@@ -118,7 +124,7 @@ $schema("Users") {
 
     Users::id ||--o{ MindustryUser::userID
     MindustryUserServerData::mindustryUserID }--|| MindustryUser::id
-
+    MindustryUserUSID::mindustryUserID }--|| MindustryUser::id
     MindustryUser::id ||--{ MindustryUserIPAddresses::mindustryUserID
     IPAddresses::id ||--{ MindustryUserIPAddresses::ipAddressID
     MindustryUser::id ||--{ MindustryUserMindustryNames::mindustryUserID
