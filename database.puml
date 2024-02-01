@@ -54,10 +54,10 @@ $schema("Users") {
         * $column("mindustryUUID") VARCHAR(255) UNIQUE
     }
 
-    $table("MindustryUserUSID") {
+    $table("MindustryUSID") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $fk("mindustryUserServerDataID") INTEGER
-        * $column("mindustryUSID") VARCHAR(64) UNIQUE
+        * $column("MindustryUSID") VARCHAR(64) UNIQUE
     }
 
     $table("MindustryUserIPAddresses") {
@@ -121,7 +121,7 @@ $schema("Users") {
     Users::id ||--o{ MindustryUser::userID
     MindustryUserServerData::mindustryUserID }--|| MindustryUser::id
 
-    MindustryUserUSID::mindustryUserServerDataID }--|| MindustryUserServerData::id
+    MindustryUSID::mindustryUserServerDataID }--|| MindustryUserServerData::id
 
     MindustryUser::id ||--{ MindustryUserIPAddresses::mindustryUserID
     IPAddresses::id ||--{ MindustryUserIPAddresses::ipAddressID
