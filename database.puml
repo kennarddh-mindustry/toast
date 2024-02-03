@@ -57,7 +57,7 @@ $schema("Users") {
     $table("MindustryUSID") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $fk("mindustryUserServerDataID") INTEGER
-        * $column("MindustryUSID") VARCHAR(64) UNIQUE
+        * $column("mindustryUSID") VARCHAR(64) UNIQUE
     }
 
     $table("MindustryUserIPAddresses") {
