@@ -10,6 +10,7 @@ import com.github.kennarddh.mindustry.genesis.core.menus.Menus
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoMessage
 import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
+import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SaltGenerator
@@ -94,7 +95,7 @@ class UserAccountHandler : Handler() {
                     MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
                 }) {
                     it[this.mindustryUserID] = mindustryUserID
-                    it[this.server] = Server.Survival
+                    it[this.server] = ToastVars.server
                 }
 
                 if (mindustryUser[MindustryUser.userID] == null) {
