@@ -55,63 +55,47 @@ class UserAccountHandler : Handler() {
 
         CoroutineScopes.Main.launch {
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                val mindustryUser = MindustryUser.selectAll().where {
+                val mindustryUser = MindustryUser.insertIfNotExistAndGet({
                     MindustryUser.mindustryUUID eq player.uuid()
-                }.firstOrNull() ?: MindustryUser.insert {
+                }) {
                     it[this.mindustryUUID] = player.uuid()
-                }.resultedValues!!.first()
+                }
 
-                val ipAddress = IPAddresses.selectAll().where {
+                val ipAddress = IPAddresses.insertIfNotExistAndGet({
                     IPAddresses.ipAddress eq ip
-                }.firstOrNull()
-
-                val ipAddressID = if (ipAddress == null) {
-                    IPAddresses.insertAndGetId {
-                        it[this.ipAddress] = ip
-                    }
-                } else {
-                    ipAddress[IPAddresses.id]
+                }) {
+                    it[this.ipAddress] = ip
                 }
 
-                val mindustryName = MindustryNames.selectOne {
+                val mindustryName = MindustryNames.insertIfNotExistAndGet({
                     MindustryNames.name eq name
+                }) {
+                    it[this.name] = name
+                    it[this.strippedName] = strippedName
                 }
 
-                val mindustryNameID = if (mindustryName == null) {
-                    MindustryNames.insertAndGetId {
-                        it[this.name] = name
-                        it[this.strippedName] = strippedName
-                    }
-                } else {
-                    mindustryName[MindustryNames.id]
+                MindustryUserIPAddresses.insertIfNotExistAndGet({
+                    MindustryUserIPAddresses.mindustryUserID eq mindustryUser[MindustryUser.id]
+                    MindustryUserIPAddresses.ipAddressID eq ipAddress[IPAddresses.id]
+                }) {
+                    it[this.mindustryUserID] = mindustryUserID
+                    it[this.ipAddressID] = ipAddressID
                 }
 
-                if (!MindustryUserIPAddresses.exists {
-                        MindustryUserIPAddresses.mindustryUserID eq mindustryUser[MindustryUser.id]
-                        MindustryUserIPAddresses.ipAddressID eq ipAddressID
-                    }) {
-                    MindustryUserIPAddresses.insertIgnore {
-                        it[this.mindustryUserID] = mindustryUserID
-                        it[this.ipAddressID] = ipAddressID
-                    }
+                MindustryUserMindustryNames.insertIfNotExistAndGet({
+                    MindustryUserMindustryNames.mindustryUserID eq mindustryUser[MindustryUser.id]
+                    MindustryUserMindustryNames.mindustryNameID eq mindustryName[MindustryNames.id]
+                }) {
+                    it[this.mindustryUserID] = mindustryUserID
+                    it[this.mindustryNameID] = mindustryNameID
                 }
 
-                if (!MindustryUserMindustryNames.exists {
-                        MindustryUserMindustryNames.mindustryUserID eq mindustryUser[MindustryUser.id]
-                        MindustryUserMindustryNames.mindustryNameID eq mindustryNameID
-                    }) {
-                    MindustryUserMindustryNames.insertIgnore {
-                        it[this.mindustryUserID] = mindustryUserID
-                        it[this.mindustryNameID] = mindustryNameID
-                    }
-                }
-
-                val mindustryUserServerData = MindustryUserServerData.selectOne {
+                val mindustryUserServerData = MindustryUserServerData.insertIfNotExistAndGet({
                     MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
-                } ?: MindustryUserServerData.insert {
+                }) {
                     it[this.mindustryUserID] = mindustryUserID
                     it[this.server] = Server.Survival
-                }.resultedValues!!.first()
+                }
 
                 if (mindustryUser[MindustryUser.userID] == null) {
                     // Non registered account or new account
