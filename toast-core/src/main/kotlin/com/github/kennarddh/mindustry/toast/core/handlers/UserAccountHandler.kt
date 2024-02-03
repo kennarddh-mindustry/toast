@@ -57,15 +57,9 @@ class UserAccountHandler : Handler() {
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
                 val mindustryUser = MindustryUser.selectAll().where {
                     MindustryUser.mindustryUUID eq player.uuid()
-                }.firstOrNull()
-
-                val mindustryUserID = if (mindustryUser == null) {
-                    MindustryUser.insertAndGetId {
-                        it[this.mindustryUUID] = player.uuid()
-                    }
-                } else {
-                    mindustryUser[MindustryUser.id]
-                }
+                }.firstOrNull() ?: MindustryUser.insert {
+                    it[this.mindustryUUID] = player.uuid()
+                }.resultedValues!!.first()
 
                 val ipAddress = IPAddresses.selectAll().where {
                     IPAddresses.ipAddress eq ip
@@ -93,7 +87,7 @@ class UserAccountHandler : Handler() {
                 }
 
                 if (!MindustryUserIPAddresses.exists {
-                        MindustryUserIPAddresses.mindustryUserID eq mindustryUserID
+                        MindustryUserIPAddresses.mindustryUserID eq mindustryUser[MindustryUser.id]
                         MindustryUserIPAddresses.ipAddressID eq ipAddressID
                     }) {
                     MindustryUserIPAddresses.insertIgnore {
@@ -103,7 +97,7 @@ class UserAccountHandler : Handler() {
                 }
 
                 if (!MindustryUserMindustryNames.exists {
-                        MindustryUserMindustryNames.mindustryUserID eq mindustryUserID
+                        MindustryUserMindustryNames.mindustryUserID eq mindustryUser[MindustryUser.id]
                         MindustryUserMindustryNames.mindustryNameID eq mindustryNameID
                     }) {
                     MindustryUserMindustryNames.insertIgnore {
@@ -112,16 +106,30 @@ class UserAccountHandler : Handler() {
                     }
                 }
 
-                if (!MindustryUserServerData.exists { MindustryUserServerData.mindustryUserID eq mindustryUserID }) {
-                    MindustryUserServerData.insertIgnore {
-                        it[this.mindustryUserID] = mindustryUserID
-                        it[this.server] = Server.Survival
+                val mindustryUserServerData = MindustryUserServerData.selectOne {
+                    MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
+                } ?: MindustryUserServerData.insert {
+                    it[this.mindustryUserID] = mindustryUserID
+                    it[this.server] = Server.Survival
+                }.resultedValues!!.first()
+
+                if (mindustryUser[MindustryUser.userID] == null) {
+                    // Non registered account or new account
+                    if (
+                        !MindustryUSID.exists {
+                            MindustryUSID.mindustryUSID eq player.usid()
+                        }
+                    ) {
+                        MindustryUSID.insert {
+                            it[this.mindustryUSID] = player.usid()
+                            it[this.mindustryUserServerDataID] = mindustryUserServerData[MindustryUserServerData.id]
+                        }
                     }
                 }
 
                 // TODO: Check for kick and ban
 
-                val userID = mindustryUser?.get(MindustryUser.userID)
+                val userID = mindustryUser[MindustryUser.userID]
 
                 if (userID != null) {
                     val user = Users.selectAll().where {
