@@ -19,8 +19,11 @@ import com.password4j.types.Argon2
 import kotlinx.coroutines.launch
 import mindustry.game.EventType
 import mindustry.gen.Player
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.JoinType
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.jetbrains.exposed.sql.update
 
 class UserAccountHandler : Handler() {
     private val argon2FunctionInstance = Argon2Function.getInstance(
@@ -117,9 +120,9 @@ class UserAccountHandler : Handler() {
                 val userID = mindustryUser[MindustryUser.userID]
 
                 if (userID != null) {
-                    val user = Users.selectAll().where {
+                    val user = Users.selectOne {
                         Users.id eq userID
-                    }.first()
+                    }!!
 
                     // TODO: Handle more role
                     when (user[Users.role]) {
