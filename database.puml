@@ -46,11 +46,11 @@ $schema("Users") {
         * $column("xp") INTEGER DEFAULT 0
         * $column("playTime") BIGINT DEFAULT 0
         * $column("activePlayTime") BIGINT DEFAULT 0
+          $fk("userID") INTEGER
     }
 
     $table("MindustryUser") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-          $fk("userID") INTEGER
         * $column("mindustryUUID") VARCHAR(255) UNIQUE
     }
 
@@ -118,7 +118,7 @@ $schema("Users") {
         * $fk("targetMindustryUserID") INTEGER
     }
 
-    Users::id ||--o{ MindustryUser::userID
+    Users::id ||--o{ MindustryUserServerData::userID
     MindustryUserServerData::mindustryUserID }--|| MindustryUser::id
 
     MindustryUSID::mindustryUserServerDataID }--|| MindustryUserServerData::id
