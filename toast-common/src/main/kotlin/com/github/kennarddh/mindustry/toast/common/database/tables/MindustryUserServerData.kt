@@ -9,4 +9,5 @@ object MindustryUserServerData : IntIdTable() {
     val xp = integer("xp").default(0)
     val playTime = long("playTime").default(0)
     val activePlayTime = long("activePlayTime").default(0)
+    val userID = reference("userID", Users).nullable()
 }
