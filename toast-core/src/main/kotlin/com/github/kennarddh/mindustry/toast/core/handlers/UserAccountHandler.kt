@@ -94,30 +94,50 @@ class UserAccountHandler : Handler() {
                     it[this.mindustryNameID] = mindustryNameID
                 }
 
-                val mindustryUserServerData = MindustryUserServerData.insertIfNotExistAndGet({
-                    MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
-                }) {
-                    it[this.mindustryUserID] = mindustryUserID
-                    it[this.server] = ToastVars.server
-                }
-
-                if (mindustryUser[MindustryUser.userID] == null) {
-                    // Non registered account or new account
-                    if (
-                        !MindustryUSID.exists {
-                            MindustryUSID.mindustryUSID eq player.usid()
-                        }
-                    ) {
-                        MindustryUSID.insert {
-                            it[this.mindustryUSID] = player.usid()
-                            it[this.mindustryUserServerDataID] = mindustryUserServerData[MindustryUserServerData.id]
-                        }
+                val mindustryUserServerDataCanBeNull = MindustryUserServerData
+                    .selectOne {
+                        MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
+                        MindustryUserServerData.server eq ToastVars.server
                     }
+
+                val mindustryUserServerData = if (mindustryUserServerDataCanBeNull == null) {
+                    // New user server data
+                    MindustryUserServerData.insert {
+                        it[this.mindustryUserID] = mindustryUserID
+                        it[this.server] = ToastVars.server
+                        it[this.mindustryUSID] = player.uuid()
+                    }.resultedValues!!.first()
+                } else {
+                    val storedUSID = mindustryUserServerDataCanBeNull[MindustryUserServerData.mindustryUSID]
+
+                    val mindustryUserServerData =
+                        if (!Password.check(player.usid(), storedUSID).with(argon2FunctionInstance)) {
+                            // USID is not same as stored usid, Invalidate login
+                            player.infoMessage(
+                                "[#ff0000]Your login was invalidated. Either there is server's ip update or your account got stolen by other player. If this happen too often without any announcements, likely that your user was stolen."
+                            )
+
+                            MindustryUserServerData.update({
+                                MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
+                            }) {
+                                it[this.mindustryUSID] = player.uuid()
+                                it[this.userID] = null
+                            }
+
+                            // Return updated user server data
+                            MindustryUserServerData.selectOne {
+                                MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
+                            }!!
+                        } else {
+                            mindustryUserServerDataCanBeNull
+                        }
+
+                    mindustryUserServerData
                 }
 
                 // TODO: Check for kick and ban
 
-                val userID = mindustryUser[MindustryUser.userID]
+                val userID = mindustryUserServerData[MindustryUserServerData.userID]
 
                 if (userID != null) {
                     val user = Users.selectOne {
@@ -215,9 +235,19 @@ class UserAccountHandler : Handler() {
                 )
 
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                val mindustryUser = MindustryUser.selectOne { MindustryUser.mindustryUUID eq player.uuid() }!!
+                val mindustryUserServerData = MindustryUserServerData
+                    .join(
+                        MindustryUser,
+                        JoinType.INNER,
+                        onColumn = MindustryUserServerData.mindustryUserID,
+                        otherColumn = MindustryUser.id
+                    )
+                    .selectOne {
+                        MindustryUser.mindustryUUID eq player.uuid()
+                        MindustryUserServerData.server eq ToastVars.server
+                    }!!
 
-                if (mindustryUser[MindustryUser.userID] != null)
+                if (mindustryUserServerData[MindustryUserServerData.userID] != null)
                     return@newSuspendedTransaction player.infoMessage(
                         "[#ff0000]You are already logged in."
                     )
@@ -234,9 +264,19 @@ class UserAccountHandler : Handler() {
                         "[#ff0000]Wrong password."
                     )
 
-                MindustryUser.update({ MindustryUser.mindustryUUID eq player.uuid() }) {
-                    it[userID] = user[Users.id]
-                }
+                MindustryUserServerData
+                    .join(
+                        MindustryUser,
+                        JoinType.INNER,
+                        onColumn = MindustryUserServerData.mindustryUserID,
+                        otherColumn = MindustryUser.id
+                    )
+                    .update({
+                        MindustryUser.mindustryUUID eq player.uuid()
+                        MindustryUserServerData.server eq ToastVars.server
+                    }) {
+                        it[MindustryUserServerData.userID] = user[Users.id]
+                    }
 
                 player.infoMessage(
                     "[#00ff00]Login success. You are now logged in as ${user[Users.username]}."
@@ -250,18 +290,32 @@ class UserAccountHandler : Handler() {
     fun logout(player: Player) {
         CoroutineScopes.Main.launch {
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                val user =
-                    MindustryUser.join(Users, JoinType.INNER, MindustryUser.userID, Users.id)
-                        .selectOne { MindustryUser.mindustryUUID eq player.uuid() }!!
+                val mindustryUserServerData = MindustryUserServerData
+                    .join(
+                        MindustryUser,
+                        JoinType.INNER,
+                        onColumn = MindustryUserServerData.mindustryUserID,
+                        otherColumn = MindustryUser.id
+                    )
+                    .selectOne {
+                        MindustryUser.mindustryUUID eq player.uuid()
+                        MindustryUserServerData.server eq ToastVars.server
+                    }!!
 
-                if (user[MindustryUser.userID] == null)
-                    return@newSuspendedTransaction player.infoMessage(
+                val userID = mindustryUserServerData[MindustryUserServerData.userID]
+                    ?: return@newSuspendedTransaction player.infoMessage(
                         "[#ff0000]You are not logged in."
                     )
 
-                MindustryUser.update({ MindustryUser.id eq user[MindustryUser.id] }) {
-                    it[userID] = null
-                }
+                val user = Users.selectOne { Users.id eq userID }!!
+
+                MindustryUserServerData
+                    .update({
+                        MindustryUserServerData.userID eq userID
+                        MindustryUserServerData.server eq ToastVars.server
+                    }) {
+                        it[MindustryUserServerData.userID] = null
+                    }
 
                 player.infoMessage(
                     "[#00ff00]Logout success. You are now no longer logged in as ${user[Users.username]}."
