@@ -20,7 +20,6 @@ import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
 
@@ -214,7 +213,7 @@ class UserAccountHandler : Handler() {
                     .addRandomSalt(64)
                     .with(passwordHashFunctionInstance)
 
-                Users.insertIgnore {
+                Users.insert {
                     it[this.username] = username
                     it[this.password] = hashedPassword.result
                     it[this.role] = UserRole.Player
