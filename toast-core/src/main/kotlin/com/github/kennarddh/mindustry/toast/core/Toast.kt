@@ -7,7 +7,6 @@ import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStartGameEvent
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStopGameEvent
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.validateMinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
@@ -46,13 +45,6 @@ class Toast : AbstractPlugin() {
     }
 
     override fun dispose() {
-        Messenger.publishGameEvent(
-            GameEvent(
-                ToastVars.server, Instant.now().toEpochMilli(),
-                ServerStopGameEvent()
-            )
-        )
-
         Messenger.close()
 
         TransactionManager.closeAndUnregister(DatabaseSettings.database)

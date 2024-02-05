@@ -4,15 +4,21 @@ import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandl
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.extensions.stripFooMessageInvisibleCharacters
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerChatGameEvent
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerJoinGameEvent
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerLeaveGameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import mindustry.game.EventType
 import java.time.Instant
 
 class GameEventsHandler : Handler() {
+    override fun onDispose() {
+        Messenger.publishGameEvent(
+            GameEvent(
+                ToastVars.server, Instant.now().toEpochMilli(),
+                ServerStopGameEvent()
+            )
+        )
+    }
+
     @EventHandler
     fun onPlayerJoin(event: EventType.PlayerJoin) {
         val player = event.player
