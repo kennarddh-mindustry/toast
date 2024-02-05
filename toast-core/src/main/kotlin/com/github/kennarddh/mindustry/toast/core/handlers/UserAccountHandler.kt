@@ -9,10 +9,10 @@ import com.github.kennarddh.mindustry.genesis.core.menus.Menus
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoMessage
 import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
+import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.password4j.Argon2Function
 import com.password4j.Password
-import com.password4j.SaltGenerator
 import com.password4j.SecureString
 import com.password4j.types.Argon2
 import kotlinx.coroutines.launch
@@ -25,8 +25,12 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.jetbrains.exposed.sql.update
 
 class UserAccountHandler : Handler() {
-    private val argon2FunctionInstance = Argon2Function.getInstance(
-        15360, 6, 2, 64, Argon2.ID
+    private val passwordHashFunctionInstance = Argon2Function.getInstance(
+        16384, 10, 4, 64, Argon2.ID
+    )
+
+    private val usidHashFunctionInstance = Argon2Function.getInstance(
+        16384, 10, 4, 64, Argon2.ID
     )
 
     private val usernameRegex = """[a-zA-Z0-9_]{1,50}""".toRegex()
@@ -100,10 +104,13 @@ class UserAccountHandler : Handler() {
 
                 val mindustryUserServerData = if (mindustryUserServerDataCanBeNull == null) {
                     // New user server data
-                    val hashedUSID =
-                        Password.hash(SecureString(player.usid().toCharArray()))
-                            .addSalt(SaltGenerator.generate(64))
-                            .with(argon2FunctionInstance)
+                    Logger.info("USID: ${player.usid()}")
+
+                    val hashedUSID = Password.hash(SecureString(player.usid().toCharArray()))
+                        .addRandomSalt(64)
+                        .with(usidHashFunctionInstance)
+
+                    Logger.info("HASHED USID: ${hashedUSID.result.length}, ${hashedUSID.result}")
 
                     MindustryUserServerData.insert {
                         it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
@@ -114,16 +121,19 @@ class UserAccountHandler : Handler() {
                     val storedUSID = mindustryUserServerDataCanBeNull[MindustryUserServerData.mindustryUSID]
 
                     val mindustryUserServerData =
-                        if (!Password.check(player.usid(), storedUSID).with(argon2FunctionInstance)) {
-                            // USID is not same as stored usid, Invalidate login
+                        if (
+                            !Password.check(player.usid(), storedUSID)
+                                .with(usidHashFunctionInstance)
+                        ) {
+                            // USID is not same as stored usid, Invalidate login.
                             player.infoMessage(
                                 "[#ff0000]Your login was invalidated. Either there is server's ip update or your account got stolen by other player. If this happen too often without any announcements, likely that your user was stolen."
                             )
 
                             val hashedUSID =
                                 Password.hash(SecureString(player.usid().toCharArray()))
-                                    .addSalt(SaltGenerator.generate(64))
-                                    .with(argon2FunctionInstance)
+                                    .addRandomSalt(64)
+                                    .with(usidHashFunctionInstance)
 
                             MindustryUserServerData.update({
                                 MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
@@ -200,9 +210,9 @@ class UserAccountHandler : Handler() {
                         "[#ff0000]Your username is already taken."
                     )
 
-                val hashedPassword =
-                    Password.hash(SecureString(password.toCharArray())).addSalt(SaltGenerator.generate(64))
-                        .with(argon2FunctionInstance)
+                val hashedPassword = Password.hash(SecureString(password.toCharArray()))
+                    .addRandomSalt(64)
+                    .with(passwordHashFunctionInstance)
 
                 Users.insertIgnore {
                     it[this.username] = username
@@ -263,7 +273,8 @@ class UserAccountHandler : Handler() {
                     )
 
                 if (
-                    !Password.check(password, user[Users.password]).with(argon2FunctionInstance)
+                    !Password.check(password, user[Users.password])
+                        .with(passwordHashFunctionInstance)
                 )
                     return@newSuspendedTransaction player.infoMessage(
                         "[#ff0000]Wrong password."
