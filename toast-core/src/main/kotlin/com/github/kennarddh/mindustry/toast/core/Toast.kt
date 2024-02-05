@@ -8,6 +8,8 @@ import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStartGameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStopGameEvent
+import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
+import com.github.kennarddh.mindustry.toast.core.commands.validations.validateMinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.handlers.GameEventsHandler
@@ -23,6 +25,8 @@ class Toast : AbstractPlugin() {
         CoroutineScopes.Main.launch {
             DatabaseSettings.init()
             Messenger.init()
+
+            Genesis.commandRegistry.registerCommandValidationAnnotation(MinimumRole::class, ::validateMinimumRole)
 
             Genesis.registerHandler(UserAccountHandler())
             Genesis.registerHandler(UserStatsHandler())
