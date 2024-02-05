@@ -1,6 +1,5 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
-import arc.util.Strings
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
@@ -55,7 +54,6 @@ class UserAccountHandler : Handler() {
         val player = event.player
         val ip = player.con.address.packIP()
         val name = player.name
-        val strippedName = Strings.stripColors(name)
 
         CoroutineScopes.Main.launch {
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
@@ -75,7 +73,7 @@ class UserAccountHandler : Handler() {
                     MindustryNames.name eq name
                 }) {
                     it[this.name] = name
-                    it[this.strippedName] = strippedName
+                    it[this.strippedName] = player.plainName()
                 }
 
                 MindustryUserIPAddresses.insertIfNotExistAndGet({
