@@ -9,7 +9,6 @@ import com.github.kennarddh.mindustry.genesis.core.menus.Menus
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoMessage
 import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
-import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserServerData
 import com.password4j.Argon2Function
@@ -100,13 +99,9 @@ class UserAccountHandler : Handler() {
 
                 val mindustryUserServerData = if (mindustryUserServerDataCanBeNull == null) {
                     // New user server data
-                    Logger.info("USID: ${player.usid()}")
-
                     val hashedUSID = Password.hash(SecureString(player.usid().toCharArray()))
                         .addRandomSalt(64)
                         .with(usidHashFunctionInstance)
-
-                    Logger.info("HASHED USID: ${hashedUSID.result.length}, ${hashedUSID.result}")
 
                     MindustryUserServerData.insert {
                         it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
