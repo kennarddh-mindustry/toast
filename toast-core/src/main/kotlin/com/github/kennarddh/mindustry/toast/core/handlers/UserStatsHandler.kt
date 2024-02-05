@@ -9,6 +9,7 @@ import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.common.selectOne
+import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kotlinx.coroutines.launch
 import mindustry.game.EventType
 import mindustry.gen.Groups
@@ -55,7 +56,10 @@ class UserStatsHandler : Handler() {
                         JoinType.INNER,
                         onColumn = MindustryUserServerData.mindustryUserID,
                         otherColumn = MindustryUser.id
-                    ).update({ MindustryUser.mindustryUUID eq it.uuid() }) {
+                    ).update({
+                        MindustryUser.mindustryUUID eq it.uuid()
+                        MindustryUserServerData.server eq ToastVars.server
+                    }) {
                         with(SqlExpressionBuilder) {
                             it[MindustryUserServerData.xp] = MindustryUserServerData.xp + xpDelta
                             it[MindustryUserServerData.playTime] = MindustryUserServerData.playTime + playTimeChanges
