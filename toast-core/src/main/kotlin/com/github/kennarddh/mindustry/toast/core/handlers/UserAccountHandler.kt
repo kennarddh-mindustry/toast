@@ -82,16 +82,16 @@ class UserAccountHandler : Handler() {
                     MindustryUserIPAddresses.mindustryUserID eq mindustryUser[MindustryUser.id]
                     MindustryUserIPAddresses.ipAddressID eq ipAddress[IPAddresses.id]
                 }) {
-                    it[this.mindustryUserID] = mindustryUserID
-                    it[this.ipAddressID] = ipAddressID
+                    it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
+                    it[this.ipAddressID] = ipAddress[IPAddresses.id]
                 }
 
                 MindustryUserMindustryNames.insertIfNotExistAndGet({
                     MindustryUserMindustryNames.mindustryUserID eq mindustryUser[MindustryUser.id]
                     MindustryUserMindustryNames.mindustryNameID eq mindustryName[MindustryNames.id]
                 }) {
-                    it[this.mindustryUserID] = mindustryUserID
-                    it[this.mindustryNameID] = mindustryNameID
+                    it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
+                    it[this.mindustryNameID] = mindustryName[MindustryNames.id]
                 }
 
                 val mindustryUserServerDataCanBeNull = MindustryUserServerData
