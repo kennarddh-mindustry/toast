@@ -102,10 +102,15 @@ class UserAccountHandler : Handler() {
 
                 val mindustryUserServerData = if (mindustryUserServerDataCanBeNull == null) {
                     // New user server data
+                    val hashedUSID =
+                        Password.hash(SecureString(player.usid().toCharArray()))
+                            .addSalt(SaltGenerator.generate(64))
+                            .with(argon2FunctionInstance)
+
                     MindustryUserServerData.insert {
                         it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
                         it[this.server] = ToastVars.server
-                        it[this.mindustryUSID] = player.uuid()
+                        it[this.mindustryUSID] = hashedUSID.result
                     }.resultedValues!!.first()
                 } else {
                     val storedUSID = mindustryUserServerDataCanBeNull[MindustryUserServerData.mindustryUSID]
