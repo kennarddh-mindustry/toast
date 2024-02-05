@@ -103,7 +103,7 @@ class UserAccountHandler : Handler() {
                 val mindustryUserServerData = if (mindustryUserServerDataCanBeNull == null) {
                     // New user server data
                     MindustryUserServerData.insert {
-                        it[this.mindustryUserID] = mindustryUserID
+                        it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
                         it[this.server] = ToastVars.server
                         it[this.mindustryUSID] = player.uuid()
                     }.resultedValues!!.first()
