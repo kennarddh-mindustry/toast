@@ -31,6 +31,7 @@ fun validateMinimumRole(annotation: Annotation, player: Player?): Boolean {
         otherColumn = MindustryUser.id
     ).selectOne { MindustryUser.mindustryUUID eq player.uuid() }
 
+    // Non registered user
     if (user == null) return false
 
     val userRole = user[Users.role]
