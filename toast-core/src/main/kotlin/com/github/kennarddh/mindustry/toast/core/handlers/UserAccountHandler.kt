@@ -11,6 +11,7 @@ import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserServerData
 import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
@@ -95,11 +96,7 @@ class UserAccountHandler : Handler() {
                     it[this.mindustryNameID] = mindustryName[MindustryNames.id]
                 }
 
-                val mindustryUserServerDataCanBeNull = MindustryUserServerData
-                    .selectOne {
-                        MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
-                        MindustryUserServerData.server eq ToastVars.server
-                    }
+                val mindustryUserServerDataCanBeNull = player.getMindustryUserServerData()
 
                 val mindustryUserServerData = if (mindustryUserServerDataCanBeNull == null) {
                     // New user server data
@@ -120,10 +117,7 @@ class UserAccountHandler : Handler() {
                     val storedUSID = mindustryUserServerDataCanBeNull[MindustryUserServerData.mindustryUSID]
 
                     val mindustryUserServerData =
-                        if (
-                            !Password.check(player.usid(), storedUSID)
-                                .with(usidHashFunctionInstance)
-                        ) {
+                        if (!Password.check(player.usid(), storedUSID).with(usidHashFunctionInstance)) {
                             // USID is not same as stored usid, Invalidate login.
                             player.infoMessage(
                                 "[#ff0000]Your login was invalidated. Either there is server's ip update or your account got stolen by other player. If this happen too often without any announcements, likely that your user was stolen."
@@ -143,10 +137,7 @@ class UserAccountHandler : Handler() {
                             }
 
                             // Return updated user server data
-                            MindustryUserServerData.selectOne {
-                                MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
-                                MindustryUserServerData.server eq ToastVars.server
-                            }!!
+                            player.getMindustryUserServerData()!!
                         } else {
                             mindustryUserServerDataCanBeNull
                         }
@@ -250,17 +241,7 @@ class UserAccountHandler : Handler() {
     fun login(player: Player) {
         CoroutineScopes.Main.launch {
             val mindustryUserServerData = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                MindustryUserServerData
-                    .join(
-                        MindustryUser,
-                        JoinType.INNER,
-                        onColumn = MindustryUserServerData.mindustryUserID,
-                        otherColumn = MindustryUser.id
-                    )
-                    .selectOne {
-                        MindustryUser.mindustryUUID eq player.uuid()
-                        MindustryUserServerData.server eq ToastVars.server
-                    }!!
+                player.getMindustryUserServerData()!!
             }
 
             if (mindustryUserServerData[MindustryUserServerData.userID] != null)
@@ -326,17 +307,7 @@ class UserAccountHandler : Handler() {
     fun logout(player: Player) {
         CoroutineScopes.Main.launch {
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                val mindustryUserServerData = MindustryUserServerData
-                    .join(
-                        MindustryUser,
-                        JoinType.INNER,
-                        onColumn = MindustryUserServerData.mindustryUserID,
-                        otherColumn = MindustryUser.id
-                    )
-                    .selectOne {
-                        MindustryUser.mindustryUUID eq player.uuid()
-                        MindustryUserServerData.server eq ToastVars.server
-                    }!!
+                val mindustryUserServerData = player.getMindustryUserServerData()!!
 
                 val userID = mindustryUserServerData[MindustryUserServerData.userID]
                     ?: return@newSuspendedTransaction player.infoMessage(
