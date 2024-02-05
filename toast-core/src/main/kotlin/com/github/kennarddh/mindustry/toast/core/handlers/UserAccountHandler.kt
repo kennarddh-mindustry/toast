@@ -119,6 +119,7 @@ class UserAccountHandler : Handler() {
 
                             MindustryUserServerData.update({
                                 MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
+                                MindustryUserServerData.server eq ToastVars.server
                             }) {
                                 it[this.mindustryUSID] = player.uuid()
                                 it[this.userID] = null
@@ -127,6 +128,7 @@ class UserAccountHandler : Handler() {
                             // Return updated user server data
                             MindustryUserServerData.selectOne {
                                 MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
+                                MindustryUserServerData.server eq ToastVars.server
                             }!!
                         } else {
                             mindustryUserServerDataCanBeNull
