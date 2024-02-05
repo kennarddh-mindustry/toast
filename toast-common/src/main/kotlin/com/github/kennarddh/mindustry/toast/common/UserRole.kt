@@ -5,18 +5,18 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class UserRole {
-    @SerialName("Owner")
-    Owner,
-
-    @SerialName("CoOwner")
-    CoOwner,
-
-    @SerialName("Admin")
-    Admin,
+    @SerialName("Player")
+    Player,
 
     @SerialName("Mod")
     Mod,
 
-    @SerialName("Player")
-    Player,
+    @SerialName("Admin")
+    Admin,
+
+    @SerialName("CoOwner")
+    CoOwner,
+
+    @SerialName("Owner")
+    Owner,
 }
