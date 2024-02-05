@@ -38,7 +38,7 @@ data class PlayerKickedGameEvent(
 ) : GameEventBase()
 
 @Serializable
-@SerialName("PlayerKicked")
+@SerialName("PlayerBanned")
 data class PlayerBannedGameEvent(
     val userBanID: Int,
     val targetPlayerMindustryName: String,
