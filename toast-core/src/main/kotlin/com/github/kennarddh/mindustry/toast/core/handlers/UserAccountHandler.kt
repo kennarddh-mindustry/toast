@@ -117,11 +117,16 @@ class UserAccountHandler : Handler() {
                                 "[#ff0000]Your login was invalidated. Either there is server's ip update or your account got stolen by other player. If this happen too often without any announcements, likely that your user was stolen."
                             )
 
+                            val hashedUSID =
+                                Password.hash(SecureString(player.usid().toCharArray()))
+                                    .addSalt(SaltGenerator.generate(64))
+                                    .with(argon2FunctionInstance)
+
                             MindustryUserServerData.update({
                                 MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
                                 MindustryUserServerData.server eq ToastVars.server
                             }) {
-                                it[this.mindustryUSID] = player.uuid()
+                                it[this.mindustryUSID] = hashedUSID.result
                                 it[this.userID] = null
                             }
 
