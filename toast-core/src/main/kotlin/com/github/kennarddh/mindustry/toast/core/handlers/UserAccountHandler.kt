@@ -175,6 +175,25 @@ class UserAccountHandler : Handler() {
     @ClientSide
     fun register(player: Player) {
         CoroutineScopes.Main.launch {
+            val mindustryUserServerData = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                MindustryUserServerData
+                    .join(
+                        MindustryUser,
+                        JoinType.INNER,
+                        onColumn = MindustryUserServerData.mindustryUserID,
+                        otherColumn = MindustryUser.id
+                    )
+                    .selectOne {
+                        MindustryUser.mindustryUUID eq player.uuid()
+                        MindustryUserServerData.server eq ToastVars.server
+                    }!!
+            }
+
+            if (mindustryUserServerData[MindustryUserServerData.userID] != null)
+                return@launch player.sendMessage(
+                    "[#ff0000]You are already logged in."
+                )
+
             val output = registerMenu.open(player)
                 ?: return@launch player.infoMessage(
                     "[#ff0000]Register canceled."
@@ -230,6 +249,25 @@ class UserAccountHandler : Handler() {
     @ClientSide
     fun login(player: Player) {
         CoroutineScopes.Main.launch {
+            val mindustryUserServerData = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                MindustryUserServerData
+                    .join(
+                        MindustryUser,
+                        JoinType.INNER,
+                        onColumn = MindustryUserServerData.mindustryUserID,
+                        otherColumn = MindustryUser.id
+                    )
+                    .selectOne {
+                        MindustryUser.mindustryUUID eq player.uuid()
+                        MindustryUserServerData.server eq ToastVars.server
+                    }!!
+            }
+
+            if (mindustryUserServerData[MindustryUserServerData.userID] != null)
+                return@launch player.sendMessage(
+                    "[#ff0000]You are already logged in."
+                )
+
             val output = loginMenu.open(player)
                 ?: return@launch player.infoMessage(
                     "[#ff0000]Login canceled."
@@ -249,23 +287,6 @@ class UserAccountHandler : Handler() {
                 )
 
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                val mindustryUserServerData = MindustryUserServerData
-                    .join(
-                        MindustryUser,
-                        JoinType.INNER,
-                        onColumn = MindustryUserServerData.mindustryUserID,
-                        otherColumn = MindustryUser.id
-                    )
-                    .selectOne {
-                        MindustryUser.mindustryUUID eq player.uuid()
-                        MindustryUserServerData.server eq ToastVars.server
-                    }!!
-
-                if (mindustryUserServerData[MindustryUserServerData.userID] != null)
-                    return@newSuspendedTransaction player.infoMessage(
-                        "[#ff0000]You are already logged in."
-                    )
-
                 val user = Users.selectOne { Users.username eq username }
                     ?: return@newSuspendedTransaction player.infoMessage(
                         "[#ff0000]User not found."
