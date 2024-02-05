@@ -146,13 +146,8 @@ class UserAccountHandler : Handler() {
                         Users.id eq userID
                     }!!
 
-                    // TODO: Handle more role
-                    when (user[Users.role]) {
-                        UserRole.Owner -> player.admin = true
-                        UserRole.CoOwner -> player.admin = true
-                        UserRole.Admin -> player.admin = true
-                        UserRole.Mod -> TODO()
-                        UserRole.Player -> Unit
+                    if (user[Users.role] >= UserRole.Admin) {
+                        player.admin = true
                     }
                 }
             }
