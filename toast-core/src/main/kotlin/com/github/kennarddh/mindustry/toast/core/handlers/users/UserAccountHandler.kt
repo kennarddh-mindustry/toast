@@ -2,6 +2,9 @@ package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
+import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
+import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.menus.Menu
@@ -9,13 +12,16 @@ import com.github.kennarddh.mindustry.genesis.core.menus.Menus
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoMessage
 import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
+import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserServerData
+import com.github.kennarddh.mindustry.toast.core.commons.getUser
 import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
 import com.password4j.types.Argon2
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
@@ -323,6 +329,43 @@ class UserAccountHandler : Handler() {
                     "[#00ff00]Logout success. You are now no longer logged in as ${user[Users.username]}."
                 )
             }
+        }
+    }
+
+    // TODO: Suspended function call genesis
+    @Command(["changeRole"])
+    @ClientSide
+    @ServerSide
+    @MinimumRole(UserRole.Admin)
+    fun changeRole(player: Player? = null, target: Player, newRole: UserRole): CommandResult = runBlocking {
+        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            val targetUser =
+                target.getUser() ?: return@newSuspendedTransaction CommandResult(
+                    "Target is not logged in.",
+                    CommandResultStatus.Failed
+                )
+
+            if (player != null) {
+                val playerUser = player.getUser()!!
+
+                if (playerUser[Users.role] <= targetUser[Users.role])
+                    return@newSuspendedTransaction CommandResult(
+                        "Your role must be higher than target's role to change target's role.",
+                        CommandResultStatus.Failed
+                    )
+
+                if (playerUser[Users.role] <= newRole)
+                    return@newSuspendedTransaction CommandResult(
+                        "Your role must be higher than new role.",
+                        CommandResultStatus.Failed
+                    )
+            }
+
+            Users.update({ Users.id eq targetUser[Users.id] }) {
+                it[this.role] = newRole
+            }
+
+            return@newSuspendedTransaction CommandResult("Successfully changed ${targetUser[Users.username]} to $newRole.")
         }
     }
 }
