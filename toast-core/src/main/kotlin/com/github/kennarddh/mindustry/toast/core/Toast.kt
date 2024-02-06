@@ -12,9 +12,9 @@ import com.github.kennarddh.mindustry.toast.core.commands.validations.validateMi
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.handlers.GameEventsHandler
-import com.github.kennarddh.mindustry.toast.core.handlers.UserAccountHandler
-import com.github.kennarddh.mindustry.toast.core.handlers.UserModerationHandler
-import com.github.kennarddh.mindustry.toast.core.handlers.UserStatsHandler
+import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
+import com.github.kennarddh.mindustry.toast.core.handlers.users.UserModerationHandler
+import com.github.kennarddh.mindustry.toast.core.handlers.users.UserStatsHandler
 import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import java.time.Instant

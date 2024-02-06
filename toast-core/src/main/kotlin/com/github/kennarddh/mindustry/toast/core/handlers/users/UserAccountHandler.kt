@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.core.handlers
+package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command

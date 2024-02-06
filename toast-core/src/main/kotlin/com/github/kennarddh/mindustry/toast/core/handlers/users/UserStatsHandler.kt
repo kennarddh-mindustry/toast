@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.core.handlers
+package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import arc.util.Align
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
