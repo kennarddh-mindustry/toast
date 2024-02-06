@@ -4,13 +4,10 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validati
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validations.CommandValidationDescription
 import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.UserRole
-import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
-import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
-import com.github.kennarddh.mindustry.toast.common.selectOne
+import com.github.kennarddh.mindustry.toast.core.commons.getUser
 import kotlinx.coroutines.runBlocking
 import mindustry.gen.Player
-import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 
@@ -23,20 +20,8 @@ fun validateMinimumRole(annotation: Annotation, player: Player?): Boolean = runB
     val minimumRole = (annotation as MinimumRole).minimumRole
 
     newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-        val user = Users.join(
-            MindustryUserServerData,
-            JoinType.INNER,
-            onColumn = Users.id,
-            otherColumn = MindustryUserServerData.userID
-        ).join(
-            MindustryUser,
-            JoinType.INNER,
-            onColumn = MindustryUserServerData.mindustryUserID,
-            otherColumn = MindustryUser.id
-        ).selectOne { MindustryUser.mindustryUUID eq player.uuid() }
-
-        // Non registered user
-        if (user == null) return@newSuspendedTransaction false
+        // If user is null it means the user is not logged in
+        val user = player.getUser() ?: return@newSuspendedTransaction false
 
         val userRole = user[Users.role]
 
