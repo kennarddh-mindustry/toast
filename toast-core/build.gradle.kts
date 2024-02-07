@@ -43,14 +43,16 @@ project.version = metadata.version
 
 val exposedVersion: String = "0.46.0"
 
+val genesisVersion = "3.0.0-beta.0"
+
 dependencies {
     mindustryDependencies()
 
     implementation(project(":toast-common"))
 
     compileOnly("com.xpdustry:kotlin-runtime:3.1.1-k.1.9.22")
-    compileOnly("com.github.kennarddh.mindustry:genesis-core:3.0.0-beta.0")
-    compileOnly("com.github.kennarddh.mindustry:genesis-standard:3.0.0-beta.0")
+    compileOnly("com.github.kennarddh.mindustry:genesis-core:$genesisVersion")
+    compileOnly("com.github.kennarddh.mindustry:genesis-standard:$genesisVersion")
 
     implementation(platform("org.jetbrains.exposed:exposed-bom:0.46.0"))
     implementation("org.jetbrains.exposed:exposed-java-time")
@@ -127,16 +129,16 @@ val downloadGenesisCore =
     tasks.register<GithubArtifactDownload>("downloadGenesisCore") {
         user.set("kennarddh-mindustry")
         repo.set("genesis")
-        name.set("genesis-core-3.0.0-beta.0.jar")
-        version.set("v3.0.0-beta.0")
+        name.set("genesis-core-$genesisVersion.jar")
+        version.set("v$genesisVersion")
     }
 
 val downloadGenesisStandard =
     tasks.register<GithubArtifactDownload>("downloadGenesisStandard") {
         user.set("kennarddh-mindustry")
         repo.set("genesis")
-        name.set("genesis-standard-3.0.0-beta.0.jar")
-        version.set("v3.0.0-beta.0")
+        name.set("genesis-standard-$genesisVersion.jar")
+        version.set("v$genesisVersion")
     }
 
 tasks.runMindustryServer {
