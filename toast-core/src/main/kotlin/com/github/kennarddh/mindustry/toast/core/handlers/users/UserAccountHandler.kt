@@ -20,8 +20,6 @@ import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
 import com.password4j.types.Argon2
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
@@ -59,105 +57,103 @@ class UserAccountHandler : Handler() {
     )
 
     @EventHandler
-    fun onPlayerJoin(event: EventType.PlayerJoin) {
+    suspend fun onPlayerJoin(event: EventType.PlayerJoin) {
         val player = event.player
         val ip = player.con.address.packIP()
         val name = player.name
 
-        CoroutineScopes.Main.launch {
-            newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                val mindustryUser = MindustryUser.insertIfNotExistAndGet({
-                    MindustryUser.mindustryUUID eq player.uuid()
-                }) {
-                    it[this.mindustryUUID] = player.uuid()
-                }
+        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            val mindustryUser = MindustryUser.insertIfNotExistAndGet({
+                MindustryUser.mindustryUUID eq player.uuid()
+            }) {
+                it[this.mindustryUUID] = player.uuid()
+            }
 
-                val ipAddress = IPAddresses.insertIfNotExistAndGet({
-                    IPAddresses.ipAddress eq ip
-                }) {
-                    it[this.ipAddress] = ip
-                }
+            val ipAddress = IPAddresses.insertIfNotExistAndGet({
+                IPAddresses.ipAddress eq ip
+            }) {
+                it[this.ipAddress] = ip
+            }
 
-                val mindustryName = MindustryNames.insertIfNotExistAndGet({
-                    MindustryNames.name eq name
-                }) {
-                    it[this.name] = name
-                    it[this.strippedName] = player.plainName()
-                }
+            val mindustryName = MindustryNames.insertIfNotExistAndGet({
+                MindustryNames.name eq name
+            }) {
+                it[this.name] = name
+                it[this.strippedName] = player.plainName()
+            }
 
-                MindustryUserIPAddresses.insertIfNotExistAndGet({
-                    MindustryUserIPAddresses.mindustryUserID eq mindustryUser[MindustryUser.id]
-                    MindustryUserIPAddresses.ipAddressID eq ipAddress[IPAddresses.id]
-                }) {
+            MindustryUserIPAddresses.insertIfNotExistAndGet({
+                MindustryUserIPAddresses.mindustryUserID eq mindustryUser[MindustryUser.id]
+                MindustryUserIPAddresses.ipAddressID eq ipAddress[IPAddresses.id]
+            }) {
+                it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
+                it[this.ipAddressID] = ipAddress[IPAddresses.id]
+            }
+
+            MindustryUserMindustryNames.insertIfNotExistAndGet({
+                MindustryUserMindustryNames.mindustryUserID eq mindustryUser[MindustryUser.id]
+                MindustryUserMindustryNames.mindustryNameID eq mindustryName[MindustryNames.id]
+            }) {
+                it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
+                it[this.mindustryNameID] = mindustryName[MindustryNames.id]
+            }
+
+            val mindustryUserServerDataCanBeNull = player.getMindustryUserServerData()
+
+            val mindustryUserServerData = if (mindustryUserServerDataCanBeNull == null) {
+                // New user server data
+                val hashedUSID = Password.hash(SecureString(player.usid().toCharArray()))
+                    .addRandomSalt(64)
+                    .with(usidHashFunctionInstance)
+
+                MindustryUserServerData.insert {
                     it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
-                    it[this.ipAddressID] = ipAddress[IPAddresses.id]
-                }
+                    it[this.server] = ToastVars.server
+                    it[this.mindustryUSID] = hashedUSID.result
+                }.resultedValues!!.first()
+            } else {
+                val storedUSID = mindustryUserServerDataCanBeNull[MindustryUserServerData.mindustryUSID]
 
-                MindustryUserMindustryNames.insertIfNotExistAndGet({
-                    MindustryUserMindustryNames.mindustryUserID eq mindustryUser[MindustryUser.id]
-                    MindustryUserMindustryNames.mindustryNameID eq mindustryName[MindustryNames.id]
-                }) {
-                    it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
-                    it[this.mindustryNameID] = mindustryName[MindustryNames.id]
-                }
+                val mindustryUserServerData =
+                    if (!Password.check(player.usid(), storedUSID).with(usidHashFunctionInstance)) {
+                        // USID is not same as stored usid, Invalidate login.
+                        player.infoMessage(
+                            "[#ff0000]Your login was invalidated. Either there is server's ip update or your account got stolen by other player. If this happen too often without any announcements, likely that your user was stolen."
+                        )
 
-                val mindustryUserServerDataCanBeNull = player.getMindustryUserServerData()
+                        val hashedUSID =
+                            Password.hash(SecureString(player.usid().toCharArray()))
+                                .addRandomSalt(64)
+                                .with(usidHashFunctionInstance)
 
-                val mindustryUserServerData = if (mindustryUserServerDataCanBeNull == null) {
-                    // New user server data
-                    val hashedUSID = Password.hash(SecureString(player.usid().toCharArray()))
-                        .addRandomSalt(64)
-                        .with(usidHashFunctionInstance)
-
-                    MindustryUserServerData.insert {
-                        it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
-                        it[this.server] = ToastVars.server
-                        it[this.mindustryUSID] = hashedUSID.result
-                    }.resultedValues!!.first()
-                } else {
-                    val storedUSID = mindustryUserServerDataCanBeNull[MindustryUserServerData.mindustryUSID]
-
-                    val mindustryUserServerData =
-                        if (!Password.check(player.usid(), storedUSID).with(usidHashFunctionInstance)) {
-                            // USID is not same as stored usid, Invalidate login.
-                            player.infoMessage(
-                                "[#ff0000]Your login was invalidated. Either there is server's ip update or your account got stolen by other player. If this happen too often without any announcements, likely that your user was stolen."
-                            )
-
-                            val hashedUSID =
-                                Password.hash(SecureString(player.usid().toCharArray()))
-                                    .addRandomSalt(64)
-                                    .with(usidHashFunctionInstance)
-
-                            MindustryUserServerData.update({
-                                MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
-                                MindustryUserServerData.server eq ToastVars.server
-                            }) {
-                                it[this.mindustryUSID] = hashedUSID.result
-                                it[this.userID] = null
-                            }
-
-                            // Return updated user server data
-                            player.getMindustryUserServerData()!!
-                        } else {
-                            mindustryUserServerDataCanBeNull
+                        MindustryUserServerData.update({
+                            MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
+                            MindustryUserServerData.server eq ToastVars.server
+                        }) {
+                            it[this.mindustryUSID] = hashedUSID.result
+                            it[this.userID] = null
                         }
 
-                    mindustryUserServerData
-                }
-
-                // TODO: Check for kick and ban
-
-                val userID = mindustryUserServerData[MindustryUserServerData.userID]
-
-                if (userID != null) {
-                    val user = Users.selectOne {
-                        Users.id eq userID
-                    }!!
-
-                    if (user[Users.role] >= UserRole.Admin) {
-                        player.admin = true
+                        // Return updated user server data
+                        player.getMindustryUserServerData()!!
+                    } else {
+                        mindustryUserServerDataCanBeNull
                     }
+
+                mindustryUserServerData
+            }
+
+            // TODO: Check for kick and ban
+
+            val userID = mindustryUserServerData[MindustryUserServerData.userID]
+
+            if (userID != null) {
+                val user = Users.selectOne {
+                    Users.id eq userID
+                }!!
+
+                if (user[Users.role] >= UserRole.Admin) {
+                    player.admin = true
                 }
             }
         }
@@ -165,179 +161,172 @@ class UserAccountHandler : Handler() {
 
     @Command(["register"])
     @ClientSide
-    fun register(player: Player) {
-        CoroutineScopes.Main.launch {
-            val mindustryUserServerData = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                MindustryUserServerData
-                    .join(
-                        MindustryUser,
-                        JoinType.INNER,
-                        onColumn = MindustryUserServerData.mindustryUserID,
-                        otherColumn = MindustryUser.id
-                    )
-                    .selectOne {
-                        MindustryUser.mindustryUUID eq player.uuid()
-                        MindustryUserServerData.server eq ToastVars.server
-                    }!!
-            }
-
-            if (mindustryUserServerData[MindustryUserServerData.userID] != null)
-                return@launch player.sendMessage(
-                    "[#ff0000]You are already logged in."
+    suspend fun register(player: Player) {
+        val mindustryUserServerData = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            MindustryUserServerData
+                .join(
+                    MindustryUser,
+                    JoinType.INNER,
+                    onColumn = MindustryUserServerData.mindustryUserID,
+                    otherColumn = MindustryUser.id
                 )
+                .selectOne {
+                    MindustryUser.mindustryUUID eq player.uuid()
+                    MindustryUserServerData.server eq ToastVars.server
+                }!!
+        }
 
-            val output = registerMenu.open(player)
-                ?: return@launch player.infoMessage(
-                    "[#ff0000]Register canceled."
-                )
-
-            val username = output["username"]!!
-            val password = output["password"]!!
-            val confirmPassword = output["confirmPassword"]!!
-
-            if (!username.matches(usernameRegex))
-                return@launch player.infoMessage(
-                    "[#ff0000]Invalid username. Username may only contains lowercase, uppercase, and numbers."
-                )
-
-            if (!password.matches(passwordRegex))
-                return@launch player.infoMessage(
-                    "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers."
-                )
-
-            if (!confirmPassword.matches(passwordRegex))
-                return@launch player.infoMessage(
-                    "[#ff0000]Invalid confirm password. Confirm password may only contains lowercase, uppercase, symbols, and numbers."
-                )
-
-            if (confirmPassword != password) return@launch player.infoMessage(
-                "[#ff0000]Confirm password is not same as password."
+        if (mindustryUserServerData[MindustryUserServerData.userID] != null)
+            return player.sendMessage(
+                "[#ff0000]You are already logged in."
             )
 
-            newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                if (Users.exists { Users.username eq username })
-                    return@newSuspendedTransaction player.infoMessage(
-                        "[#ff0000]Your username is already taken."
-                    )
+        val output = registerMenu.open(player)
+            ?: return player.infoMessage(
+                "[#ff0000]Register canceled."
+            )
 
-                val hashedPassword = Password.hash(SecureString(password.toCharArray()))
-                    .addRandomSalt(64)
-                    .with(passwordHashFunctionInstance)
+        val username = output["username"]!!
+        val password = output["password"]!!
+        val confirmPassword = output["confirmPassword"]!!
 
-                Users.insert {
-                    it[this.username] = username
-                    it[this.password] = hashedPassword.result
-                    it[this.role] = UserRole.Player
-                }
+        if (!username.matches(usernameRegex))
+            return player.infoMessage(
+                "[#ff0000]Invalid username. Username may only contains lowercase, uppercase, and numbers."
+            )
 
-                player.infoMessage(
-                    "[#00ff00]Register success. Login with /login to use your account."
+        if (!password.matches(passwordRegex))
+            return player.infoMessage(
+                "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers."
+            )
+
+        if (!confirmPassword.matches(passwordRegex))
+            return player.infoMessage(
+                "[#ff0000]Invalid confirm password. Confirm password may only contains lowercase, uppercase, symbols, and numbers."
+            )
+
+        if (confirmPassword != password) return player.infoMessage(
+            "[#ff0000]Confirm password is not same as password."
+        )
+
+        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            if (Users.exists { Users.username eq username })
+                return@newSuspendedTransaction player.infoMessage(
+                    "[#ff0000]Your username is already taken."
                 )
+
+            val hashedPassword = Password.hash(SecureString(password.toCharArray()))
+                .addRandomSalt(64)
+                .with(passwordHashFunctionInstance)
+
+            Users.insert {
+                it[this.username] = username
+                it[this.password] = hashedPassword.result
+                it[this.role] = UserRole.Player
             }
+
+            player.infoMessage(
+                "[#00ff00]Register success. Login with /login to use your account."
+            )
         }
     }
 
     @Command(["login"])
     @ClientSide
-    fun login(player: Player) {
-        CoroutineScopes.Main.launch {
-            val mindustryUserServerData = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                player.getMindustryUserServerData()!!
-            }
+    suspend fun login(player: Player) {
+        val mindustryUserServerData = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            player.getMindustryUserServerData()!!
+        }
 
-            if (mindustryUserServerData[MindustryUserServerData.userID] != null)
-                return@launch player.sendMessage(
-                    "[#ff0000]You are already logged in."
+        if (mindustryUserServerData[MindustryUserServerData.userID] != null)
+            return player.sendMessage(
+                "[#ff0000]You are already logged in."
+            )
+
+        val output = loginMenu.open(player)
+            ?: return player.infoMessage(
+                "[#ff0000]Login canceled."
+            )
+
+        val username = output["username"]!!
+        val password = output["password"]!!
+
+        if (!username.matches(usernameRegex))
+            return player.infoMessage(
+                "[#ff0000]Invalid username. Username may only contains lowercase, uppercase, and numbers."
+            )
+
+        if (!password.matches(passwordRegex))
+            return player.infoMessage(
+                "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers."
+            )
+
+        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            val user = Users.selectOne { Users.username eq username }
+                ?: return@newSuspendedTransaction player.infoMessage(
+                    "[#ff0000]User not found."
                 )
 
-            val output = loginMenu.open(player)
-                ?: return@launch player.infoMessage(
-                    "[#ff0000]Login canceled."
+            if (
+                !Password.check(password, user[Users.password])
+                    .with(passwordHashFunctionInstance)
+            )
+                return@newSuspendedTransaction player.infoMessage(
+                    "[#ff0000]Wrong password."
                 )
 
-            val username = output["username"]!!
-            val password = output["password"]!!
-
-            if (!username.matches(usernameRegex))
-                return@launch player.infoMessage(
-                    "[#ff0000]Invalid username. Username may only contains lowercase, uppercase, and numbers."
+            MindustryUserServerData
+                .join(
+                    MindustryUser,
+                    JoinType.INNER,
+                    onColumn = MindustryUserServerData.mindustryUserID,
+                    otherColumn = MindustryUser.id
                 )
+                .update({
+                    MindustryUser.mindustryUUID eq player.uuid()
+                    MindustryUserServerData.server eq ToastVars.server
+                }) {
+                    it[MindustryUserServerData.userID] = user[Users.id]
+                }
 
-            if (!password.matches(passwordRegex))
-                return@launch player.infoMessage(
-                    "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers."
-                )
-
-            newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                val user = Users.selectOne { Users.username eq username }
-                    ?: return@newSuspendedTransaction player.infoMessage(
-                        "[#ff0000]User not found."
-                    )
-
-                if (
-                    !Password.check(password, user[Users.password])
-                        .with(passwordHashFunctionInstance)
-                )
-                    return@newSuspendedTransaction player.infoMessage(
-                        "[#ff0000]Wrong password."
-                    )
-
-                MindustryUserServerData
-                    .join(
-                        MindustryUser,
-                        JoinType.INNER,
-                        onColumn = MindustryUserServerData.mindustryUserID,
-                        otherColumn = MindustryUser.id
-                    )
-                    .update({
-                        MindustryUser.mindustryUUID eq player.uuid()
-                        MindustryUserServerData.server eq ToastVars.server
-                    }) {
-                        it[MindustryUserServerData.userID] = user[Users.id]
-                    }
-
-                player.infoMessage(
-                    "[#00ff00]Login success. You are now logged in as ${user[Users.username]}."
-                )
-            }
+            player.infoMessage(
+                "[#00ff00]Login success. You are now logged in as ${user[Users.username]}."
+            )
         }
     }
 
     @Command(["logout"])
     @ClientSide
-    fun logout(player: Player) {
-        CoroutineScopes.Main.launch {
-            newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                val mindustryUserServerData = player.getMindustryUserServerData()!!
+    suspend fun logout(player: Player) {
+        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            val mindustryUserServerData = player.getMindustryUserServerData()!!
 
-                val userID = mindustryUserServerData[MindustryUserServerData.userID]
-                    ?: return@newSuspendedTransaction player.infoMessage(
-                        "[#ff0000]You are not logged in."
-                    )
-
-                val user = Users.selectOne { Users.id eq userID }!!
-
-                MindustryUserServerData
-                    .update({
-                        MindustryUserServerData.userID eq userID
-                        MindustryUserServerData.server eq ToastVars.server
-                    }) {
-                        it[MindustryUserServerData.userID] = null
-                    }
-
-                player.infoMessage(
-                    "[#00ff00]Logout success. You are now no longer logged in as ${user[Users.username]}."
+            val userID = mindustryUserServerData[MindustryUserServerData.userID]
+                ?: return@newSuspendedTransaction player.infoMessage(
+                    "[#ff0000]You are not logged in."
                 )
-            }
+
+            val user = Users.selectOne { Users.id eq userID }!!
+
+            MindustryUserServerData
+                .update({
+                    MindustryUserServerData.userID eq userID
+                    MindustryUserServerData.server eq ToastVars.server
+                }) {
+                    it[MindustryUserServerData.userID] = null
+                }
+
+            player.infoMessage(
+                "[#00ff00]Logout success. You are now no longer logged in as ${user[Users.username]}."
+            )
         }
     }
 
-    // TODO: Suspended function call genesis
     @Command(["changeRole"])
     @ClientSide
     @ServerSide
     @MinimumRole(UserRole.Admin)
-    fun changeRole(player: Player? = null, target: Player, newRole: UserRole): CommandResult = runBlocking {
+    suspend fun changeRole(player: Player? = null, target: Player, newRole: UserRole): CommandResult =
         newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             val targetUser =
                 target.getUser() ?: return@newSuspendedTransaction CommandResult(
@@ -367,5 +356,4 @@ class UserAccountHandler : Handler() {
 
             return@newSuspendedTransaction CommandResult("Successfully changed ${targetUser[Users.username]} to $newRole.")
         }
-    }
 }

@@ -10,7 +10,6 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
-import kotlinx.coroutines.launch
 import mindustry.game.EventType
 import mindustry.gen.Groups
 import mindustry.gen.Player
@@ -34,7 +33,7 @@ class UserStatsHandler : Handler() {
     private val playersLastPlayTimeSave: MutableMap<Player, Long> = mutableMapOf()
 
     @TimerTask(0f, 10f)
-    private fun savePlayerDelta() {
+    private suspend fun savePlayerDelta() {
         Groups.player.forEach {
             val playerActionsCount = playersActionsCounter[it]!!
             val lastPlayTimeSave = playersLastPlayTimeSave[it]!!
@@ -49,34 +48,32 @@ class UserStatsHandler : Handler() {
             val xpDelta = playersXPDelta[it]!!
             val isPlayerActive = xpDelta > 0
 
-            CoroutineScopes.Main.launch {
-                newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-                    // TODO: Only update once even if the player is in multiple servers. Use redis with set ttl to lock which server will generate xp for each player
-                    MindustryUserServerData.join(
-                        MindustryUser,
-                        JoinType.INNER,
-                        onColumn = MindustryUserServerData.mindustryUserID,
-                        otherColumn = MindustryUser.id
-                    ).update({
-                        MindustryUser.mindustryUUID eq it.uuid()
-                        MindustryUserServerData.server eq ToastVars.server
-                    }) {
-                        with(SqlExpressionBuilder) {
-                            it[MindustryUserServerData.xp] = MindustryUserServerData.xp + xpDelta
-                            it[MindustryUserServerData.playTime] = MindustryUserServerData.playTime + playTimeChanges
+            newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                // TODO: Only update once even if the player is in multiple servers. Use redis with set ttl to lock which server will generate xp for each player
+                MindustryUserServerData.join(
+                    MindustryUser,
+                    JoinType.INNER,
+                    onColumn = MindustryUserServerData.mindustryUserID,
+                    otherColumn = MindustryUser.id
+                ).update({
+                    MindustryUser.mindustryUUID eq it.uuid()
+                    MindustryUserServerData.server eq ToastVars.server
+                }) {
+                    with(SqlExpressionBuilder) {
+                        it[MindustryUserServerData.xp] = MindustryUserServerData.xp + xpDelta
+                        it[MindustryUserServerData.playTime] = MindustryUserServerData.playTime + playTimeChanges
 
-                            if (isPlayerActive)
-                                it[MindustryUserServerData.activePlayTime] =
-                                    MindustryUserServerData.activePlayTime + playTimeChanges
-                        }
+                        if (isPlayerActive)
+                            it[MindustryUserServerData.activePlayTime] =
+                                MindustryUserServerData.activePlayTime + playTimeChanges
                     }
-
-                    updateStatsPopup(it)
-
-                    playersActionsCounter[it] = 0
-                    playersXPDelta[it] = 0
-                    playersLastPlayTimeSave[it] = now
                 }
+
+                updateStatsPopup(it)
+
+                playersActionsCounter[it] = 0
+                playersXPDelta[it] = 0
+                playersLastPlayTimeSave[it] = now
             }
         }
     }
