@@ -41,8 +41,6 @@ val metadata = ModMetadata.fromJson(project.file("plugin.json"))
 project.group = "com.github.kennarddh.mindustry"
 project.version = metadata.version
 
-val exposedVersion: String = "0.46.0"
-
 val genesisVersion = "3.0.0-beta.0"
 
 dependencies {
