@@ -6,20 +6,19 @@ import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.core.commons.getUser
-import kotlinx.coroutines.runBlocking
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 
-fun validateMinimumRole(annotation: Annotation, player: Player?): Boolean = runBlocking {
+suspend fun validateMinimumRole(annotation: Annotation, player: Player?): Boolean {
     if (player == null) {
         // On server console
-        return@runBlocking true
+        return true
     }
 
     val minimumRole = (annotation as MinimumRole).minimumRole
 
-    newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+    return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
         // If user is null it means the user is not logged in
         val user = player.getUser() ?: return@newSuspendedTransaction false
 
