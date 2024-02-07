@@ -1,6 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
-import com.github.kennarddh.mindustry.genesis.core.Genesis
+import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.extensions.stripFooMessageInvisibleCharacters
@@ -11,7 +11,7 @@ import mindustry.game.EventType
 import java.time.Instant
 
 class GameEventsHandler : Handler() {
-    override fun onDispose() {
+    override suspend fun onDispose() {
         Messenger.publishGameEvent(
             GameEvent(
                 ToastVars.server, Instant.now().toEpochMilli(),
@@ -51,7 +51,7 @@ class GameEventsHandler : Handler() {
         val player = event.player
 
         // Ignore client command
-        if (event.message.startsWith(Genesis.commandRegistry.clientPrefix)) return
+        if (event.message.startsWith(GenesisAPI.commandRegistry.clientPrefix)) return
 
         Messenger.publishGameEvent(
             GameEvent(

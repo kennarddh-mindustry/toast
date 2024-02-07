@@ -1,6 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
-import com.github.kennarddh.mindustry.genesis.core.Genesis
+import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
@@ -12,8 +12,8 @@ import mindustry.gen.Player
 import kotlin.time.Duration
 
 class UserModerationHandler : Handler() {
-    override fun onInit() {
-        Genesis.commandRegistry.removeCommand("kick")
+    override suspend fun onInit() {
+        GenesisAPI.commandRegistry.removeCommand("kick")
     }
 
     @Command(["kick"])

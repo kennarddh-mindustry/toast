@@ -1,6 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core
 
-import com.github.kennarddh.mindustry.genesis.core.Genesis
+import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commons.AbstractPlugin
 import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
@@ -26,12 +26,12 @@ class Toast : AbstractPlugin() {
             DatabaseSettings.init()
             Messenger.init()
 
-            Genesis.commandRegistry.registerCommandValidationAnnotation(MinimumRole::class, ::validateMinimumRole)
+            GenesisAPI.commandRegistry.registerCommandValidationAnnotation(MinimumRole::class, ::validateMinimumRole)
 
-            Genesis.registerHandler(UserAccountHandler())
-            Genesis.registerHandler(UserStatsHandler())
-            Genesis.registerHandler(GameEventsHandler())
-            Genesis.registerHandler(UserModerationHandler())
+            GenesisAPI.registerHandler(UserAccountHandler())
+            GenesisAPI.registerHandler(UserStatsHandler())
+            GenesisAPI.registerHandler(GameEventsHandler())
+            GenesisAPI.registerHandler(UserModerationHandler())
 
             Messenger.publishGameEvent(
                 GameEvent(
@@ -44,7 +44,7 @@ class Toast : AbstractPlugin() {
         }
     }
 
-    override fun dispose() {
+    override suspend fun dispose() {
         Messenger.close()
 
         TransactionManager.closeAndUnregister(DatabaseSettings.database)
