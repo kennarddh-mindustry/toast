@@ -4,13 +4,23 @@ import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
+import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
+import com.github.kennarddh.mindustry.toast.common.PunishmentType
 import com.github.kennarddh.mindustry.toast.common.UserRole
+import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
+import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
+import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUser
+import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUser
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import mindustry.gen.Player
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import kotlin.time.Duration
 
@@ -24,10 +34,33 @@ class UserModerationHandler : Handler() {
     @ClientSide
     @ServerSide
     suspend fun kick(player: Player? = null, target: Player, duration: Duration, reason: String) {
-        Logger.info("kicked ${target.name} for $duration with the reason $reason")
+        Logger.info("${if (player == null) "Server" else player.name} kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
+
+        target.kick("You were kicked for the reason:\n$reason")
 
         newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-            UserPunishments
+            val mindustryUser = target.getMindustryUser()!!
+            val targetMindustryUser = target.getMindustryUser()!!
+            val user = target.getUserAndMindustryUser()
+            val targetUser = target.getUserAndMindustryUser()
+
+            UserPunishments.insert {
+                it[this.reason] = reason
+                it[this.endAt] =
+                    Clock.System.now().plus(duration).toLocalDateTime(TimeZone.UTC)
+                it[this.type] = PunishmentType.Kick
+
+                it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
+                it[this.targetMindustryUserID] = targetMindustryUser[MindustryUser.id]
+
+                if (user != null)
+                    it[this.userID] = user[Users.id]
+
+                if (targetUser != null)
+                    it[this.targetUserID] = targetUser[Users.id]
+            }
         }
+
+        CommandResult("Successfully kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
     }
 }
