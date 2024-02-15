@@ -7,7 +7,7 @@ import com.github.kennarddh.mindustry.toast.common.selectOne
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 
-fun Player.getMindustryUserServerData() =
+fun Player.getMindustryUserAndUserServerData() =
     MindustryUserServerData
         .join(
             MindustryUser,
@@ -20,7 +20,7 @@ fun Player.getMindustryUserServerData() =
             MindustryUserServerData.server eq ToastVars.server
         }
 
-fun Player.getUser() =
+fun Player.getUserAndMindustryUserAndUserServerData() =
     Users.join(
         MindustryUserServerData,
         JoinType.INNER,
@@ -31,4 +31,18 @@ fun Player.getUser() =
         JoinType.INNER,
         onColumn = MindustryUserServerData.mindustryUserID,
         otherColumn = MindustryUser.id
+    ).selectOne {
+        MindustryUser.mindustryUUID eq uuid()
+        MindustryUserServerData.server eq ToastVars.server
+    }
+
+fun Player.getUserAndMindustryUser() =
+    Users.join(
+        MindustryUser,
+        JoinType.INNER,
+        onColumn = MindustryUserServerData.mindustryUserID,
+        otherColumn = MindustryUser.id
     ).selectOne { MindustryUser.mindustryUUID eq uuid() }
+
+fun Player.getMindustryUser() =
+    MindustryUser.selectOne { MindustryUser.mindustryUUID eq uuid() }

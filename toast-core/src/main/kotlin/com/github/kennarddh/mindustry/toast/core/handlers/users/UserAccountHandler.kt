@@ -14,8 +14,8 @@ import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
-import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserServerData
-import com.github.kennarddh.mindustry.toast.core.commons.getUser
+import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
+import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUser
 import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
@@ -98,7 +98,7 @@ class UserAccountHandler : Handler() {
                 it[this.mindustryNameID] = mindustryName[MindustryNames.id]
             }
 
-            val mindustryUserServerDataCanBeNull = player.getMindustryUserServerData()
+            val mindustryUserServerDataCanBeNull = player.getMindustryUserAndUserServerData()
 
             val mindustryUserServerData = if (mindustryUserServerDataCanBeNull == null) {
                 // New user server data
@@ -135,7 +135,7 @@ class UserAccountHandler : Handler() {
                         }
 
                         // Return updated user server data
-                        player.getMindustryUserServerData()!!
+                        player.getMindustryUserAndUserServerData()!!
                     } else {
                         mindustryUserServerDataCanBeNull
                     }
@@ -235,7 +235,7 @@ class UserAccountHandler : Handler() {
     @ClientSide
     suspend fun login(player: Player) {
         val mindustryUserServerData = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-            player.getMindustryUserServerData()!!
+            player.getMindustryUserAndUserServerData()!!
         }
 
         if (mindustryUserServerData[MindustryUserServerData.userID] != null)
@@ -299,7 +299,7 @@ class UserAccountHandler : Handler() {
     @ClientSide
     suspend fun logout(player: Player) {
         newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-            val mindustryUserServerData = player.getMindustryUserServerData()!!
+            val mindustryUserServerData = player.getMindustryUserAndUserServerData()!!
 
             val userID = mindustryUserServerData[MindustryUserServerData.userID]
                 ?: return@newSuspendedTransaction player.infoMessage(
@@ -329,13 +329,13 @@ class UserAccountHandler : Handler() {
     suspend fun changeRole(player: Player? = null, target: Player, newRole: UserRole): CommandResult =
         newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             val targetUser =
-                target.getUser() ?: return@newSuspendedTransaction CommandResult(
+                target.getUserAndMindustryUser() ?: return@newSuspendedTransaction CommandResult(
                     "Target is not logged in.",
                     CommandResultStatus.Failed
                 )
 
             if (player != null) {
-                val playerUser = player.getUser()!!
+                val playerUser = player.getUserAndMindustryUser()!!
 
                 if (playerUser[Users.role] <= targetUser[Users.role])
                     return@newSuspendedTransaction CommandResult(
