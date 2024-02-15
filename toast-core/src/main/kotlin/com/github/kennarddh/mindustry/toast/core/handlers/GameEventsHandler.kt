@@ -7,14 +7,14 @@ import com.github.kennarddh.mindustry.genesis.standard.extensions.stripFooMessag
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import kotlinx.datetime.Clock
 import mindustry.game.EventType
-import java.time.Instant
 
 class GameEventsHandler : Handler() {
     override suspend fun onDispose() {
         Messenger.publishGameEvent(
             GameEvent(
-                ToastVars.server, Instant.now().toEpochMilli(),
+                ToastVars.server, Clock.System.now().toEpochMilliseconds(),
                 ServerStopGameEvent()
             )
         )
@@ -27,7 +27,7 @@ class GameEventsHandler : Handler() {
         Messenger.publishGameEvent(
             GameEvent(
                 ToastVars.server,
-                Instant.now().toEpochMilli(),
+                Clock.System.now().toEpochMilliseconds(),
                 PlayerJoinGameEvent(player.name, player.uuid())
             )
         )
@@ -40,7 +40,7 @@ class GameEventsHandler : Handler() {
         Messenger.publishGameEvent(
             GameEvent(
                 ToastVars.server,
-                Instant.now().toEpochMilli(),
+                Clock.System.now().toEpochMilliseconds(),
                 PlayerLeaveGameEvent(player.name, player.uuid())
             )
         )
@@ -55,7 +55,7 @@ class GameEventsHandler : Handler() {
 
         Messenger.publishGameEvent(
             GameEvent(
-                ToastVars.server, Instant.now().toEpochMilli(),
+                ToastVars.server, Clock.System.now().toEpochMilliseconds(),
                 PlayerChatGameEvent(player.name, player.uuid(), event.message.stripFooMessageInvisibleCharacters())
             )
         )

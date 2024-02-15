@@ -15,8 +15,8 @@ import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandl
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserModerationHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserStatsHandler
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.transactions.TransactionManager
-import java.time.Instant
 
 @Suppress("unused")
 class Toast : AbstractPlugin() {
@@ -33,7 +33,7 @@ class Toast : AbstractPlugin() {
 
         Messenger.publishGameEvent(
             GameEvent(
-                ToastVars.server, Instant.now().toEpochMilli(),
+                ToastVars.server, Clock.System.now().toEpochMilliseconds(),
                 ServerStartGameEvent()
             )
         )
