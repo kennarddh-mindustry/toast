@@ -37,8 +37,9 @@ object DatabaseSettings {
             SchemaUtils.createMissingTablesAndColumns(MindustryUserServerData)
             SchemaUtils.createMissingTablesAndColumns(MindustryUserIPAddresses)
             SchemaUtils.createMissingTablesAndColumns(MindustryUserMindustryNames)
-            SchemaUtils.createMissingTablesAndColumns(UserKick)
-            SchemaUtils.createMissingTablesAndColumns(UserBan)
+            SchemaUtils.createMissingTablesAndColumns(UserPunishments)
+            SchemaUtils.createMissingTablesAndColumns(UserVoteKick)
+            SchemaUtils.createMissingTablesAndColumns(UserVoteKickVotes)
         }
     }
 }
