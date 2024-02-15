@@ -5,10 +5,13 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSi
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
+import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.UserRole
+import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import mindustry.gen.Player
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import kotlin.time.Duration
 
 class UserModerationHandler : Handler() {
@@ -20,11 +23,11 @@ class UserModerationHandler : Handler() {
     @MinimumRole(UserRole.Mod)
     @ClientSide
     @ServerSide
-    fun kick(player: Player? = null, target: Player, duration: Duration, reason: String) {
+    suspend fun kick(player: Player? = null, target: Player, duration: Duration, reason: String) {
         Logger.info("kicked ${target.name} for $duration with the reason $reason")
-//        CoroutineScopes.Main.launch {
-//            newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-//            }
-//        }
+
+        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            UserPunishments
+        }
     }
 }

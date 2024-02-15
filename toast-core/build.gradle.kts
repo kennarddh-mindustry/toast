@@ -52,8 +52,8 @@ dependencies {
     compileOnly("com.github.kennarddh.mindustry:genesis-core:$genesisVersion")
     compileOnly("com.github.kennarddh.mindustry:genesis-standard:$genesisVersion")
 
-    implementation(platform("org.jetbrains.exposed:exposed-bom:0.46.0"))
-    implementation("org.jetbrains.exposed:exposed-java-time")
+    implementation(platform("org.jetbrains.exposed:exposed-bom:0.47.0"))
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime")
     implementation("org.jetbrains.exposed:exposed-core")
     implementation("org.jetbrains.exposed:exposed-jdbc")
 
@@ -65,6 +65,7 @@ dependencies {
     implementation("com.rabbitmq:amqp-client:5.20.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 
     implementation("org.slf4j:slf4j-api:2.0.11")
 }

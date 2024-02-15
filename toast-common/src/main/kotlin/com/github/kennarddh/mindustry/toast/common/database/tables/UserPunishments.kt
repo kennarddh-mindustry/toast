@@ -2,8 +2,8 @@ package com.github.kennarddh.mindustry.toast.common.database.tables
 
 import com.github.kennarddh.mindustry.toast.common.PunishmentType
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.javatime.CurrentDateTime
-import org.jetbrains.exposed.sql.javatime.datetime
+import org.jetbrains.exposed.sql.kotlin.datetime.CurrentDateTime
+import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 
 object UserPunishments : IntIdTable() {
     val reason = text("reason")
