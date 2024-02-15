@@ -78,21 +78,21 @@ $schema("Users") {
         * $column("strippedName") VARCHAR(50)
     }
 
-    $table("UserKick") {
+    $table("UserPunishments") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $column("reason") TEXT
-        * $column("kickedAt") DATETIME
-        * $column("kickEndAt") DATETIME
-        * $column("kickType") VARCHAR(50) COMMENT Kick, VoteKick
+        * $column("punishedAt") DATETIME
+        * $column("endAt") DATETIME
+        * $column("type") VARCHAR(50) COMMENT Kick, VoteKick, Ban, Mute
           $fk("mindustryUserID") INTEGER
+          $fk("userID") INTEGER
+          $fk("targetMindustryUserID") INTEGER
           $fk("targetUserID") INTEGER
-        * $fk("targetMindustryUserID") INTEGER
     }
 
     $table("UserVoteKick") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $fk("userKickID") INTEGER
-        * $fk("voteKickStarterUserID") INTEGER
+        * $fk("userPunishmentID") INTEGER
         * $column("requiredVotes") SHORT
         * $column("result") VARCHAR(50)
     }
@@ -104,15 +104,6 @@ $schema("Users") {
         * $column("vote") BOOLEAN
     }
 
-    $table("UserBan") {
-        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $column("reason") TEXT
-        * $column("bannedAt") DATETIME
-        * $fk("userID") INTEGER
-          $fk("targetUserID") INTEGER
-        * $fk("targetMindustryUserID") INTEGER
-    }
-
     Users::id ||--o{ MindustryUserServerData::userID
     MindustryUserServerData::mindustryUserID }--|| MindustryUser::id
 
@@ -121,19 +112,15 @@ $schema("Users") {
     MindustryUser::id ||--{ MindustryUserMindustryNames::mindustryUserID
     MindustryNames::id ||--{ MindustryUserMindustryNames::mindustryNameID
 
-    UserKick::mindustryUserID }o--|| MindustryUser::id
-    UserKick::targetUserID }o--|| Users::id
-    UserKick::targetMindustryUserID }--|| MindustryUser::id
+    UserPunishments::userID }o--|| Users::id
+    UserPunishments::mindustryUserID }o--|| MindustryUser::id
+    UserPunishments::targetUserID }o--|| Users::id
+    UserPunishments::targetMindustryUserID }o--|| MindustryUser::id
 
-    UserVoteKick::voteKickStarterUserID }o--|| Users::id
-    UserVoteKick::userKickID }o--|| UserKick::id
+    UserVoteKick::userPunishmentID }o--|| UserPunishments::id
 
     UserVoteKickVotes::userVoteKickID }o--|| UserVoteKick::id
     UserVoteKickVotes::mindustryUserID }o--|| MindustryUser::id
-
-    UserBan::userID }--|| Users::id
-    UserBan::targetUserID }o--|| Users::id
-    UserBan::targetMindustryUserID }--|| MindustryUser::id
 }
 
 $schema("Map") {
