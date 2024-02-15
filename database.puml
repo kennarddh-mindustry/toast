@@ -94,7 +94,6 @@ $schema("Users") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $fk("userPunishmentID") INTEGER
         * $column("requiredVotes") SHORT
-        * $column("result") VARCHAR(50)
     }
 
     $table("UserVoteKickVotes") {
