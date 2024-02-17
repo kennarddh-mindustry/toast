@@ -1,13 +1,8 @@
 package com.github.kennarddh.mindustry.toast.discord
 
-import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
-import com.github.kennarddh.mindustry.toast.common.database.tables.UserBan
-import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
-import com.github.kennarddh.mindustry.toast.common.selectOne
-import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
@@ -15,9 +10,6 @@ import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
-import org.jetbrains.exposed.sql.JoinType
-import org.jetbrains.exposed.sql.alias
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 lateinit var jda: JDA
 
@@ -41,39 +33,35 @@ class ReadyListener : ListenerAdapter() {
                 is ServerStartGameEvent -> "Server start."
                 is ServerStopGameEvent -> "Server stop."
                 is ServerRestartGameEvent -> "Server restart."
-                is PlayerBannedGameEvent -> {
+                is PlayerPunishedGameEvent -> {
                     // TODO: Make reports channel for ban/kick/voteKick stuff
-                    val data = it.data as PlayerBannedGameEvent
+//                    val data = it.data as PlayerPunishedGameEvent
 
-                    CoroutineScopes.IO.launch {
-                        newSuspendedTransaction {
-                            val targetUserAlias = Users.alias("target")
-
-                            val userBan = UserBan
-                                .join(Users, JoinType.INNER, onColumn = UserBan.userID, otherColumn = Users.id)
-                                .join(
-                                    targetUserAlias,
-                                    JoinType.LEFT,
-                                    onColumn = UserBan.targetUserID,
-                                    otherColumn = targetUserAlias[Users.id]
-                                )
-                                .selectOne { UserBan.id eq data.userBanID }!!
-
-                            val message = if (userBan.hasValue(targetUserAlias[Users.id]))
-                                "`${data.targetPlayerMindustryName}` was banned by `${userBan[Users.username]}/${userBan[Users.id]}`"
-                            else
-                                "`${data.targetPlayerMindustryName}/${userBan[targetUserAlias[Users.username]]}/${userBan[targetUserAlias[Users.id]]}` was banned by `${userBan[Users.username]}/${userBan[Users.id]}`"
-
-                            channel.sendMessage(message).queue()
-                        }
-                    }
+//                    CoroutineScopes.IO.launch {
+//                        newSuspendedTransaction {
+//                            val targetUserAlias = Users.alias("target")
+//
+//                            val userPunishment = UserPunishments
+//                                .join(Users, JoinType.INNER, onColumn = UserBan.userID, otherColumn = Users.id)
+//                                .join(
+//                                    targetUserAlias,
+//                                    JoinType.LEFT,
+//                                    onColumn = UserBan.targetUserID,
+//                                    otherColumn = targetUserAlias[Users.id]
+//                                )
+//                                .selectOne { UserBan.id eq data.userBanID }!!
+//
+//                            val message = if (userBan.hasValue(targetUserAlias[Users.id]))
+//                                "`${data.targetPlayerMindustryName}` was banned by `${userBan[Users.username]}/${userBan[Users.id]}`"
+//                            else
+//                                "`${data.targetPlayerMindustryName}/${userBan[targetUserAlias[Users.username]]}/${userBan[targetUserAlias[Users.id]]}` was banned by `${userBan[Users.username]}/${userBan[Users.id]}`"
+//
+//                            channel.sendMessage(message).queue()
+//                        }
+//                    }
+                    channel.sendMessage("Punishment Event").queue()
                     null
                 }
-
-                is PlayerKickedGameEvent -> TODO()
-                is PlayerVoteKickCancelGameEvent -> TODO()
-                is PlayerVoteKickStartGameEvent -> TODO()
-                is PlayerVoteKickVoteGameEvent -> TODO()
             }
 
             if (message != null)
