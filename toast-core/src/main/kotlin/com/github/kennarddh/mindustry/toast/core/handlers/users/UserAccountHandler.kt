@@ -129,7 +129,10 @@ class UserAccountHandler : Handler() {
                 mindustryUserServerData
             }
 
-            // TODO: Check for kick and ban
+            // TODO: Check for punishments
+            // TODO: Check if any player with the same user already joined
+            // TODO: Make map of user and player
+            // TODO: Reject player that name starts with '#' or only numbers
 
             val userID = mindustryUserServerData[MindustryUserServerData.userID]
 
