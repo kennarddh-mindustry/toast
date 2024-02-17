@@ -72,7 +72,8 @@ $schema("Users") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $column("reason") TEXT
         * $column("punishedAt") DATETIME
-        * $column("endAt") DATETIME
+          $column("endAt") DATETIME
+          $column("pardonedAt") DATETIME
         * $column("type") VARCHAR(50) COMMENT Kick, VoteKick, Ban, Mute
           $fk("mindustryUserID") INTEGER
           $fk("userID") INTEGER
