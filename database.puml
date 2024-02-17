@@ -117,13 +117,15 @@ $schema("Map") {
         * $column("name") VARCHAR(60)
         * $column("description") TEXT
         * $column("author") VARCHAR(50)
-        * $fk("submitterUserID") INTEGER
         * $column("width") INTEGER
         * $column("height") INTEGER
         * $column("file") MEDIUMBLOB
+        * $fk("submittedByUserID") INTEGER
+          $fk("acceptedByUserID") INTEGER
+          $fk("rejectedByUserID") INTEGER
+          $fk("amendedByUserID") INTEGER
         * $column("createdAt") DATETIME
-        * $column("updatedAt") DATETIME
-        * $column("isActive") BOOLEAN
+          $column("closedAt") DATETIME
     }
 
     $table("MapGameMode") {
@@ -141,7 +143,10 @@ $schema("Map") {
         * $column("description") TEXT
     }
 
-    Map::submitterUserID ||---|| Users.Users::id
+    Map::submittedByUserID }o--|| Users.Users::id
+    Map::acceptedByUserID }o--|| Users.Users::id
+    Map::rejectedByUserID }o--|| Users.Users::id
+    Map::amendedByUserID }o--|| Users.Users::id
     MapRating::mapID }o--|| Map::id
     MapRating::userID |o--|| Users.Users::id
 
