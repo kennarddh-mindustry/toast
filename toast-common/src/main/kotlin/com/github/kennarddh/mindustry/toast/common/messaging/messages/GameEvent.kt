@@ -31,45 +31,10 @@ data class PlayerChatGameEvent(
     GameEventBase()
 
 @Serializable
-@SerialName("PlayerKicked")
-data class PlayerKickedGameEvent(
-    val userKickID: Int,
+@SerialName("PlayerPunished")
+data class PlayerPunishedGameEvent(
+    val userPunishmentID: Int,
     val targetPlayerMindustryName: String,
-) : GameEventBase()
-
-@Serializable
-@SerialName("PlayerBanned")
-data class PlayerBannedGameEvent(
-    val userBanID: Int,
-    val targetPlayerMindustryName: String,
-) : GameEventBase()
-
-@Serializable
-@SerialName("PlayerVoteKickStart")
-data class PlayerVoteKickStartGameEvent(
-    val playerMindustryName: String,
-    val playerMindustryUUID: String,
-    val targetPlayerMindustryName: String,
-    val targetPlayerMindustryUUID: String
-) : GameEventBase()
-
-@Serializable
-@SerialName("PlayerVoteKickVote")
-data class PlayerVoteKickVoteGameEvent(
-    val playerMindustryName: String,
-    val playerMindustryUUID: String,
-    val targetPlayerMindustryName: String,
-    val targetPlayerMindustryUUID: String,
-    val vote: Boolean
-) : GameEventBase()
-
-@Serializable
-@SerialName("PlayerVoteKickCancel")
-data class PlayerVoteKickCancelGameEvent(
-    val playerMindustryName: String,
-    val playerMindustryUUID: String,
-    val targetPlayerMindustryName: String,
-    val targetPlayerMindustryUUID: String,
 ) : GameEventBase()
 
 // TODO: Implement map in database first. MapStart, MapEnd.

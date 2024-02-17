@@ -14,7 +14,7 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishmen
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerKickedGameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerPunishedGameEvent
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
@@ -69,7 +69,7 @@ class UserModerationHandler : Handler() {
             GameEvent(
                 ToastVars.server,
                 Clock.System.now().toEpochMilliseconds(),
-                PlayerKickedGameEvent(punishmentID.value, target.name)
+                PlayerPunishedGameEvent(punishmentID.value, target.name)
             )
         )
 
