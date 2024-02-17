@@ -60,7 +60,6 @@ class UserAccountHandler : Handler() {
     suspend fun onPlayerJoin(event: EventType.PlayerJoin) {
         val player = event.player
         val ip = player.con.address.packIP()
-        val name = player.name
 
         newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             val mindustryUser = MindustryUser.insertIfNotExistAndGet({
@@ -69,33 +68,21 @@ class UserAccountHandler : Handler() {
                 it[this.mindustryUUID] = player.uuid()
             }
 
-            val ipAddress = IPAddresses.insertIfNotExistAndGet({
-                IPAddresses.ipAddress eq ip
-            }) {
-                it[this.ipAddress] = ip
-            }
-
-            val mindustryName = MindustryNames.insertIfNotExistAndGet({
-                MindustryNames.name eq name
-            }) {
-                it[this.name] = name
-                it[this.strippedName] = player.plainName()
-            }
-
             MindustryUserIPAddresses.insertIfNotExistAndGet({
                 MindustryUserIPAddresses.mindustryUserID eq mindustryUser[MindustryUser.id]
-                MindustryUserIPAddresses.ipAddressID eq ipAddress[IPAddresses.id]
+                MindustryUserIPAddresses.ipAddress eq ip
             }) {
                 it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
-                it[this.ipAddressID] = ipAddress[IPAddresses.id]
+                it[this.ipAddress] = ip
             }
 
             MindustryUserMindustryNames.insertIfNotExistAndGet({
                 MindustryUserMindustryNames.mindustryUserID eq mindustryUser[MindustryUser.id]
-                MindustryUserMindustryNames.mindustryNameID eq mindustryName[MindustryNames.id]
+                MindustryUserMindustryNames.name eq player.name
             }) {
                 it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
-                it[this.mindustryNameID] = mindustryName[MindustryNames.id]
+                it[this.name] = player.name
+                it[this.strippedName] = player.plainName()
             }
 
             val mindustryUserServerDataCanBeNull = player.getMindustryUserAndUserServerData()
@@ -121,10 +108,9 @@ class UserAccountHandler : Handler() {
                             "[#ff0000]Your login was invalidated. Either there is server's ip update or your account got stolen by other player. If this happen too often without any announcements, likely that your user was stolen."
                         )
 
-                        val hashedUSID =
-                            Password.hash(SecureString(player.usid().toCharArray()))
-                                .addRandomSalt(64)
-                                .with(usidHashFunctionInstance)
+                        val hashedUSID = Password.hash(SecureString(player.usid().toCharArray()))
+                            .addRandomSalt(64)
+                            .with(usidHashFunctionInstance)
 
                         MindustryUserServerData.update({
                             MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
