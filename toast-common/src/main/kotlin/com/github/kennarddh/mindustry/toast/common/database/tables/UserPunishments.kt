@@ -8,7 +8,8 @@ import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 object UserPunishments : IntIdTable() {
     val reason = text("reason")
     val punishedAt = datetime("punishedAt").defaultExpression(CurrentDateTime)
-    val endAt = datetime("endAt")
+    val endAt = datetime("endAt").nullable()
+    val pardonedAt = datetime("pardonedAt").nullable()
     val type = enumerationByName<PunishmentType>("type", 50)
     val mindustryUserID = reference("mindustryUserID", MindustryUser).nullable()
     val userID = reference("userID", MindustryUser).nullable()
