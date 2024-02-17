@@ -57,24 +57,14 @@ $schema("Users") {
 
     $table("MindustryUserIPAddresses") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $fk("ipAddressID") INTEGER
         * $fk("mindustryUserID") INTEGER
+        * $column("ipAddress") INTEGER
     }
 
     $table("MindustryUserMindustryNames") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $fk("mindustryNameID") INTEGER
         * $fk("mindustryUserID") INTEGER
-    }
-
-    $table("IPAddresses") {
-        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $column("ipAddress") INTEGER UNIQUE
-    }
-
-    $table("MindustryNames") {
-        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $column("name") VARCHAR(50) UNIQUE
+        * $column("name") VARCHAR(50)
         * $column("strippedName") VARCHAR(50)
     }
 
@@ -107,9 +97,7 @@ $schema("Users") {
     MindustryUserServerData::mindustryUserID }--|| MindustryUser::id
 
     MindustryUser::id ||--{ MindustryUserIPAddresses::mindustryUserID
-    IPAddresses::id ||--{ MindustryUserIPAddresses::ipAddressID
     MindustryUser::id ||--{ MindustryUserMindustryNames::mindustryUserID
-    MindustryNames::id ||--{ MindustryUserMindustryNames::mindustryNameID
 
     UserPunishments::userID }o--|| Users::id
     UserPunishments::mindustryUserID }o--|| MindustryUser::id
