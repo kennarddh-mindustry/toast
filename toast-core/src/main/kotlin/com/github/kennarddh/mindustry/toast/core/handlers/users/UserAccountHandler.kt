@@ -149,17 +149,7 @@ class UserAccountHandler : Handler() {
     @ClientSide
     suspend fun register(player: Player) {
         val mindustryUserServerData = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-            MindustryUserServerData
-                .join(
-                    MindustryUser,
-                    JoinType.INNER,
-                    onColumn = MindustryUserServerData.mindustryUserID,
-                    otherColumn = MindustryUser.id
-                )
-                .selectOne {
-                    MindustryUser.mindustryUUID eq player.uuid()
-                    MindustryUserServerData.server eq ToastVars.server
-                }!!
+            player.getMindustryUserAndUserServerData()!!
         }
 
         if (mindustryUserServerData[MindustryUserServerData.userID] != null)
