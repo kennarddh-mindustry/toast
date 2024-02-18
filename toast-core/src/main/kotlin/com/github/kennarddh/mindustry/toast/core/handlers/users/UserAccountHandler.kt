@@ -219,11 +219,7 @@ class UserAccountHandler : Handler() {
     @Command(["register"])
     @ClientSide
     suspend fun register(player: Player) {
-        val mindustryUserServerData = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-            player.getMindustryUserAndUserServerData()!!
-        }
-
-        if (mindustryUserServerData[MindustryUserServerData.userID] != null)
+        if (users[player]!!.userID != null)
             return player.sendMessage(
                 "[#ff0000]You are already logged in."
             )
@@ -281,11 +277,7 @@ class UserAccountHandler : Handler() {
     @Command(["login"])
     @ClientSide
     suspend fun login(player: Player) {
-        val mindustryUserServerData = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-            player.getMindustryUserAndUserServerData()!!
-        }
-
-        if (mindustryUserServerData[MindustryUserServerData.userID] != null)
+        if (users[player]!!.userID != null)
             return player.sendMessage(
                 "[#ff0000]You are already logged in."
             )
@@ -353,28 +345,24 @@ class UserAccountHandler : Handler() {
     @Command(["logout"])
     @ClientSide
     suspend fun logout(player: Player) {
+        if (users[player]!!.userID == null)
+            return player.sendMessage(
+                "[#ff0000]You are not logged in."
+            )
+
         newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-            val mindustryUserServerData = player.getMindustryUserAndUserServerData()!!
-
-            val userID = mindustryUserServerData[MindustryUserServerData.userID]
-                ?: return@newSuspendedTransaction player.infoMessage(
-                    "[#ff0000]You are not logged in."
-                )
-
-            val user = Users.selectOne { Users.id eq userID }!!
-
             MindustryUserServerData
                 .update({
-                    MindustryUserServerData.userID eq userID
+                    MindustryUserServerData.userID eq users[player]!!.userID
                     MindustryUserServerData.server eq ToastVars.server
                 }) {
-                    it[MindustryUserServerData.userID] = null
+                    it[userID] = null
                 }
 
             users.remove(player)
 
             player.infoMessage(
-                "[#00ff00]Logout success. You are now no longer logged in as ${user[Users.username]}."
+                "[#00ff00]Logout success. You are now no longer logged in."
             )
         }
     }
