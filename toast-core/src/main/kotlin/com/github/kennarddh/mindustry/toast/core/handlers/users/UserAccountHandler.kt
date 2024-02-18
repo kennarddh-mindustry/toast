@@ -31,9 +31,10 @@ import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
+import java.util.*
 
 class UserAccountHandler : Handler() {
-    private val users: MutableMap<Player, User> = mutableMapOf()
+    private val users: MutableMap<Player, User> = Collections.synchronizedMap(mutableMapOf())
 
     private val passwordHashFunctionInstance = Argon2Function.getInstance(
         16384, 10, 4, 64, Argon2.ID
