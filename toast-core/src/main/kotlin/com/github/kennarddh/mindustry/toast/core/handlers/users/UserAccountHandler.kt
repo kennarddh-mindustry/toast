@@ -34,7 +34,9 @@ import org.jetbrains.exposed.sql.update
 import java.util.*
 
 class UserAccountHandler : Handler() {
-    private val users: MutableMap<Player, User> = Collections.synchronizedMap(mutableMapOf())
+    private val backingUsers: MutableMap<Player, User> = Collections.synchronizedMap(mutableMapOf())
+
+    val users get() = backingUsers
 
     private val passwordHashFunctionInstance = Argon2Function.getInstance(
         16384, 10, 4, 64, Argon2.ID
@@ -189,7 +191,7 @@ class UserAccountHandler : Handler() {
 
             val userID = mindustryUserServerData[MindustryUserServerData.userID]
 
-            users[player] = User(userID?.value, mindustryUser[MindustryUser.id].value, player)
+            backingUsers[player] = User(userID?.value, mindustryUser[MindustryUser.id].value, player)
 
             if (userID != null) {
                 val user = Users.selectOne {
@@ -205,7 +207,7 @@ class UserAccountHandler : Handler() {
 
     @EventHandler
     fun onPlayerLeave(event: EventType.PlayerLeave) {
-        users.remove(event.player)
+        backingUsers.remove(event.player)
     }
 
     @Command(["register"])
