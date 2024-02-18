@@ -5,11 +5,14 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
+import com.github.kennarddh.mindustry.genesis.core.commons.priority.PriorityEnum
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.menus.Menu
 import com.github.kennarddh.mindustry.genesis.core.menus.Menus
+import com.github.kennarddh.mindustry.genesis.core.server.packets.annotations.ServerPacketHandler
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoMessage
+import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
 import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
@@ -22,6 +25,8 @@ import com.password4j.SecureString
 import com.password4j.types.Argon2
 import mindustry.game.EventType
 import mindustry.gen.Player
+import mindustry.net.NetConnection
+import mindustry.net.Packets
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -55,6 +60,25 @@ class UserAccountHandler : Handler() {
             "password" to Menu("Login 2/2", "Password", 50),
         )
     )
+
+    @ServerPacketHandler(PriorityEnum.Important)
+    fun checkPlayerName(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
+        if (packet.name.startsWith('#')) {
+            con.kickWithoutLogging("Name cannot starts with #.")
+
+            return false
+        }
+
+        val nameInLong = packet.name.toLongOrNull()
+
+        if (nameInLong != null) {
+            con.kickWithoutLogging("Name cannot only contains numbers.")
+
+            return false
+        }
+
+        return true
+    }
 
     @EventHandler
     suspend fun onPlayerJoin(event: EventType.PlayerJoin) {
@@ -132,7 +156,6 @@ class UserAccountHandler : Handler() {
             // TODO: Check for punishments
             // TODO: Check if any player with the same user already joined
             // TODO: Make map of user and player
-            // TODO: Reject player that name starts with '#' or only numbers
 
             val userID = mindustryUserServerData[MindustryUserServerData.userID]
 
