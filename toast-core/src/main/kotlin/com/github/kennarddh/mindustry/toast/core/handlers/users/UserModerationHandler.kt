@@ -41,10 +41,6 @@ class UserModerationHandler : Handler() {
     @ClientSide
     @ServerSide
     suspend fun kick(player: Player? = null, target: Player, duration: Duration, reason: String): CommandResult {
-        Logger.info("${if (player == null) "Server" else player.name} kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
-
-        target.kickWithoutLogging("You were kicked for the reason:\n$reason")
-
         return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             val mindustryUser = target.getMindustryUser()!!
             val targetMindustryUser = target.getMindustryUser()!!
@@ -71,6 +67,10 @@ class UserModerationHandler : Handler() {
                 if (targetUser != null)
                     it[this.targetUserID] = targetUser[Users.id]
             }
+
+            Logger.info("${if (player == null) "Server" else player.name} kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
+
+            target.kickWithoutLogging("You were kicked for the reason:\n$reason")
 
             CoroutineScopes.Main.launch {
                 Messenger.publishGameEvent(
