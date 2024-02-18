@@ -46,6 +46,7 @@ class UserAccountHandler : Handler() {
 
     private val usernameRegex = """[a-zA-Z0-9_]{1,50}""".toRegex()
     private val passwordRegex = """[a-zA-Z0-9 !@#$%^&*()-_+=\[\]{};:'",.<>/?|`~]{8,50}""".toRegex()
+    private val numberOnlyNameRegex = """\\d+""".toRegex()
 
     private val registerMenu = Menus(
         mapOf
@@ -72,9 +73,7 @@ class UserAccountHandler : Handler() {
             return false
         }
 
-        val nameInLong = packet.name.toLongOrNull()
-
-        if (nameInLong != null) {
+        if (packet.name.matches(numberOnlyNameRegex)) {
             con.kickWithoutLogging("Name cannot only contains numbers.")
 
             return false
@@ -84,14 +83,22 @@ class UserAccountHandler : Handler() {
     }
 
     @ServerPacketHandler(PriorityEnum.Important)
-    fun checkIsSameUserAlreadyJoined(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
-        val user = Users.join(
-            MindustryUser,
-            JoinType.INNER,
-            onColumn = MindustryUserServerData.mindustryUserID,
-            otherColumn = MindustryUser.id
-        ).selectOne {
-            MindustryUser.mindustryUUID eq packet.uuid
+    suspend fun checkIsSameUserAlreadyJoined(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
+        val user = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            Users.join(
+                MindustryUserServerData,
+                JoinType.INNER,
+                onColumn = Users.id,
+                otherColumn = MindustryUserServerData.userID
+            ).join(
+                MindustryUser,
+                JoinType.INNER,
+                onColumn = MindustryUserServerData.mindustryUserID,
+                otherColumn = MindustryUser.id
+            ).selectOne {
+                MindustryUser.mindustryUUID eq packet.uuid
+                MindustryUserServerData.server eq ToastVars.server
+            }
         }
 
         if (user == null) return true
