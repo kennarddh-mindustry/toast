@@ -1,9 +1,11 @@
 package com.github.kennarddh.mindustry.toast.core.commands.paramaters.types
 
+import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.parameters.types.CommandParameter
 import com.github.kennarddh.mindustry.genesis.core.commands.parameters.types.CommandParameterParsingException
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.selectOne
+import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
 import mindustry.gen.Groups
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -40,8 +42,7 @@ class ToastPlayerParameter : CommandParameter<Player> {
             if (user == null)
                 throw CommandParameterParsingException("Cannot convert $input into player for parameter :parameterName:. Cannot find player with the id $inputInt.")
 
-            // TODO: Complete this after has map of user to player
-            throw Error()
+            GenesisAPI.getHandler<UserAccountHandler>()!!.users.filter { it.value.userID == user[Users.id].value }.keys.first()
         }
     }
 
