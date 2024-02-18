@@ -33,6 +33,8 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.jetbrains.exposed.sql.update
 
 class UserAccountHandler : Handler() {
+    private val users: MutableMap<Player, User> = mutableMapOf()
+
     private val passwordHashFunctionInstance = Argon2Function.getInstance(
         16384, 10, 4, 64, Argon2.ID
     )
@@ -155,11 +157,12 @@ class UserAccountHandler : Handler() {
 
             // TODO: Check for punishments
             // TODO: Check if any player with the same user already joined
-            // TODO: Make map of user and player
 
             val userID = mindustryUserServerData[MindustryUserServerData.userID]
 
             if (userID != null) {
+                users[player] = User(userID.value, player)
+
                 val user = Users.selectOne {
                     Users.id eq userID
                 }!!
@@ -169,6 +172,11 @@ class UserAccountHandler : Handler() {
                 }
             }
         }
+    }
+
+    @EventHandler
+    fun onPlayerLeave(event: EventType.PlayerLeave) {
+        users.remove(event.player)
     }
 
     @Command(["register"])
