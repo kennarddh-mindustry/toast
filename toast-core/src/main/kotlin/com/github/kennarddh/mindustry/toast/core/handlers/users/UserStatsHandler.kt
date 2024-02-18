@@ -9,8 +9,8 @@ import com.github.kennarddh.mindustry.genesis.standard.extensions.infoPopup
 import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
-import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
 import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
@@ -81,13 +81,7 @@ class UserStatsHandler : Handler() {
 
     private suspend fun updateStatsPopup(player: Player) {
         newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-            val mindustryUserServerData =
-                MindustryUserServerData.join(
-                    MindustryUser,
-                    JoinType.INNER,
-                    onColumn = MindustryUserServerData.mindustryUserID,
-                    otherColumn = MindustryUser.id
-                ).selectOne { MindustryUser.mindustryUUID eq player.uuid() }!!
+            val mindustryUserServerData = player.getMindustryUserAndUserServerData()!!
 
             val xp = mindustryUserServerData[MindustryUserServerData.xp]
             val playTimeMillis = mindustryUserServerData[MindustryUserServerData.playTime]
