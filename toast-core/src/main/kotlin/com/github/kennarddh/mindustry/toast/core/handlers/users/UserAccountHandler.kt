@@ -83,6 +83,28 @@ class UserAccountHandler : Handler() {
         return true
     }
 
+    @ServerPacketHandler(PriorityEnum.Important)
+    fun checkIsSameUserAlreadyJoined(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
+        val user = Users.join(
+            MindustryUser,
+            JoinType.INNER,
+            onColumn = MindustryUserServerData.mindustryUserID,
+            otherColumn = MindustryUser.id
+        ).selectOne {
+            MindustryUser.mindustryUUID eq packet.uuid
+        }
+
+        if (user == null) return true
+
+        if (users.values.count { it.userID == user[Users.id].value } >= 1) {
+            con.kickWithoutLogging("There is someone with the same user already on this server.")
+
+            return false
+        }
+
+        return true
+    }
+
     @EventHandler
     suspend fun onPlayerJoin(event: EventType.PlayerJoin) {
         val player = event.player
@@ -157,7 +179,6 @@ class UserAccountHandler : Handler() {
             }
 
             // TODO: Check for punishments
-            // TODO: Check if any player with the same user already joined
 
             val userID = mindustryUserServerData[MindustryUserServerData.userID]
 
