@@ -1,6 +1,7 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import arc.util.Align
+import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask
@@ -11,7 +12,6 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import mindustry.game.EventType
-import mindustry.gen.Groups
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
@@ -34,18 +34,19 @@ class UserStatsHandler : Handler() {
 
     @TimerTask(0f, 10f)
     private suspend fun savePlayerDelta() {
-        Groups.player.forEach {
-            val playerActionsCount = playersActionsCounter[it]!!
-            val lastPlayTimeSave = playersLastPlayTimeSave[it]!!
+        GenesisAPI.getHandler<UserAccountHandler>()!!.users.forEach {
+            val player = it.key
+            val playerActionsCount = playersActionsCounter[player]!!
+            val lastPlayTimeSave = playersLastPlayTimeSave[player]!!
 
             val now = Instant.now().toEpochMilli()
             val playTimeChanges = now - lastPlayTimeSave
 
             // It's like this for easier change if later xp can be incremented in other places
             if (playerActionsCount >= minActionsPerWindowTimeToGetXP)
-                playersXPDelta[it] = playersXPDelta[it]!! + xpPerWindowTime
+                playersXPDelta[player] = playersXPDelta[player]!! + xpPerWindowTime
 
-            val xpDelta = playersXPDelta[it]!!
+            val xpDelta = playersXPDelta[player]!!
             val isPlayerActive = xpDelta > 0
 
             newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
@@ -56,7 +57,7 @@ class UserStatsHandler : Handler() {
                     onColumn = MindustryUserServerData.mindustryUserID,
                     otherColumn = MindustryUser.id
                 ).update({
-                    MindustryUser.mindustryUUID eq it.uuid()
+                    MindustryUser.mindustryUUID eq player.uuid()
                     MindustryUserServerData.server eq ToastVars.server
                 }) {
                     with(SqlExpressionBuilder) {
@@ -69,11 +70,11 @@ class UserStatsHandler : Handler() {
                     }
                 }
 
-                updateStatsPopup(it)
+                updateStatsPopup(player)
 
-                playersActionsCounter[it] = 0
-                playersXPDelta[it] = 0
-                playersLastPlayTimeSave[it] = now
+                playersActionsCounter[player] = 0
+                playersXPDelta[player] = 0
+                playersLastPlayTimeSave[player] = now
             }
         }
     }
