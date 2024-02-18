@@ -7,6 +7,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSi
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
+import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
 import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.PunishmentType
 import com.github.kennarddh.mindustry.toast.common.UserRole
@@ -42,7 +43,7 @@ class UserModerationHandler : Handler() {
     suspend fun kick(player: Player? = null, target: Player, duration: Duration, reason: String): CommandResult {
         Logger.info("${if (player == null) "Server" else player.name} kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
 
-        target.kick("You were kicked for the reason:\n$reason")
+        target.kickWithoutLogging("You were kicked for the reason:\n$reason")
 
         return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             val mindustryUser = target.getMindustryUser()!!
