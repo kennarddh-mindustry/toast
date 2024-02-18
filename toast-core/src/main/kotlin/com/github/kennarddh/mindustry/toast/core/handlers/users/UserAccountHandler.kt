@@ -46,7 +46,7 @@ class UserAccountHandler : Handler() {
 
     private val usernameRegex = """[a-zA-Z0-9_]{1,50}""".toRegex()
     private val passwordRegex = """[a-zA-Z0-9 !@#$%^&*()-_+=\[\]{};:'",.<>/?|`~]{8,50}""".toRegex()
-    private val numberOnlyNameRegex = """\\d+""".toRegex()
+    private val numberOnlyNameRegex = """^\d+$""".toRegex()
 
     private val registerMenu = Menus(
         mapOf
