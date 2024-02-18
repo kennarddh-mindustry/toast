@@ -16,9 +16,10 @@ import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLog
 import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
+import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
-import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUser
+import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
 import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
@@ -28,6 +29,7 @@ import mindustry.gen.Player
 import mindustry.net.NetConnection
 import mindustry.net.Packets
 import org.jetbrains.exposed.sql.JoinType
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
@@ -104,12 +106,19 @@ class UserAccountHandler : Handler() {
                 onColumn = MindustryUserServerData.mindustryUserID,
                 otherColumn = MindustryUser.id
             ).selectOne {
-                MindustryUser.mindustryUUID eq packet.uuid
-                MindustryUserServerData.server eq ToastVars.server
+                (MindustryUser.mindustryUUID eq packet.uuid) and (MindustryUserServerData.server eq ToastVars.server)
             }
         }
 
+        Logger.info("$user")
+        Logger.info(packet.uuid)
+        Logger.info(ToastVars.server.displayName)
+
         if (user == null) return true
+
+        Logger.info("$users")
+        Logger.info("${user[Users.id].value}")
+        Logger.info("${users.count { it.value.userID == user[Users.id].value }}")
 
         if (users.count { it.value.userID == user[Users.id].value } >= 1) {
             con.kickWithoutLogging("There is someone with the same user already on this server.")
@@ -374,13 +383,13 @@ class UserAccountHandler : Handler() {
     suspend fun changeRole(player: Player? = null, target: Player, newRole: UserRole): CommandResult =
         newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             val targetUser =
-                target.getUserAndMindustryUser() ?: return@newSuspendedTransaction CommandResult(
+                target.getUserAndMindustryUserAndUserServerData() ?: return@newSuspendedTransaction CommandResult(
                     "Target is not logged in.",
                     CommandResultStatus.Failed
                 )
 
             if (player != null) {
-                val playerUser = player.getUserAndMindustryUser()!!
+                val playerUser = player.getUserAndMindustryUserAndUserServerData()!!
 
                 if (playerUser[Users.role] <= targetUser[Users.role])
                     return@newSuspendedTransaction CommandResult(

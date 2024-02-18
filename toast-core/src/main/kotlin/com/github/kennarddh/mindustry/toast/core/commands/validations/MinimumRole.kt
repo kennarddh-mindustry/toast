@@ -5,7 +5,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validati
 import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
-import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUser
+import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
@@ -20,7 +20,7 @@ suspend fun validateMinimumRole(annotation: Annotation, player: Player?): Boolea
 
     return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
         // If user is null it means the user is not logged in
-        val user = player.getUserAndMindustryUser() ?: return@newSuspendedTransaction false
+        val user = player.getUserAndMindustryUserAndUserServerData() ?: return@newSuspendedTransaction false
 
         val userRole = user[Users.role]
 

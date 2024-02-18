@@ -36,13 +36,5 @@ fun Player.getUserAndMindustryUserAndUserServerData() =
         MindustryUserServerData.server eq ToastVars.server
     }
 
-fun Player.getUserAndMindustryUser() =
-    Users.join(
-        MindustryUser,
-        JoinType.INNER,
-        onColumn = MindustryUserServerData.mindustryUserID,
-        otherColumn = MindustryUser.id
-    ).selectOne { MindustryUser.mindustryUUID eq uuid() }
-
 fun Player.getMindustryUser() =
     MindustryUser.selectOne { MindustryUser.mindustryUUID eq uuid() }
