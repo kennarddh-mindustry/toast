@@ -69,6 +69,12 @@ class UserAccountHandler : Handler() {
 
     @ServerPacketHandler(PriorityEnum.Important)
     fun checkPlayerName(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
+        if (packet.name.length > 50) {
+            con.kickWithoutLogging("Name cannot be longer than 50 characters long.")
+
+            return false
+        }
+
         if (packet.name.startsWith('#')) {
             con.kickWithoutLogging("Name cannot starts with #.")
 
