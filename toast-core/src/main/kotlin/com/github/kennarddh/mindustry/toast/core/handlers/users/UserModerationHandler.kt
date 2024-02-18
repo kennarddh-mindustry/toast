@@ -51,9 +51,9 @@ class UserModerationHandler : Handler() {
             val user = target.getUserAndMindustryUserAndUserServerData()!!
             val targetUser = target.getUserAndMindustryUserAndUserServerData()
 
-            if (targetUser != null && user[Users.role] <= targetUser[Users.role])
+            if (targetUser != null && user[Users.role] > targetUser[Users.role])
                 return@newSuspendedTransaction CommandResult(
-                    "Your role must be higher than target's role to change target's role.",
+                    "Your role must be higher than target's role to kick.",
                     CommandResultStatus.Failed
                 )
 
