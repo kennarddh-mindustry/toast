@@ -105,7 +105,7 @@ class UserAccountHandler : Handler() {
 
         if (user == null) return true
 
-        if (users.values.count { it.userID == user[Users.id].value } >= 1) {
+        if (users.count { it.value.userID == user[Users.id].value } >= 1) {
             con.kickWithoutLogging("There is someone with the same user already on this server.")
 
             return false
