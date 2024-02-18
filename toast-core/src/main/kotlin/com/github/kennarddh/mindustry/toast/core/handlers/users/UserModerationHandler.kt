@@ -21,7 +21,7 @@ import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRol
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUser
-import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUser
+import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -48,8 +48,8 @@ class UserModerationHandler : Handler() {
         return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             val mindustryUser = target.getMindustryUser()!!
             val targetMindustryUser = target.getMindustryUser()!!
-            val user = target.getUserAndMindustryUser()!!
-            val targetUser = target.getUserAndMindustryUser()
+            val user = target.getUserAndMindustryUserAndUserServerData()!!
+            val targetUser = target.getUserAndMindustryUserAndUserServerData()
 
             if (targetUser != null && user[Users.role] <= targetUser[Users.role])
                 return@newSuspendedTransaction CommandResult(
