@@ -308,6 +308,12 @@ class UserAccountHandler : Handler() {
                     "[#ff0000]User not found."
                 )
 
+            if (users.count { it.value.userID == user[Users.id].value } >= 1) {
+                return@newSuspendedTransaction player.infoMessage(
+                    "[#ff0000]There is someone with the same user already on this server."
+                )
+            }
+
             if (
                 !Password.check(password, user[Users.password])
                     .with(passwordHashFunctionInstance)
@@ -329,6 +335,8 @@ class UserAccountHandler : Handler() {
                 }) {
                     it[MindustryUserServerData.userID] = user[Users.id]
                 }
+
+            users[player]!!.userID = user[Users.id].value
 
             player.infoMessage(
                 "[#00ff00]Login success. You are now logged in as ${user[Users.username]}."
@@ -356,6 +364,8 @@ class UserAccountHandler : Handler() {
                 }) {
                     it[MindustryUserServerData.userID] = null
                 }
+
+            users.remove(player)
 
             player.infoMessage(
                 "[#00ff00]Logout success. You are now no longer logged in as ${user[Users.username]}."
