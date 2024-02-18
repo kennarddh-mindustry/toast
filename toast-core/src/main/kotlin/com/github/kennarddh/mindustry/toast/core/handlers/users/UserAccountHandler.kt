@@ -189,9 +189,9 @@ class UserAccountHandler : Handler() {
 
             val userID = mindustryUserServerData[MindustryUserServerData.userID]
 
-            if (userID != null) {
-                users[player] = User(userID.value, player)
+            users[player] = User(userID?.value, mindustryUser[MindustryUser.id].value, player)
 
+            if (userID != null) {
                 val user = Users.selectOne {
                     Users.id eq userID
                 }!!
