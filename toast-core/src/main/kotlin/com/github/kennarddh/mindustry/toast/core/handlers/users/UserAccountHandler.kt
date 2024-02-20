@@ -25,15 +25,16 @@ import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
 import com.password4j.types.Argon2
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import mindustry.game.EventType
 import mindustry.gen.Player
 import mindustry.net.NetConnection
 import mindustry.net.Packets
-import org.jetbrains.exposed.sql.JoinType
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.kotlin.datetime.CurrentDateTime
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
-import org.jetbrains.exposed.sql.update
 import java.util.*
 
 class UserAccountHandler : Handler() {
@@ -194,11 +195,95 @@ class UserAccountHandler : Handler() {
                 mindustryUserServerData
             }
 
-            // TODO: Check for punishments
-
             val userID = mindustryUserServerData[MindustryUserServerData.userID]
 
             backingUsers[player] = User(userID?.value, mindustryUser[MindustryUser.id].value, player)
+
+            val targetUserAlias = Users.alias("targetUser")
+            val targetMindustryUserAlias = MindustryUser.alias("targetMindustryUser")
+
+            val userPunishmentsQuery = UserPunishments
+                .join(
+                    Users,
+                    JoinType.LEFT,
+                    onColumn = UserPunishments.userID,
+                    otherColumn = Users.id
+                )
+                .join(
+                    targetUserAlias,
+                    JoinType.LEFT,
+                    onColumn = UserPunishments.targetUserID,
+                    otherColumn = targetUserAlias[Users.id]
+                )
+                .join(
+                    MindustryUser,
+                    JoinType.LEFT,
+                    onColumn = UserPunishments.mindustryUserID,
+                    otherColumn = MindustryUser.id
+                )
+                .join(
+                    targetMindustryUserAlias,
+                    JoinType.LEFT,
+                    onColumn = UserPunishments.targetMindustryUserID,
+                    otherColumn = targetMindustryUserAlias[MindustryUser.id]
+                )
+                .selectAll()
+
+            if (userID != null)
+                userPunishmentsQuery.andWhere {
+                    UserPunishments.targetUserID.isNull() or (UserPunishments.targetUserID eq userID.value)
+                }
+
+            userPunishmentsQuery.andWhere {
+                UserPunishments.targetMindustryUserID.isNull() or (UserPunishments.targetMindustryUserID eq mindustryUser[MindustryUser.id])
+            }
+
+            // Check is still not ended and has not been pardoned
+            userPunishmentsQuery.andWhere {
+                (UserPunishments.endAt greaterEq CurrentDateTime) or UserPunishments.pardonedAt.isNotNull()
+            }
+
+            for (userPunishment in userPunishmentsQuery) {
+                if (userPunishment[UserPunishments.type] == PunishmentType.Ban) {
+                    player.kickWithoutLogging(
+                        """
+                            [#ff0000]You were banned for the reason
+                            []${userPunishment[UserPunishments.reason]}
+                            [#00ff00]Appeal in Discord.
+                            """.trimIndent()
+                    )
+
+                    return@newSuspendedTransaction
+                } else if (userPunishment[UserPunishments.type] == PunishmentType.Kick) {
+                    val kickTimeLeft =
+                        userPunishment[UserPunishments.endAt]!!.toInstant(TimeZone.UTC).minus(Clock.System.now())
+
+                    player.kickWithoutLogging(
+                        """
+                            [#ff0000]You were kicked for the reason
+                            []${userPunishment[UserPunishments.reason]}
+                            [#00ff00]You can join again in $kickTimeLeft.
+                            [#00ff00]Appeal in Discord.
+                            """.trimIndent()
+                    )
+
+                    return@newSuspendedTransaction
+                } else if (userPunishment[UserPunishments.type] == PunishmentType.VoteKick) {
+                    val kickTimeLeft =
+                        userPunishment[UserPunishments.endAt]!!.toInstant(TimeZone.UTC).minus(Clock.System.now())
+
+                    player.kickWithoutLogging(
+                        """
+                            [#ff0000]You were vote kicked for the reason
+                            []${userPunishment[UserPunishments.reason]}
+                            [#00ff00]You can join again in $kickTimeLeft.
+                            [#00ff00]Appeal in Discord.
+                            """.trimIndent()
+                    )
+
+                    return@newSuspendedTransaction
+                }
+            }
 
             if (userID != null) {
                 val user = Users.selectOne { Users.id eq userID }!!
