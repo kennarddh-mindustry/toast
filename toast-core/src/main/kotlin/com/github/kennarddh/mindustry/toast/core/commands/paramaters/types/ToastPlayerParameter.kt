@@ -3,6 +3,7 @@ package com.github.kennarddh.mindustry.toast.core.commands.paramaters.types
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.parameters.types.CommandParameter
 import com.github.kennarddh.mindustry.genesis.core.commands.parameters.types.CommandParameterParsingException
+import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
@@ -34,7 +35,7 @@ class ToastPlayerParameter : CommandParameter<Player> {
             return Groups.player.find { it.name == input }
                 ?: throw CommandParameterParsingException("Cannot convert $input into player for parameter :parameterName:. Cannot find player with the name $input.")
 
-        return newSuspendedTransaction {
+        return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             val user = Users.selectOne {
                 Users.id eq inputInt
             }
