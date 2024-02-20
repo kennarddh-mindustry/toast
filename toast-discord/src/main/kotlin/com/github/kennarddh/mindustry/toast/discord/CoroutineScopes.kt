@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.common
+package com.github.kennarddh.mindustry.toast.discord
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

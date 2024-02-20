@@ -1,6 +1,5 @@
 package com.github.kennarddh.mindustry.toast.common.database
 
-import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -9,11 +8,12 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import kotlin.coroutines.CoroutineContext
 
 object DatabaseSettings {
     lateinit var database: Database
 
-    suspend fun init() {
+    suspend fun init(coroutineContext: CoroutineContext) {
         val config = HikariConfig()
 
         config.minimumIdle = 2
@@ -27,7 +27,7 @@ object DatabaseSettings {
 
         database = Database.connect(dataSource)
 
-        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+        newSuspendedTransaction(coroutineContext) {
             addLogger(StdOutSqlLogger)
 
             SchemaUtils.createMissingTablesAndColumns(Users)

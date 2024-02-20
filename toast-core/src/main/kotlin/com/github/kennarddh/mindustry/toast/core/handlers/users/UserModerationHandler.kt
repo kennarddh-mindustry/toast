@@ -6,9 +6,9 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
+import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
-import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.PunishmentType
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser

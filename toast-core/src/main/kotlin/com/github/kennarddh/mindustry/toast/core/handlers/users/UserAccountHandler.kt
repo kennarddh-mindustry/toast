@@ -5,6 +5,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
+import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.commons.priority.PriorityEnum
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler

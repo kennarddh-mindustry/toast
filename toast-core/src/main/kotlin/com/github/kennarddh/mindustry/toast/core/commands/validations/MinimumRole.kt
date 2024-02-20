@@ -2,7 +2,7 @@ package com.github.kennarddh.mindustry.toast.core.commands.validations
 
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validations.CommandValidation
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validations.CommandValidationDescription
-import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
+import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData

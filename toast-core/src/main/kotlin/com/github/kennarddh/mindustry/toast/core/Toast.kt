@@ -2,6 +2,7 @@ package com.github.kennarddh.mindustry.toast.core
 
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commons.AbstractPlugin
+import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
@@ -22,7 +23,7 @@ import org.jetbrains.exposed.sql.transactions.TransactionManager
 @Suppress("unused")
 class Toast : AbstractPlugin() {
     override suspend fun onInit() {
-        DatabaseSettings.init()
+        DatabaseSettings.init(CoroutineScopes.IO.coroutineContext)
         Messenger.init()
 
         GenesisAPI.commandRegistry.registerCommandValidationAnnotation(MinimumRole::class, ::validateMinimumRole)

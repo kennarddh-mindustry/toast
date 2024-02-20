@@ -75,7 +75,7 @@ suspend fun main() {
 
     Messenger.init()
 
-    DatabaseSettings.init()
+    DatabaseSettings.init(CoroutineScopes.IO.coroutineContext)
 
     addShutdownHook()
 

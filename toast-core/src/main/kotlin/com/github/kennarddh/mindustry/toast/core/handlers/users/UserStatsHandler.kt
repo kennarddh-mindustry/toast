@@ -2,11 +2,11 @@ package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import arc.util.Align
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
+import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoPopup
-import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
