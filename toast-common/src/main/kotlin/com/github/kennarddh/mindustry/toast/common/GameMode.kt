@@ -6,5 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class GameMode {
     @SerialName("Survival")
-    Survival
+    Survival,
+
+    @SerialName("Attack")
+    Attack,
+
+    @SerialName("PvP")
+    PvP,
 }
