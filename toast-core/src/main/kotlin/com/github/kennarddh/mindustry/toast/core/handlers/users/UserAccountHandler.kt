@@ -106,7 +106,8 @@ class UserAccountHandler : Handler() {
                 JoinType.INNER,
                 onColumn = MindustryUserServerData.mindustryUserID,
                 otherColumn = MindustryUser.id
-            ).selectOne { con.mindustryServerUserDataWhereClause }
+            )
+                .selectOne { (MindustryUser.mindustryUUID eq packet.uuid) and (MindustryUserServerData.server eq ToastVars.server) }
         }
 
         if (user == null) return true
