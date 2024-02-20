@@ -16,7 +16,10 @@ import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLog
 import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
-import com.github.kennarddh.mindustry.toast.core.commons.*
+import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
+import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
+import com.github.kennarddh.mindustry.toast.core.commons.mindustryServerUserDataWhereClause
 import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
@@ -105,15 +108,7 @@ class UserAccountHandler : Handler() {
             ).selectOne { con.mindustryServerUserDataWhereClause }
         }
 
-        Logger.info("$user")
-        Logger.info(packet.uuid)
-        Logger.info(ToastVars.server.displayName)
-
         if (user == null) return true
-
-        Logger.info("$users")
-        Logger.info("${user[Users.id].value}")
-        Logger.info("${users.count { it.value.userID == user[Users.id].value }}")
 
         if (users.count { it.value.userID == user[Users.id].value } >= 1) {
             con.kickWithoutLogging("There is someone with the same user already on this server.")
