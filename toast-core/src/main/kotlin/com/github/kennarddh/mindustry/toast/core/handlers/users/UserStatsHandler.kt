@@ -9,8 +9,8 @@ import com.github.kennarddh.mindustry.genesis.standard.extensions.infoPopup
 import com.github.kennarddh.mindustry.toast.common.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
-import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
+import com.github.kennarddh.mindustry.toast.core.commons.mindustryServerUserDataWhereClause
 import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
@@ -56,10 +56,7 @@ class UserStatsHandler : Handler() {
                     JoinType.INNER,
                     onColumn = MindustryUserServerData.mindustryUserID,
                     otherColumn = MindustryUser.id
-                ).update({
-                    MindustryUser.mindustryUUID eq player.uuid()
-                    MindustryUserServerData.server eq ToastVars.server
-                }) {
+                ).update({ player.mindustryServerUserDataWhereClause }) {
                     with(SqlExpressionBuilder) {
                         it[MindustryUserServerData.xp] = MindustryUserServerData.xp + xpDelta
                         it[MindustryUserServerData.playTime] = MindustryUserServerData.playTime + playTimeChanges

@@ -6,6 +6,7 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.selectOne
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
+import org.jetbrains.exposed.sql.Op
 
 fun Player.getMindustryUserAndUserServerData() =
     MindustryUserServerData
@@ -15,10 +16,10 @@ fun Player.getMindustryUserAndUserServerData() =
             onColumn = MindustryUserServerData.mindustryUserID,
             otherColumn = MindustryUser.id
         )
-        .selectOne {
-            MindustryUser.mindustryUUID eq uuid()
-            MindustryUserServerData.server eq ToastVars.server
-        }
+        .selectOne { mindustryServerUserDataWhereClause }
+
+val Player.mindustryServerUserDataWhereClause: Op<Boolean>
+    get() = con.mindustryServerUserDataWhereClause
 
 fun Player.getUserAndMindustryUserAndUserServerData() =
     Users.join(
@@ -31,10 +32,7 @@ fun Player.getUserAndMindustryUserAndUserServerData() =
         JoinType.INNER,
         onColumn = MindustryUserServerData.mindustryUserID,
         otherColumn = MindustryUser.id
-    ).selectOne {
-        MindustryUser.mindustryUUID eq uuid()
-        MindustryUserServerData.server eq ToastVars.server
-    }
+    ).selectOne { mindustryServerUserDataWhereClause }
 
 fun Player.getMindustryUser() =
     MindustryUser.selectOne { MindustryUser.mindustryUUID eq uuid() }

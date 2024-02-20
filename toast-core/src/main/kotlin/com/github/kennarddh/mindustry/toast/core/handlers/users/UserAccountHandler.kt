@@ -16,10 +16,7 @@ import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLog
 import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
-import com.github.kennarddh.mindustry.toast.core.commons.Logger
-import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
-import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
-import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
+import com.github.kennarddh.mindustry.toast.core.commons.*
 import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
@@ -105,9 +102,7 @@ class UserAccountHandler : Handler() {
                 JoinType.INNER,
                 onColumn = MindustryUserServerData.mindustryUserID,
                 otherColumn = MindustryUser.id
-            ).selectOne {
-                (MindustryUser.mindustryUUID eq packet.uuid) and (MindustryUserServerData.server eq ToastVars.server)
-            }
+            ).selectOne { con.mindustryServerUserDataWhereClause }
         }
 
         Logger.info("$user")
@@ -142,16 +137,16 @@ class UserAccountHandler : Handler() {
             }
 
             MindustryUserIPAddresses.insertIfNotExistAndGet({
-                MindustryUserIPAddresses.mindustryUserID eq mindustryUser[MindustryUser.id]
-                MindustryUserIPAddresses.ipAddress eq ip
+                (MindustryUserIPAddresses.mindustryUserID eq mindustryUser[MindustryUser.id]) and
+                        (MindustryUserIPAddresses.ipAddress eq ip)
             }) {
                 it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
                 it[this.ipAddress] = ip
             }
 
             MindustryUserMindustryNames.insertIfNotExistAndGet({
-                MindustryUserMindustryNames.mindustryUserID eq mindustryUser[MindustryUser.id]
-                MindustryUserMindustryNames.name eq player.name
+                (MindustryUserMindustryNames.mindustryUserID eq mindustryUser[MindustryUser.id]) and
+                        (MindustryUserMindustryNames.name eq player.name)
             }) {
                 it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
                 it[this.name] = player.name
@@ -186,8 +181,8 @@ class UserAccountHandler : Handler() {
                             .with(usidHashFunctionInstance)
 
                         MindustryUserServerData.update({
-                            MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]
-                            MindustryUserServerData.server eq ToastVars.server
+                            (MindustryUserServerData.mindustryUserID eq mindustryUser[MindustryUser.id]) and
+                                    (MindustryUserServerData.server eq ToastVars.server)
                         }) {
                             it[this.mindustryUSID] = hashedUSID.result
                             it[this.userID] = null
@@ -209,9 +204,7 @@ class UserAccountHandler : Handler() {
             backingUsers[player] = User(userID?.value, mindustryUser[MindustryUser.id].value, player)
 
             if (userID != null) {
-                val user = Users.selectOne {
-                    Users.id eq userID
-                }!!
+                val user = Users.selectOne { Users.id eq userID }!!
 
                 if (user[Users.role] >= UserRole.Admin) {
                     player.admin = true
@@ -336,10 +329,7 @@ class UserAccountHandler : Handler() {
                     onColumn = MindustryUserServerData.mindustryUserID,
                     otherColumn = MindustryUser.id
                 )
-                .update({
-                    MindustryUser.mindustryUUID eq player.uuid()
-                    MindustryUserServerData.server eq ToastVars.server
-                }) {
+                .update({ player.mindustryServerUserDataWhereClause }) {
                     it[MindustryUserServerData.userID] = user[Users.id]
                 }
 
