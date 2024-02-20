@@ -8,6 +8,9 @@ import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.Op
 
+val Player.mindustryServerUserDataWhereClause: Op<Boolean>
+    get() = con.mindustryServerUserDataWhereClause
+
 fun Player.getMindustryUserAndUserServerData() =
     MindustryUserServerData
         .join(
@@ -17,9 +20,6 @@ fun Player.getMindustryUserAndUserServerData() =
             otherColumn = MindustryUser.id
         )
         .selectOne { mindustryServerUserDataWhereClause }
-
-val Player.mindustryServerUserDataWhereClause: Op<Boolean>
-    get() = con.mindustryServerUserDataWhereClause
 
 fun Player.getUserAndMindustryUserAndUserServerData() =
     Users.join(
