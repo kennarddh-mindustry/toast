@@ -1,27 +1,43 @@
 package com.github.kennarddh.mindustry.toast.discord
 
 import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
+import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
+import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
+import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
+import com.github.kennarddh.mindustry.toast.common.selectOne
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
+import org.jetbrains.exposed.sql.JoinType
+import org.jetbrains.exposed.sql.alias
+
 
 lateinit var jda: JDA
 
-const val TOAST_MINDUSTRY_GUILD_ID = 1189553927843237888L
-
 class ReadyListener : ListenerAdapter() {
     private lateinit var toastMindustryGuild: Guild
+    private lateinit var notificationChannel: TextChannel
+    private lateinit var reportsChannel: TextChannel
+    private lateinit var serverListChannel: TextChannel
 
     override fun onReady(event: ReadyEvent) {
         Logger.info("Bot Ready")
 
-        toastMindustryGuild = jda.getGuildById(TOAST_MINDUSTRY_GUILD_ID)!!
+        toastMindustryGuild = jda.getGuildById(DiscordConstant.TOAST_MINDUSTRY_GUILD_ID)!!
+        notificationChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.NOTIFICATIONS_CHANNEL_ID)!!
+        reportsChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.REPORTS_CHANNEL_ID)!!
+        serverListChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.SERVER_LIST_CHANNEL_ID)!!
 
         Messenger.listenGameEvent("DiscordBot") {
             val channel = toastMindustryGuild.getTextChannelById(it.server.discordChannelID)!!
@@ -34,32 +50,72 @@ class ReadyListener : ListenerAdapter() {
                 is ServerStopGameEvent -> "Server stop."
                 is ServerRestartGameEvent -> "Server restart."
                 is PlayerPunishedGameEvent -> {
-                    // TODO: Make reports channel for ban/kick/voteKick stuff
-//                    val data = it.data as PlayerPunishedGameEvent
+                    val data = it.data as PlayerPunishedGameEvent
 
-//                    CoroutineScopes.IO.launch {
-//                        newSuspendedTransaction {
-//                            val targetUserAlias = Users.alias("target")
-//
-//                            val userPunishment = UserPunishments
-//                                .join(Users, JoinType.INNER, onColumn = UserBan.userID, otherColumn = Users.id)
-//                                .join(
-//                                    targetUserAlias,
-//                                    JoinType.LEFT,
-//                                    onColumn = UserBan.targetUserID,
-//                                    otherColumn = targetUserAlias[Users.id]
-//                                )
-//                                .selectOne { UserBan.id eq data.userBanID }!!
-//
-//                            val message = if (userBan.hasValue(targetUserAlias[Users.id]))
-//                                "`${data.targetPlayerMindustryName}` was banned by `${userBan[Users.username]}/${userBan[Users.id]}`"
-//                            else
-//                                "`${data.targetPlayerMindustryName}/${userBan[targetUserAlias[Users.username]]}/${userBan[targetUserAlias[Users.id]]}` was banned by `${userBan[Users.username]}/${userBan[Users.id]}`"
-//
-//                            channel.sendMessage(message).queue()
-//                        }
-//                    }
-                    channel.sendMessage("Punishment Event").queue()
+                    val targetUserAlias = Users.alias("targetUser")
+                    val targetMindustryUserAlias = MindustryUser.alias("targetMindustryUser")
+
+                    val userPunishment = UserPunishments
+                        .join(
+                            Users,
+                            JoinType.LEFT,
+                            onColumn = UserPunishments.userID,
+                            otherColumn = Users.id
+                        )
+                        .join(
+                            targetUserAlias,
+                            JoinType.LEFT,
+                            onColumn = UserPunishments.targetUserID,
+                            otherColumn = targetUserAlias[Users.id]
+                        )
+                        .join(
+                            MindustryUser,
+                            JoinType.LEFT,
+                            onColumn = UserPunishments.mindustryUserID,
+                            otherColumn = MindustryUser.id
+                        )
+                        .join(
+                            targetMindustryUserAlias,
+                            JoinType.LEFT,
+                            onColumn = UserPunishments.targetMindustryUserID,
+                            otherColumn = targetMindustryUserAlias[MindustryUser.id]
+                        )
+                        .selectOne {
+                            UserPunishments.id eq data.userPunishmentID
+                        }!!
+
+                    val embed = EmbedBuilder().run {
+                        setTitle("Punishment")
+
+                        setColor(DiscordConstant.PUNISHMENT_EMBED_COLOR)
+
+                        addField(MessageEmbed.Field("ID", userPunishment[UserPunishments.id].value.toString(), false))
+
+                        addField(MessageEmbed.Field("Name", "${data.name}/", false))
+                        addField(MessageEmbed.Field("Target", data.targetPlayerMindustryName, false))
+
+                        addField(MessageEmbed.Field("Type", userPunishment[UserPunishments.type].displayName, false))
+
+                        addField(
+                            MessageEmbed.Field(
+                                "Duration",
+                                if (userPunishment[UserPunishments.endAt] == null) "Null" else
+                                    userPunishment[UserPunishments.endAt]!!
+                                        .toInstant(TimeZone.UTC)
+                                        .minus(
+                                            userPunishment[UserPunishments.punishedAt].toInstant(TimeZone.UTC)
+                                        )
+                                        .toString(),
+                                true
+                            )
+                        )
+
+                        addField(MessageEmbed.Field("Reason", userPunishment[UserPunishments.reason], false))
+
+                        build()
+                    }
+
+                    notificationChannel.sendMessageEmbeds(embed).queue()
                     null
                 }
             }
