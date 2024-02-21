@@ -23,7 +23,7 @@ val exposedVersion: String = "0.46.0"
 dependencies {
     implementation(project(":toast-common"))
 
-    implementation(platform("org.jetbrains.exposed:exposed-bom:0.46.0"))
+    implementation(platform("org.jetbrains.exposed:exposed-bom:0.47.0"))
     implementation("org.jetbrains.exposed:exposed-java-time")
     implementation("org.jetbrains.exposed:exposed-core")
     implementation("org.jetbrains.exposed:exposed-jdbc")

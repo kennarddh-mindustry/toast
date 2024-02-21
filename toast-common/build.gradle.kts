@@ -19,8 +19,6 @@ repositories {
 project.group = "com.github.kennarddh.mindustry"
 project.version = project.file("version.txt").readLines()[0]
 
-val exposedVersion: String = "0.46.0"
-
 dependencies {
     compileOnly("com.xpdustry:kotlin-runtime:3.1.0-k.1.9.10")
 
