@@ -34,6 +34,11 @@ import kotlin.time.Duration
 class UserModerationHandler : Handler() {
     override suspend fun onInit() {
         GenesisAPI.commandRegistry.removeCommand("kick")
+        GenesisAPI.commandRegistry.removeCommand("ban")
+        GenesisAPI.commandRegistry.removeCommand("bans")
+        GenesisAPI.commandRegistry.removeCommand("unban")
+        GenesisAPI.commandRegistry.removeCommand("pardon")
+        GenesisAPI.commandRegistry.removeCommand("subnet-ban")
     }
 
     @Command(["kick"])
@@ -90,6 +95,60 @@ class UserModerationHandler : Handler() {
             }
 
             CommandResult("Successfully kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
+        }
+    }
+
+    @Command(["ban"])
+    @MinimumRole(UserRole.Admin)
+    @ClientSide
+    @ServerSide
+    suspend fun ban(player: Player? = null, target: Player, reason: String): CommandResult {
+        return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            val mindustryUser = target.getMindustryUser()!!
+            val targetMindustryUser = target.getMindustryUser()!!
+            val user = target.getUserAndMindustryUserAndUserServerData()!!
+            val targetUser = target.getUserAndMindustryUserAndUserServerData()
+
+            if (targetUser != null && user[Users.role] > targetUser[Users.role])
+                return@newSuspendedTransaction CommandResult(
+                    "Your role must be higher than target's role to kick.",
+                    CommandResultStatus.Failed
+                )
+
+            val punishmentID = UserPunishments.insertAndGetId {
+                it[this.reason] = reason
+                it[this.type] = PunishmentType.Ban
+
+                it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
+                it[this.targetMindustryUserID] = targetMindustryUser[MindustryUser.id]
+
+                it[this.userID] = user[Users.id]
+
+                if (targetUser != null)
+                    it[this.targetUserID] = targetUser[Users.id]
+            }
+
+            Logger.info("${if (player == null) "Server" else player.name} banned ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
+
+            target.kickWithoutLogging(
+                """
+                [#ff0000]You were banned for the reason
+                []$reason
+                [#00ff00]Appeal in Discord.
+                """.trimIndent()
+            )
+
+            CoroutineScopes.Main.launch {
+                Messenger.publishGameEvent(
+                    GameEvent(
+                        ToastVars.server,
+                        Clock.System.now().toEpochMilliseconds(),
+                        PlayerPunishedGameEvent(punishmentID.value, target.name)
+                    )
+                )
+            }
+
+            CommandResult("Successfully banned ${target.name}/${target.uuid()} with the reason \"$reason\"")
         }
     }
 }
