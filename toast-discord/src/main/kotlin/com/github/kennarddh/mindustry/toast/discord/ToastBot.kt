@@ -140,7 +140,7 @@ class ReadyListener : ListenerAdapter() {
                                             .minus(
                                                 userPunishment[UserPunishments.punishedAt].toInstant(TimeZone.UTC)
                                             )
-                                            .toString(),
+                                            .toIsoString(),
                                     true
                                 )
                             )
