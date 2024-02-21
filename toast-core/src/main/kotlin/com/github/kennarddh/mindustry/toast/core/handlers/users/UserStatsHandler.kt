@@ -36,6 +36,10 @@ class UserStatsHandler : Handler() {
     private suspend fun savePlayerDelta() {
         GenesisAPI.getHandler<UserAccountHandler>()!!.users.forEach {
             val player = it.key
+
+            if (!playersActionsCounter.containsKey(player)) return
+            if (!playersLastPlayTimeSave.containsKey(player)) return
+
             val playerActionsCount = playersActionsCounter[player]!!
             val lastPlayTimeSave = playersLastPlayTimeSave[player]!!
 
