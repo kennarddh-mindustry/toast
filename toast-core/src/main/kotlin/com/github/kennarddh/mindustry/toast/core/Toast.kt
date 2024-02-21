@@ -14,6 +14,7 @@ import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.handlers.GameEventsHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
+import com.github.kennarddh.mindustry.toast.core.handlers.users.UserJoinsHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserModerationHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserStatsHandler
 import kotlinx.datetime.Clock
@@ -30,6 +31,7 @@ class Toast : AbstractPlugin() {
         GenesisAPI.commandRegistry.replaceParameterType(Player::class, ToastPlayerParameter())
 
         GenesisAPI.registerHandler(UserAccountHandler())
+        GenesisAPI.registerHandler(UserJoinsHandler())
         GenesisAPI.registerHandler(UserStatsHandler())
         GenesisAPI.registerHandler(GameEventsHandler())
         GenesisAPI.registerHandler(UserModerationHandler())
