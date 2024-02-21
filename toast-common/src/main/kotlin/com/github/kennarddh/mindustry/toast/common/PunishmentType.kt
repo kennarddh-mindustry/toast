@@ -4,16 +4,16 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class PunishmentType {
+enum class PunishmentType(val displayName: String) {
     @SerialName("Kick")
-    Kick,
+    Kick("Kick"),
 
     @SerialName("VoteKick")
-    VoteKick,
+    VoteKick("VoteKIck"),
 
     @SerialName("Ban")
-    Ban,
+    Ban("Ban"),
 
     @SerialName("Mute")
-    Mute
+    Mute("Mute")
 }
