@@ -18,7 +18,10 @@ import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLog
 import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
-import com.github.kennarddh.mindustry.toast.core.commons.*
+import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
+import com.github.kennarddh.mindustry.toast.core.commons.getUserOptionalAndMindustryUserAndUserServerData
+import com.github.kennarddh.mindustry.toast.core.commons.mindustryServerUserDataWhereClause
 import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
@@ -311,11 +314,6 @@ class UserAccountHandler : Handler() {
             val userAndMindustryUserAndUserServerData = player.getUserOptionalAndMindustryUserAndUserServerData()
 
             val userID = userAndMindustryUserAndUserServerData?.get(Users.id)?.value
-
-            Logger.info(player.uuid())
-            Logger.info("${ToastVars.server}")
-            Logger.info("$userAndMindustryUserAndUserServerData")
-            Logger.info("$userID ${userAndMindustryUserAndUserServerData?.get(MindustryUser.id)}")
 
             val mindustryUserID = userAndMindustryUserAndUserServerData?.get(MindustryUser.id)!!.value
 
