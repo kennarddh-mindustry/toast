@@ -7,6 +7,7 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
 import com.github.kennarddh.mindustry.toast.common.selectOne
+import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import net.dv8tion.jda.api.EmbedBuilder
@@ -21,6 +22,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.alias
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 
 lateinit var jda: JDA
@@ -52,70 +54,87 @@ class ReadyListener : ListenerAdapter() {
                 is PlayerPunishedGameEvent -> {
                     val data = it.data as PlayerPunishedGameEvent
 
-                    val targetUserAlias = Users.alias("targetUser")
-                    val targetMindustryUserAlias = MindustryUser.alias("targetMindustryUser")
+                    CoroutineScopes.Main.launch {
+                        val userPunishment = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                            val targetUserAlias = Users.alias("targetUser")
+                            val targetMindustryUserAlias = MindustryUser.alias("targetMindustryUser")
 
-                    val userPunishment = UserPunishments
-                        .join(
-                            Users,
-                            JoinType.LEFT,
-                            onColumn = UserPunishments.userID,
-                            otherColumn = Users.id
-                        )
-                        .join(
-                            targetUserAlias,
-                            JoinType.LEFT,
-                            onColumn = UserPunishments.targetUserID,
-                            otherColumn = targetUserAlias[Users.id]
-                        )
-                        .join(
-                            MindustryUser,
-                            JoinType.LEFT,
-                            onColumn = UserPunishments.mindustryUserID,
-                            otherColumn = MindustryUser.id
-                        )
-                        .join(
-                            targetMindustryUserAlias,
-                            JoinType.LEFT,
-                            onColumn = UserPunishments.targetMindustryUserID,
-                            otherColumn = targetMindustryUserAlias[MindustryUser.id]
-                        )
-                        .selectOne {
-                            UserPunishments.id eq data.userPunishmentID
-                        }!!
+                            UserPunishments
+                                .join(
+                                    Users,
+                                    JoinType.LEFT,
+                                    onColumn = UserPunishments.userID,
+                                    otherColumn = Users.id
+                                )
+                                .join(
+                                    targetUserAlias,
+                                    JoinType.LEFT,
+                                    onColumn = UserPunishments.targetUserID,
+                                    otherColumn = targetUserAlias[Users.id]
+                                )
+                                .join(
+                                    MindustryUser,
+                                    JoinType.LEFT,
+                                    onColumn = UserPunishments.mindustryUserID,
+                                    otherColumn = MindustryUser.id
+                                )
+                                .join(
+                                    targetMindustryUserAlias,
+                                    JoinType.LEFT,
+                                    onColumn = UserPunishments.targetMindustryUserID,
+                                    otherColumn = targetMindustryUserAlias[MindustryUser.id]
+                                )
+                                .selectOne {
+                                    UserPunishments.id eq data.userPunishmentID
+                                }!!
+                        }
 
-                    val embed = EmbedBuilder().run {
-                        setTitle("Punishment")
+                        val embed = EmbedBuilder().run {
+                            setTitle("Punishment")
 
-                        setColor(DiscordConstant.PUNISHMENT_EMBED_COLOR)
+                            setColor(DiscordConstant.PUNISHMENT_EMBED_COLOR)
 
-                        addField(MessageEmbed.Field("ID", userPunishment[UserPunishments.id].value.toString(), false))
-
-                        addField(MessageEmbed.Field("Name", "${data.name}/", false))
-                        addField(MessageEmbed.Field("Target", data.targetPlayerMindustryName, false))
-
-                        addField(MessageEmbed.Field("Type", userPunishment[UserPunishments.type].displayName, false))
-
-                        addField(
-                            MessageEmbed.Field(
-                                "Duration",
-                                if (userPunishment[UserPunishments.endAt] == null) "Null" else
-                                    userPunishment[UserPunishments.endAt]!!
-                                        .toInstant(TimeZone.UTC)
-                                        .minus(
-                                            userPunishment[UserPunishments.punishedAt].toInstant(TimeZone.UTC)
-                                        )
-                                        .toString(),
-                                true
+                            addField(
+                                MessageEmbed.Field(
+                                    "ID",
+                                    userPunishment[UserPunishments.id].value.toString(),
+                                    false
+                                )
                             )
-                        )
 
-                        addField(MessageEmbed.Field("Reason", userPunishment[UserPunishments.reason], false))
+                            addField(MessageEmbed.Field("Name", "${data.name}/", false))
+                            addField(MessageEmbed.Field("Target", data.targetPlayerMindustryName, false))
 
-                        build()
+                            addField(
+                                MessageEmbed.Field(
+                                    "Type",
+                                    userPunishment[UserPunishments.type].displayName,
+                                    false
+                                )
+                            )
+
+                            addField(
+                                MessageEmbed.Field(
+                                    "Duration",
+                                    if (userPunishment[UserPunishments.endAt] == null) "Null" else
+                                        userPunishment[UserPunishments.endAt]!!
+                                            .toInstant(TimeZone.UTC)
+                                            .minus(
+                                                userPunishment[UserPunishments.punishedAt].toInstant(TimeZone.UTC)
+                                            )
+                                            .toString(),
+                                    true
+                                )
+                            )
+
+                            addField(MessageEmbed.Field("Reason", userPunishment[UserPunishments.reason], false))
+
+                            build()
+                        }
+
+                        notificationChannel.sendMessageEmbeds(embed).queue()
                     }
-
-                    notificationChannel.sendMessageEmbeds(embed).queue()
+                    
                     null
                 }
             }
