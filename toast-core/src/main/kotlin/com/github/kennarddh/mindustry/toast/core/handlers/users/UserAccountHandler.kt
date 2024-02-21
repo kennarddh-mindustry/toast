@@ -1,6 +1,7 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import arc.util.Strings
+import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
@@ -71,6 +72,11 @@ class UserAccountHandler : Handler() {
             "password" to Menu("Login 2/2", "Password", 50),
         )
     )
+
+    override suspend fun onInit() {
+        GenesisAPI.commandRegistry.removeCommand("admin")
+        GenesisAPI.commandRegistry.removeCommand("admins")
+    }
 
     @ServerPacketHandler(PriorityEnum.Important)
     fun checkPlayerName(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
