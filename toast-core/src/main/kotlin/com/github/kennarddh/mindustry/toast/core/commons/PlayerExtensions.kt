@@ -34,5 +34,18 @@ fun Player.getUserAndMindustryUserAndUserServerData() =
         otherColumn = MindustryUser.id
     ).selectOne { mindustryServerUserDataWhereClause }
 
+fun Player.getUserOptionalAndMindustryUserAndUserServerData() =
+    MindustryUser.join(
+        MindustryUserServerData,
+        JoinType.INNER,
+        onColumn = MindustryUser.id,
+        otherColumn = MindustryUserServerData.mindustryUserID
+    ).join(
+        Users,
+        JoinType.LEFT,
+        onColumn = MindustryUserServerData.userID,
+        otherColumn = Users.id
+    ).selectOne { mindustryServerUserDataWhereClause }
+
 fun Player.getMindustryUser() =
     MindustryUser.selectOne { MindustryUser.mindustryUUID eq uuid() }

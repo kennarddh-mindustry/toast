@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
+import arc.util.Strings
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
@@ -17,10 +18,7 @@ import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLog
 import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
-import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
-import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
-import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
-import com.github.kennarddh.mindustry.toast.core.commons.mindustryServerUserDataWhereClause
+import com.github.kennarddh.mindustry.toast.core.commons.*
 import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
@@ -122,16 +120,16 @@ class UserAccountHandler : Handler() {
         return true
     }
 
-    @EventHandler
-    suspend fun onPlayerJoin(event: EventType.PlayerJoin) {
-        val player = event.player
-        val ip = player.con.address.packIP()
 
-        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+    @ServerPacketHandler(PriorityEnum.High)
+    suspend fun onConnectPacket(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
+        val ip = con.address.packIP()
+
+        return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             val mindustryUser = MindustryUser.insertIfNotExistAndGet({
-                MindustryUser.mindustryUUID eq player.uuid()
+                MindustryUser.mindustryUUID eq packet.uuid
             }) {
-                it[this.mindustryUUID] = player.uuid()
+                it[this.mindustryUUID] = packet.uuid
             }
 
             MindustryUserIPAddresses.insertIfNotExistAndGet({
@@ -144,18 +142,27 @@ class UserAccountHandler : Handler() {
 
             MindustryUserMindustryNames.insertIfNotExistAndGet({
                 (MindustryUserMindustryNames.mindustryUserID eq mindustryUser[MindustryUser.id]) and
-                        (MindustryUserMindustryNames.name eq player.name)
+                        (MindustryUserMindustryNames.name eq packet.name)
             }) {
                 it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
-                it[this.name] = player.name
-                it[this.strippedName] = player.plainName()
+                it[this.name] = packet.name
+                it[this.strippedName] = Strings.stripColors(packet.name)
             }
 
-            val mindustryUserServerDataCanBeNull = player.getMindustryUserAndUserServerData()
+            val mindustryUserServerDataCanBeNull = MindustryUserServerData
+                .join(
+                    MindustryUser,
+                    JoinType.INNER,
+                    onColumn = MindustryUserServerData.mindustryUserID,
+                    otherColumn = MindustryUser.id
+                )
+                .selectOne {
+                    (MindustryUser.mindustryUUID eq packet.uuid) and (MindustryUserServerData.server eq ToastVars.server)
+                }
 
             val mindustryUserServerData = if (mindustryUserServerDataCanBeNull == null) {
                 // New user server data
-                val hashedUSID = Password.hash(SecureString(player.usid().toCharArray()))
+                val hashedUSID = Password.hash(SecureString(packet.usid.toCharArray()))
                     .addRandomSalt(64)
                     .with(usidHashFunctionInstance)
 
@@ -168,13 +175,13 @@ class UserAccountHandler : Handler() {
                 val storedUSID = mindustryUserServerDataCanBeNull[MindustryUserServerData.mindustryUSID]
 
                 val mindustryUserServerData =
-                    if (!Password.check(player.usid(), storedUSID).with(usidHashFunctionInstance)) {
+                    if (!Password.check(packet.usid, storedUSID).with(usidHashFunctionInstance)) {
                         // USID is not same as stored usid, Invalidate login.
-                        player.infoMessage(
+                        con.infoMessage(
                             "[#ff0000]Your login was invalidated. Either there is server's ip update or your account got stolen by other player. If this happen too often without any announcements, likely that your user was stolen."
                         )
 
-                        val hashedUSID = Password.hash(SecureString(player.usid().toCharArray()))
+                        val hashedUSID = Password.hash(SecureString(packet.usid.toCharArray()))
                             .addRandomSalt(64)
                             .with(usidHashFunctionInstance)
 
@@ -187,7 +194,16 @@ class UserAccountHandler : Handler() {
                         }
 
                         // Return updated user server data
-                        player.getMindustryUserAndUserServerData()!!
+                        MindustryUserServerData
+                            .join(
+                                MindustryUser,
+                                JoinType.INNER,
+                                onColumn = MindustryUserServerData.mindustryUserID,
+                                otherColumn = MindustryUser.id
+                            )
+                            .selectOne {
+                                (MindustryUser.mindustryUUID eq packet.uuid) and (MindustryUserServerData.server eq ToastVars.server)
+                            }!!
                     } else {
                         mindustryUserServerDataCanBeNull
                     }
@@ -196,8 +212,6 @@ class UserAccountHandler : Handler() {
             }
 
             val userID = mindustryUserServerData[MindustryUserServerData.userID]
-
-            backingUsers[player] = User(userID?.value, mindustryUser[MindustryUser.id].value, player)
 
             val targetUserAlias = Users.alias("targetUser")
             val targetMindustryUserAlias = MindustryUser.alias("targetMindustryUser")
@@ -245,7 +259,7 @@ class UserAccountHandler : Handler() {
 
             for (userPunishment in userPunishmentsQuery) {
                 if (userPunishment[UserPunishments.type] == PunishmentType.Ban) {
-                    player.kickWithoutLogging(
+                    con.kickWithoutLogging(
                         """
                             [#ff0000]You were banned for the reason
                             []${userPunishment[UserPunishments.reason]}
@@ -253,12 +267,12 @@ class UserAccountHandler : Handler() {
                             """.trimIndent()
                     )
 
-                    return@newSuspendedTransaction
+                    return@newSuspendedTransaction false
                 } else if (userPunishment[UserPunishments.type] == PunishmentType.Kick) {
                     val kickTimeLeft =
                         userPunishment[UserPunishments.endAt]!!.toInstant(TimeZone.UTC).minus(Clock.System.now())
 
-                    player.kickWithoutLogging(
+                    con.kickWithoutLogging(
                         """
                             [#ff0000]You were kicked for the reason
                             []${userPunishment[UserPunishments.reason]}
@@ -267,12 +281,12 @@ class UserAccountHandler : Handler() {
                             """.trimIndent()
                     )
 
-                    return@newSuspendedTransaction
+                    return@newSuspendedTransaction false
                 } else if (userPunishment[UserPunishments.type] == PunishmentType.VoteKick) {
                     val kickTimeLeft =
                         userPunishment[UserPunishments.endAt]!!.toInstant(TimeZone.UTC).minus(Clock.System.now())
 
-                    player.kickWithoutLogging(
+                    con.kickWithoutLogging(
                         """
                             [#ff0000]You were vote kicked for the reason
                             []${userPunishment[UserPunishments.reason]}
@@ -281,14 +295,34 @@ class UserAccountHandler : Handler() {
                             """.trimIndent()
                     )
 
-                    return@newSuspendedTransaction
+                    return@newSuspendedTransaction false
                 }
             }
 
-            if (userID != null) {
-                val user = Users.selectOne { Users.id eq userID }!!
+            return@newSuspendedTransaction true
+        }
+    }
 
-                if (user[Users.role] >= UserRole.Admin) {
+    @EventHandler
+    suspend fun onPlayerConnect(event: EventType.PlayerConnect) {
+        val player = event.player
+
+        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            val userAndMindustryUserAndUserServerData = player.getUserOptionalAndMindustryUserAndUserServerData()
+
+            val userID = userAndMindustryUserAndUserServerData?.get(Users.id)?.value
+
+            Logger.info(player.uuid())
+            Logger.info("${ToastVars.server}")
+            Logger.info("$userAndMindustryUserAndUserServerData")
+            Logger.info("$userID ${userAndMindustryUserAndUserServerData?.get(MindustryUser.id)}")
+
+            val mindustryUserID = userAndMindustryUserAndUserServerData?.get(MindustryUser.id)!!.value
+
+            backingUsers[player] = User(userID, mindustryUserID, player)
+
+            if (userID != null) {
+                if (userAndMindustryUserAndUserServerData[Users.role] >= UserRole.Admin) {
                     player.admin = true
                 }
             }
