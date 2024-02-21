@@ -255,7 +255,7 @@ class UserAccountHandler : Handler() {
                 UserPunishments.targetMindustryUserID.isNull() or (UserPunishments.targetMindustryUserID eq mindustryUser[MindustryUser.id])
             }
 
-            // Check is has not ended
+            // Check has not ended
             userPunishmentsQuery.andWhere {
                 UserPunishments.endAt.isNull() or (UserPunishments.endAt greaterEq CurrentDateTime)
             }
