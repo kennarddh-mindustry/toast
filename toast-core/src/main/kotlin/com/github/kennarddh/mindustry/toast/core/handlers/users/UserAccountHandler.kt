@@ -351,12 +351,12 @@ class UserAccountHandler : Handler() {
 
         if (!username.matches(usernameRegex))
             return player.infoMessage(
-                "[#ff0000]Invalid username. Username may only contains lowercase, uppercase, and numbers."
+                "[#ff0000]Invalid username. Username may only contains lowercase, uppercase, and numbers. Min length is 1 and max is 50 characters."
             )
 
         if (!password.matches(passwordRegex))
             return player.infoMessage(
-                "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers."
+                "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers. Min length is 8 and max is 50 characters."
             )
 
         if (!confirmPassword.matches(passwordRegex))
@@ -408,12 +408,12 @@ class UserAccountHandler : Handler() {
 
         if (!username.matches(usernameRegex))
             return player.infoMessage(
-                "[#ff0000]Invalid username. Username may only contains lowercase, uppercase, and numbers."
+                "[#ff0000]Invalid username. Username may only contains lowercase, uppercase, and numbers. Min length is 1 and max is 50 characters."
             )
 
         if (!password.matches(passwordRegex))
             return player.infoMessage(
-                "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers."
+                "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers. Min length is 8 and max is 50 characters."
             )
 
         newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
