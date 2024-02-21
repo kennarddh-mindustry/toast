@@ -57,8 +57,7 @@ class UserAccountHandler : Handler() {
     private val numberOnlyNameRegex = """^\d+$""".toRegex()
 
     private val registerMenu = Menus(
-        mapOf
-            (
+        mapOf(
             "username" to Menu("Register 1/3", "Username", 50),
             "password" to Menu("Register 2/3", "Password", 50),
             "confirmPassword" to Menu("Register 3/3", "Confirm Password", 50)
@@ -66,8 +65,7 @@ class UserAccountHandler : Handler() {
     )
 
     private val loginMenu = Menus(
-        mapOf
-            (
+        mapOf(
             "username" to Menu("Login 1/2", "Username", 50),
             "password" to Menu("Login 2/2", "Password", 50),
         )
