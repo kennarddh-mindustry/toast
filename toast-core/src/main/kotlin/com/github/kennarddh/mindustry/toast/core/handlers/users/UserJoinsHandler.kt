@@ -48,6 +48,12 @@ class UserJoinsHandler : Handler() {
             return false
         }
 
+        if (packet.name.contains('`')) {
+            con.kickWithoutLogging("Name cannot contains the letter \"`\" (backtick).")
+
+            return false
+        }
+
         if (packet.name.startsWith('#')) {
             con.kickWithoutLogging("Name cannot starts with #.")
 
