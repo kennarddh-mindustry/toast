@@ -70,7 +70,14 @@ class UserModerationHandler : Handler() {
 
             Logger.info("${if (player == null) "Server" else player.name} kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
 
-            target.kickWithoutLogging("You were kicked for the reason:\n$reason")
+            target.kickWithoutLogging(
+                """
+                [#ff0000]You were vote kicked for the reason
+                []$reason
+                [#00ff00]You can join again in $duration.
+                [#00ff00]Appeal in Discord.
+                """.trimIndent()
+            )
 
             CoroutineScopes.Main.launch {
                 Messenger.publishGameEvent(
