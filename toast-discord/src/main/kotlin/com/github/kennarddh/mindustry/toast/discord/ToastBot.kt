@@ -106,7 +106,7 @@ class ReadyListener : ListenerAdapter() {
                                 MessageEmbed.Field(
                                     "Name",
                                     if (userPunishment[UserPunishments.userID] != null)
-                                        "${data.name}/${userPunishment[UserPunishments.userID]}"
+                                        "`${data.name}`/`${userPunishment[UserPunishments.userID]}`"
                                     else
                                         data.name,
                                     false
@@ -117,7 +117,7 @@ class ReadyListener : ListenerAdapter() {
                                 MessageEmbed.Field(
                                     "Target",
                                     if (userPunishment[UserPunishments.targetUserID] != null)
-                                        "${data.name}/${userPunishment[UserPunishments.targetUserID]}"
+                                        "`${data.name}`/`${userPunishment[UserPunishments.targetUserID]}`"
                                     else
                                         data.targetPlayerMindustryName, false
                                 )
