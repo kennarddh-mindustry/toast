@@ -11,6 +11,7 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
 import com.github.kennarddh.mindustry.toast.core.commons.mindustryServerUserDataWhereClause
+import kotlinx.datetime.Clock
 import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
@@ -43,7 +44,7 @@ class UserStatsHandler : Handler() {
             val playerActionsCount = playersActionsCounter[player]!!
             val lastPlayTimeSave = playersLastPlayTimeSave[player]!!
 
-            val now = Instant.now().toEpochMilli()
+            val now = Clock.System.now().toEpochMilliseconds()
             val playTimeChanges = now - lastPlayTimeSave
 
             // It's like this for easier change if later xp can be incremented in other places
