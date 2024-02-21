@@ -255,9 +255,14 @@ class UserAccountHandler : Handler() {
                 UserPunishments.targetMindustryUserID.isNull() or (UserPunishments.targetMindustryUserID eq mindustryUser[MindustryUser.id])
             }
 
-            // Check is still not ended and has not been pardoned
+            // Check is has not ended
             userPunishmentsQuery.andWhere {
-                (UserPunishments.endAt greaterEq CurrentDateTime) or UserPunishments.pardonedAt.isNotNull()
+                UserPunishments.endAt.isNull() or (UserPunishments.endAt greaterEq CurrentDateTime)
+            }
+
+            // Check has not been pardoned
+            userPunishmentsQuery.andWhere {
+                UserPunishments.pardonedAt.isNull()
             }
 
             for (userPunishment in userPunishmentsQuery) {
