@@ -34,6 +34,7 @@ data class PlayerChatGameEvent(
 @SerialName("PlayerPunished")
 data class PlayerPunishedGameEvent(
     val userPunishmentID: Int,
+    val playerMindustryName: String,
     val targetPlayerMindustryName: String,
 ) : GameEventBase()
 

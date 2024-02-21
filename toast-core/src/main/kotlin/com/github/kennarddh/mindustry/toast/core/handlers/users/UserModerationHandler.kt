@@ -89,7 +89,11 @@ class UserModerationHandler : Handler() {
                     GameEvent(
                         ToastVars.server,
                         Clock.System.now().toEpochMilliseconds(),
-                        PlayerPunishedGameEvent(punishmentID.value, target.name)
+                        PlayerPunishedGameEvent(
+                            punishmentID.value,
+                            player?.name ?: "server",
+                            target.name
+                        )
                     )
                 )
             }
@@ -143,7 +147,11 @@ class UserModerationHandler : Handler() {
                     GameEvent(
                         ToastVars.server,
                         Clock.System.now().toEpochMilliseconds(),
-                        PlayerPunishedGameEvent(punishmentID.value, target.name)
+                        PlayerPunishedGameEvent(
+                            punishmentID.value,
+                            player?.name ?: "server",
+                            target.name
+                        )
                     )
                 )
             }
