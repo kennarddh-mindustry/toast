@@ -77,7 +77,7 @@ class UserModerationHandler : Handler() {
 
             target.kickWithoutLogging(
                 """
-                [#ff0000]You were vote kicked for the reason
+                [#ff0000]You were kicked for the reason
                 []$reason
                 [#00ff00]You can join again in ${duration.toIsoString()}.
                 [#00ff00]Appeal in Discord.
