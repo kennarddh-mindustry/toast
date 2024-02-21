@@ -102,8 +102,26 @@ class ReadyListener : ListenerAdapter() {
                                 )
                             )
 
-                            addField(MessageEmbed.Field("Name", "${data.name}/", false))
-                            addField(MessageEmbed.Field("Target", data.targetPlayerMindustryName, false))
+                            addField(
+                                MessageEmbed.Field(
+                                    "Name",
+                                    if (userPunishment[UserPunishments.userID] != null)
+                                        "${data.name}/${userPunishment[UserPunishments.userID]}"
+                                    else
+                                        data.name,
+                                    false
+                                )
+                            )
+
+                            addField(
+                                MessageEmbed.Field(
+                                    "Target",
+                                    if (userPunishment[UserPunishments.targetUserID] != null)
+                                        "${data.name}/${userPunishment[UserPunishments.targetUserID]}"
+                                    else
+                                        data.targetPlayerMindustryName, false
+                                )
+                            )
 
                             addField(
                                 MessageEmbed.Field(
@@ -134,7 +152,7 @@ class ReadyListener : ListenerAdapter() {
 
                         notificationChannel.sendMessageEmbeds(embed).queue()
                     }
-                    
+
                     null
                 }
             }
