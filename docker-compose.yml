@@ -20,6 +20,8 @@ services:
           '--connect',
           '--innodb_initialized',
         ]
+    networks:
+      - toast
   rabbitMQ:
     image: rabbitmq:3.12-management
     hostname: rabbitmq
@@ -31,7 +33,12 @@ services:
       - rabbitmqData:/var/lib/rabbitmq/mnesia/
     healthcheck:
       test: rabbitmq-diagnostics -q ping
+    networks:
+      - toast
 
 volumes:
   data:
   rabbitmqData:
+
+networks:
+  toast:
