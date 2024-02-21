@@ -84,6 +84,12 @@ class UserAccountHandler : Handler() {
             return false
         }
 
+        if (packet.name.lowercase() == "server") {
+            con.kickWithoutLogging("Name cannot be the word \"server\".")
+
+            return false
+        }
+
         if (packet.name.startsWith('#')) {
             con.kickWithoutLogging("Name cannot starts with #.")
 
