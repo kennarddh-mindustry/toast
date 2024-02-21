@@ -22,11 +22,16 @@ services:
         ]
   rabbitMQ:
     image: rabbitmq:3.12-management
+    hostname: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
     volumes:
       - ./dev/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - rabbitmqData:/var/lib/rabbitmq/mnesia/
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
 
 volumes:
   data:
+  rabbitmqData:
