@@ -1,16 +1,16 @@
 {
-    "name": "toast-core",
-    "displayName": "ToastCore",
-    "author": "Kennarddh",
-    "description": "Description",
-    "minGameVersion": "146",
-    "java": true,
-    "main": "com.github.kennarddh.mindustry.toast.core.Toast",
-    "version": "1.0.0",
-    "repo": "kennarddh-mindustry/toast",
-    "dependencies": [
-        "kotlin-runtime",
-        "genesis-core",
-        "genesis-standard"
-    ]
+  "name": "toast-core",
+  "displayName": "ToastCore",
+  "author": "Kennarddh",
+  "description": "Description",
+  "minGameVersion": "146",
+  "java": true,
+  "main": "com.github.kennarddh.mindustry.toast.core.Toast",
+  "version": "0.0.1",
+  "repo": "kennarddh-mindustry/toast",
+  "dependencies": [
+    "kotlin-runtime",
+    "genesis-core",
+    "genesis-standard"
+  ]
 }
