@@ -13,10 +13,7 @@ import com.github.kennarddh.mindustry.toast.core.handlers.DiscordHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.GameEventsHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.RulesHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.StartHandler
-import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
-import com.github.kennarddh.mindustry.toast.core.handlers.users.UserJoinsHandler
-import com.github.kennarddh.mindustry.toast.core.handlers.users.UserModerationHandler
-import com.github.kennarddh.mindustry.toast.core.handlers.users.UserStatsHandler
+import com.github.kennarddh.mindustry.toast.core.handlers.users.*
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 
@@ -33,6 +30,7 @@ class Toast : AbstractPlugin() {
         GenesisAPI.registerHandler(UserJoinsHandler())
         GenesisAPI.registerHandler(UserStatsHandler())
         GenesisAPI.registerHandler(UserModerationHandler())
+        GenesisAPI.registerHandler(UserModerationSyncHandler())
 
         GenesisAPI.registerHandler(GameEventsHandler())
 
