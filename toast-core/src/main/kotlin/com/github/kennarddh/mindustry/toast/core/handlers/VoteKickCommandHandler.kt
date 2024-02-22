@@ -45,6 +45,7 @@ class VoteKickCommandHandler : Handler() {
 
     override suspend fun onInit() {
         GenesisAPI.commandRegistry.removeCommand("votekick")
+        GenesisAPI.commandRegistry.removeCommand("vote")
     }
 
     @Command(["votekick", "voteKick"])
