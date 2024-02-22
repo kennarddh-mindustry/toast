@@ -105,7 +105,7 @@ services:
     env_file:
       - ./prod/.env.database
     volumes:
-      - ./configs/mysql/my.cnf:/etc/mysql/my.cnf
+      - ./prod/mysql/my.cnf:/etc/mysql/my.cnf
       - data:/var/lib/mysql
     command: bash -c "chmod 644 /etc/mysql/*.cnf && /usr/local/bin/docker-entrypoint.sh mysqld"
     ports:
@@ -135,7 +135,7 @@ services:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
     volumes:
-      - ./configs/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - ./prod/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
       - rabbitmqData:/var/lib/rabbitmq/mnesia/
     healthcheck:
       test: rabbitmq-diagnostics -q check_port_connectivity
