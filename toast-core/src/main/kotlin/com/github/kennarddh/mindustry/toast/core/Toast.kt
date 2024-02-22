@@ -9,10 +9,7 @@ import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.Toast
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.validateMinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
-import com.github.kennarddh.mindustry.toast.core.handlers.DiscordHandler
-import com.github.kennarddh.mindustry.toast.core.handlers.GameEventsHandler
-import com.github.kennarddh.mindustry.toast.core.handlers.RulesHandler
-import com.github.kennarddh.mindustry.toast.core.handlers.StartHandler
+import com.github.kennarddh.mindustry.toast.core.handlers.*
 import com.github.kennarddh.mindustry.toast.core.handlers.users.*
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.transactions.TransactionManager
@@ -37,6 +34,8 @@ class Toast : AbstractPlugin() {
         GenesisAPI.registerHandler(RulesHandler())
         GenesisAPI.registerHandler(DiscordHandler())
         GenesisAPI.registerHandler(StartHandler())
+
+        GenesisAPI.registerHandler(VoteKickCommandHandler())
 
         Logger.info("Loaded")
     }
