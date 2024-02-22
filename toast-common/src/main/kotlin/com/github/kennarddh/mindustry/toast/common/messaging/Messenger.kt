@@ -39,7 +39,7 @@ object Messenger {
         channel.basicPublish(GAME_EVENTS_EXCHANGE_NAME, "", null, data.toByteArray())
     }
 
-    fun publishGameEvent(routingKey: String, serverControl: ServerControl) {
+    fun publishServerControl(routingKey: String, serverControl: ServerControl) {
         val data = Json.encodeToString(serverControl)
 
         channel.basicPublish(SERVER_CONTROL_EXCHANGE_NAME, routingKey, null, data.toByteArray())
