@@ -31,7 +31,7 @@ class Toast : AbstractPlugin() {
 
         GenesisAPI.registerHandler(GameEventsHandler())
 
-        GenesisAPI.registerHandler(RulesHandler())
+        GenesisAPI.registerHandler(SettingsHandler())
         GenesisAPI.registerHandler(DiscordHandler())
         GenesisAPI.registerHandler(StartHandler())
 

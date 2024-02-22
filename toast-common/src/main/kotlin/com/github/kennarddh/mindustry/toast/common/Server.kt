@@ -10,14 +10,15 @@ enum class Server(
     val description: String,
     val gameMode: GameMode,
     val discordChannelID: Long,
-    val applyRules: Rules.() -> Unit
+    val applyRules: Rules.() -> Unit,
+    val applyConfigs: () -> Unit
 ) {
     @SerialName("Survival")
-    Survival("Survival", "Toast Survival", GameMode.Survival, 1199598512162213958L, { }),
+    Survival("Survival", "Toast Survival", GameMode.Survival, 1199598512162213958L, { }, { }),
 
     @SerialName("Attack")
-    Attack("Attack", "Toast Attack", GameMode.Attack, 1209544700189610025L, { }),
+    Attack("Attack", "Toast Attack", GameMode.Attack, 1209544700189610025L, { }, { }),
 
     @SerialName("PvP")
-    PvP("PvP", "Toast Pvp", GameMode.PvP, 1209544729499275295L, { }),
+    PvP("PvP", "Toast Pvp", GameMode.PvP, 1209544729499275295L, { }, { }),
 }

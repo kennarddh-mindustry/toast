@@ -6,7 +6,12 @@ import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import mindustry.Vars
 import mindustry.game.EventType
 
-class RulesHandler : Handler() {
+class SettingsHandler : Handler() {
+    override suspend fun onInit() {
+        ToastVars.server.gameMode.applyConfigs()
+        ToastVars.server.applyConfigs()
+    }
+
     @EventHandler
     fun onPlay(event: EventType.PlayEvent) {
         ToastVars.server.gameMode.applyRules(Vars.state.rules)
