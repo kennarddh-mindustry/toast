@@ -33,10 +33,9 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 
 
 lateinit var jda: JDA
+lateinit var toastMindustryGuild: Guild
 
 object ReadyListener : ListenerAdapter() {
-    lateinit var toastMindustryGuild: Guild
-
     override fun onReady(event: ReadyEvent) {
         Logger.info("Bot Ready")
 
@@ -50,14 +49,12 @@ class GameEventsListener : ListenerAdapter() {
     private lateinit var serverListChannel: TextChannel
 
     override fun onReady(event: ReadyEvent) {
-        notificationChannel =
-            ReadyListener.toastMindustryGuild.getTextChannelById(DiscordConstant.NOTIFICATIONS_CHANNEL_ID)!!
-        reportsChannel = ReadyListener.toastMindustryGuild.getTextChannelById(DiscordConstant.REPORTS_CHANNEL_ID)!!
-        serverListChannel =
-            ReadyListener.toastMindustryGuild.getTextChannelById(DiscordConstant.SERVER_LIST_CHANNEL_ID)!!
+        notificationChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.NOTIFICATIONS_CHANNEL_ID)!!
+        reportsChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.REPORTS_CHANNEL_ID)!!
+        serverListChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.SERVER_LIST_CHANNEL_ID)!!
 
         Messenger.listenGameEvent("DiscordBot") {
-            val channel = ReadyListener.toastMindustryGuild.getTextChannelById(it.server.discordChannelID)!!
+            val channel = toastMindustryGuild.getTextChannelById(it.server.discordChannelID)!!
 
             val message = when (it.data) {
                 is PlayerJoinGameEvent -> "${(it.data as PlayerJoinGameEvent).playerMindustryName} joined."
@@ -186,7 +183,7 @@ class ServerControlCommands : ListenerAdapter() {
             serverOptionData.addChoice(it.displayName, it.name)
         }
 
-        ReadyListener.toastMindustryGuild.updateCommands()
+        jda.updateCommands()
             .addCommands(
                 Commands.slash("send-server-command", "Send server command to a mindustry server")
                     .addOptions(serverOptionData)
@@ -214,6 +211,8 @@ class ServerControlCommands : ListenerAdapter() {
                     ServerCommandServerControl(command)
                 )
             )
+
+            event.reply("Done").queue()
         }
     }
 }
