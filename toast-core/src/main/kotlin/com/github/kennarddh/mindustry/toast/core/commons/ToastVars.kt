@@ -13,5 +13,5 @@ object ToastVars {
         }
 
     val port: Int
-        get() = System.getenv("PORT").toInt()
+        get() = System.getenv("PORT")?.toInt() ?: 6567
 }
