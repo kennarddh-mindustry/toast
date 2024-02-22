@@ -42,7 +42,7 @@ jobs:
         run: |
           echo "TOAST_CORE_ARTIFACT_PATH=$(./gradlew :toast-core:getArtifactPath -q)" >> $GITHUB_ENV
           echo "TOAST_COMMON_ARTIFACT_PATH=$(./gradlew :toast-common:getArtifactPath -q)" >> $GITHUB_ENV
-          echo "TOAST_DISCORD_ARTIFACT_PATH=$(./gradlew :toast-common:getArtifactPath -q)" >> $GITHUB_ENV
+          echo "TOAST_DISCORD_ARTIFACT_PATH=$(./gradlew :toast-discord:getArtifactPath -q)" >> $GITHUB_ENV
 
       - name: Update Core plugin.json Version
         uses: jossef/action-set-json-field@v2.1
