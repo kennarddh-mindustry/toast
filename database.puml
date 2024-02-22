@@ -80,17 +80,10 @@ $schema("Users") {
           $fk("targetMindustryUserID") INTEGER
           $fk("targetUserID") INTEGER
     }
-
-    $table("UserVoteKick") {
-        * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $fk("userPunishmentID") INTEGER
-        * $column("requiredVotes") SHORT
-    }
-
     $table("UserVoteKickVotes") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $fk("mindustryUserID") INTEGER
-        * $fk("userVoteKickID") INTEGER
+        * $fk("userPunishmentID") INTEGER
         * $column("vote") BOOLEAN
     }
 
@@ -105,9 +98,7 @@ $schema("Users") {
     UserPunishments::targetUserID }o--|| Users::id
     UserPunishments::targetMindustryUserID }o--|| MindustryUser::id
 
-    UserVoteKick::userPunishmentID }o--|| UserPunishments::id
-
-    UserVoteKickVotes::userVoteKickID }o--|| UserVoteKick::id
+    UserVoteKickVotes::userPunishmentID }o--|| UserPunishments::id
     UserVoteKickVotes::mindustryUserID }o--|| MindustryUser::id
 }
 
