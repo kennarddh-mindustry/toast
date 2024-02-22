@@ -188,7 +188,7 @@ class ServerControlCommands : ListenerAdapter() {
                 Commands.slash("send-server-command", "Send server command to a mindustry server")
                     .addOptions(serverOptionData)
                     .addOption(OptionType.STRING, "command", "Command to send.", true)
-            )
+            ).queue()
     }
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
