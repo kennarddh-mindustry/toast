@@ -37,6 +37,8 @@ class Toast : AbstractPlugin() {
 
         GenesisAPI.registerHandler(VoteKickCommandHandler())
 
+        GenesisAPI.registerHandler(ServerPresenceHandler())
+
         Logger.info("Loaded")
     }
 
