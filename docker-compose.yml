@@ -34,7 +34,7 @@ services:
       - ./dev/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
       - rabbitmqData:/var/lib/rabbitmq/mnesia/
     healthcheck:
-      test: rabbitmq-diagnostics -q ping
+      test: rabbitmq-diagnostics -q check_port_connectivity
     networks:
       - toast
 
