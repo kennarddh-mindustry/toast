@@ -50,12 +50,12 @@ class UserModerationHandler : Handler() {
     @Description("Kick player.")
     suspend fun kick(player: Player? = null, target: Player, duration: Duration, reason: String): CommandResult {
         return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-            val mindustryUser = target.getMindustryUser()!!
+            val mindustryUser = player?.getMindustryUser()
             val targetMindustryUser = target.getMindustryUser()!!
-            val user = target.getUserAndMindustryUserAndUserServerData()!!
+            val user = player?.getUserAndMindustryUserAndUserServerData()
             val targetUser = target.getUserAndMindustryUserAndUserServerData()
 
-            if (targetUser != null && user[Users.role] > targetUser[Users.role])
+            if (targetUser != null && user != null && user[Users.role] > targetUser[Users.role])
                 return@newSuspendedTransaction CommandResult(
                     "Your role must be higher than target's role to kick.",
                     CommandResultStatus.Failed
@@ -67,10 +67,13 @@ class UserModerationHandler : Handler() {
                     Clock.System.now().plus(duration).toLocalDateTime(TimeZone.UTC)
                 it[this.type] = PunishmentType.Kick
 
-                it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
+                if (mindustryUser != null)
+                    it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
+
                 it[this.targetMindustryUserID] = targetMindustryUser[MindustryUser.id]
 
-                it[this.userID] = user[Users.id]
+                if (user != null)
+                    it[this.userID] = user[Users.id]
 
                 if (targetUser != null)
                     it[this.targetUserID] = targetUser[Users.id]
@@ -94,7 +97,7 @@ class UserModerationHandler : Handler() {
                         Clock.System.now().toEpochMilliseconds(),
                         PlayerPunishedGameEvent(
                             punishmentID.value,
-                            player?.name ?: "server",
+                            player?.name ?: "Server",
                             target.name
                         )
                     )
@@ -112,12 +115,12 @@ class UserModerationHandler : Handler() {
     @Description("Ban player.")
     suspend fun ban(player: Player? = null, target: Player, reason: String): CommandResult {
         return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
-            val mindustryUser = target.getMindustryUser()!!
+            val mindustryUser = player?.getMindustryUser()
             val targetMindustryUser = target.getMindustryUser()!!
-            val user = target.getUserAndMindustryUserAndUserServerData()!!
+            val user = player?.getUserAndMindustryUserAndUserServerData()
             val targetUser = target.getUserAndMindustryUserAndUserServerData()
 
-            if (targetUser != null && user[Users.role] > targetUser[Users.role])
+            if (targetUser != null && user != null && user[Users.role] > targetUser[Users.role])
                 return@newSuspendedTransaction CommandResult(
                     "Your role must be higher than target's role to kick.",
                     CommandResultStatus.Failed
@@ -127,10 +130,13 @@ class UserModerationHandler : Handler() {
                 it[this.reason] = reason
                 it[this.type] = PunishmentType.Ban
 
-                it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
+                if (mindustryUser != null)
+                    it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
+
                 it[this.targetMindustryUserID] = targetMindustryUser[MindustryUser.id]
 
-                it[this.userID] = user[Users.id]
+                if (user != null)
+                    it[this.userID] = user[Users.id]
 
                 if (targetUser != null)
                     it[this.targetUserID] = targetUser[Users.id]
@@ -153,7 +159,7 @@ class UserModerationHandler : Handler() {
                         Clock.System.now().toEpochMilliseconds(),
                         PlayerPunishedGameEvent(
                             punishmentID.value,
-                            player?.name ?: "server",
+                            player?.name ?: "Server",
                             target.name
                         )
                     )
