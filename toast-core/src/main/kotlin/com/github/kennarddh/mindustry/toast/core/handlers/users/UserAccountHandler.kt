@@ -3,6 +3,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers.users
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
@@ -71,6 +72,7 @@ class UserAccountHandler : Handler() {
 
     @Command(["register"])
     @ClientSide
+    @Description("Register.")
     suspend fun register(player: Player) {
         if (users[player]!!.userID != null)
             return player.sendMessage(
@@ -129,6 +131,7 @@ class UserAccountHandler : Handler() {
 
     @Command(["login"])
     @ClientSide
+    @Description("Login.")
     suspend fun login(player: Player) {
         if (users[player]!!.userID != null)
             return player.sendMessage(
@@ -194,6 +197,7 @@ class UserAccountHandler : Handler() {
 
     @Command(["logout"])
     @ClientSide
+    @Description("Logout.")
     suspend fun logout(player: Player) {
         if (users[player]!!.userID == null)
             return player.sendMessage(
@@ -221,6 +225,7 @@ class UserAccountHandler : Handler() {
     @ClientSide
     @ServerSide
     @MinimumRole(UserRole.Admin)
+    @Description("Change someone's role.")
     suspend fun changeRole(player: Player? = null, target: Player, newRole: UserRole): CommandResult =
         newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             val targetUser =

@@ -3,6 +3,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers.users
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
@@ -46,6 +47,7 @@ class UserModerationHandler : Handler() {
     @MinimumRole(UserRole.Mod)
     @ClientSide
     @ServerSide
+    @Description("Kick player.")
     suspend fun kick(player: Player? = null, target: Player, duration: Duration, reason: String): CommandResult {
         return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             val mindustryUser = target.getMindustryUser()!!
@@ -107,6 +109,7 @@ class UserModerationHandler : Handler() {
     @MinimumRole(UserRole.Admin)
     @ClientSide
     @ServerSide
+    @Description("Ban player.")
     suspend fun ban(player: Player? = null, target: Player, reason: String): CommandResult {
         return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
             val mindustryUser = target.getMindustryUser()!!
