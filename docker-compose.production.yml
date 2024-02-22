@@ -27,31 +27,33 @@ services:
           memory: 400M
           cpus: 1
 
-  #  attack-server:
-  #    build:
-  #      context: .
-  #      dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
-  #    ports:
-  #      - "6568:6568/tcp"
-  #      - "6568:6568/udp"
-  #    networks:
-  #      - toast
-  #    env_file:
-  #      - ./prod/.env.common
-  #    environment:
-  #      SERVER: Attack
-  #      PORT: 6568
-  #    depends_on:
-  #      database:
-  #        condition: service_healthy
-  #      rabbitmq:
-  #        condition: service_healthy
-  #    restart: unless-stopped
-  #    deploy:
-  #      resources:
-  #        limits:
-  #          memory: 400M
-  #          cpus: 1
+  attack-server:
+    build:
+      context: .
+      dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
+    ports:
+      - "6568:6568/tcp"
+      - "6568:6568/udp"
+    volumes:
+      - ./prod/maps/attack:/app/config/maps/
+    networks:
+      - toast
+    env_file:
+      - ./prod/.env.common
+    environment:
+      SERVER: Attack
+      PORT: 6568
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+          cpus: 1
   #
   #  pvp-server:
   #    build:
