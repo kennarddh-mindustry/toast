@@ -72,6 +72,8 @@ jobs:
             Version ${{ github.event.inputs.version }}
           files: |
             ${{ env.TOAST_CORE_ARTIFACT_PATH }}
+            ${{ env.TOAST_COMMON_ARTIFACT_PATH }}
+            ${{ env.TOAST_DISCORD_ARTIFACT_PATH }}
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v5
