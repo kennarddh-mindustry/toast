@@ -8,7 +8,9 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: toast
     volumes:
+      - ./dev/mysql/my.cnf:/etc/mysql/my.cnf
       - data:/var/lib/mysql
+    command: bash -c "chmod 644 /etc/mysql/*.cnf && /usr/local/bin/docker-entrypoint.sh mysqld"
     ports:
       - "3307:3306"
     healthcheck:
