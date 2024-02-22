@@ -42,3 +42,8 @@ bin/
 .DS_Store
 
 /toast-discord/.env
+
+# Production envs
+/prod/.env.common
+/prod/.env.database
+/prod/.env.discord

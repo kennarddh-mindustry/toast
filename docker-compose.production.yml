@@ -1,0 +1,156 @@
+version: '3.8'
+
+services:
+  survival-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "6567:6567/tcp"
+      - "6567:6567/udp"
+    networks:
+      - toast
+    env_file:
+      - ./prod/.env.common
+    environment:
+      SERVER: Survival
+      PORT: 6567
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+          cpus: 1
+
+  attack-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "6568:6568/tcp"
+      - "6568:6568/udp"
+    networks:
+      - toast
+    env_file:
+      - ./prod/.env.common
+    environment:
+      SERVER: Attack
+      PORT: 6568
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+          cpus: 1
+
+  pvp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "6569:6569/tcp"
+      - "6569:6569/udp"
+    networks:
+      - toast
+    env_file:
+      - ./prod/.env.common
+    environment:
+      SERVER: PvP
+      PORT: 6569
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+          cpus: 1
+
+  discord-bot:
+    build:
+      context: .
+      dockerfile: discord.Dockerfile
+    networks:
+      - toast
+    env_file:
+      - ./prod/.env.common
+      - ./prod/.env.discord
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+          cpus: 1
+
+  database:
+    image: mariadb:lts
+    env_file:
+      - ./prod/.env.database
+    volumes:
+      - ./configs/mysql/my.cnf:/etc/mysql/my.cnf
+      - data:/var/lib/mysql
+    command: bash -c "chmod 644 /etc/mysql/*.cnf && /usr/local/bin/docker-entrypoint.sh mysqld"
+    ports:
+      - "127.0.0.1:3306:3306"
+    healthcheck:
+      test:
+        [
+          'CMD',
+          '/usr/local/bin/healthcheck.sh',
+          '--su-mysql',
+          '--connect',
+          '--innodb_initialized',
+        ]
+    networks:
+      - toast
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+          cpus: 1
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    hostname: rabbitmq
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - ./configs/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      - rabbitmqData:/var/lib/rabbitmq/mnesia/
+    healthcheck:
+      test: rabbitmq-diagnostics -q check_port_connectivity
+    networks:
+      - toast
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+          cpus: 1
+
+volumes:
+  data:
+  rabbitmqData:
+
+networks:
+  toast:
