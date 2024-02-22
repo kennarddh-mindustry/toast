@@ -5,21 +5,18 @@ import com.github.kennarddh.mindustry.genesis.core.commons.AbstractPlugin
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStartGameEvent
 import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.ToastPlayerParameter
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.validateMinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
-import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.handlers.DiscordHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.GameEventsHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.RulesHandler
+import com.github.kennarddh.mindustry.toast.core.handlers.StartHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserJoinsHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserModerationHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserStatsHandler
-import kotlinx.datetime.Clock
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 
@@ -41,13 +38,7 @@ class Toast : AbstractPlugin() {
 
         GenesisAPI.registerHandler(RulesHandler())
         GenesisAPI.registerHandler(DiscordHandler())
-
-        Messenger.publishGameEvent(
-            GameEvent(
-                ToastVars.server, Clock.System.now().toEpochMilliseconds(),
-                ServerStartGameEvent()
-            )
-        )
+        GenesisAPI.registerHandler(StartHandler())
 
         Logger.info("Loaded")
     }
