@@ -4,7 +4,7 @@ services:
   survival-server:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
     ports:
       - "6567:6567/tcp"
       - "6567:6567/udp"
@@ -30,7 +30,7 @@ services:
   attack-server:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
     ports:
       - "6568:6568/tcp"
       - "6568:6568/udp"
@@ -56,7 +56,7 @@ services:
   pvp-server:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
     ports:
       - "6569:6569/tcp"
       - "6569:6569/udp"
@@ -82,7 +82,7 @@ services:
   discord-bot:
     build:
       context: .
-      dockerfile: discord.Dockerfile
+      dockerfile: ./prod/Dockerfiles/discord.Dockerfile
     networks:
       - toast
     env_file:
