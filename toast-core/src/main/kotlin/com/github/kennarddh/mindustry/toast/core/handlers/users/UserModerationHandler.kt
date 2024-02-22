@@ -17,6 +17,7 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerPunishedGameEvent
+import com.github.kennarddh.mindustry.toast.common.toDisplayString
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
@@ -79,7 +80,7 @@ class UserModerationHandler : Handler() {
                 """
                 [#ff0000]You were kicked for the reason
                 []$reason
-                [#00ff00]You can join again in ${duration.toIsoString()}.
+                [#00ff00]You can join again in ${duration.toDisplayString()}.
                 [#00ff00]Appeal in Discord.
                 """.trimIndent()
             )

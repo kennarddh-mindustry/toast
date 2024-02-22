@@ -7,6 +7,7 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
 import com.github.kennarddh.mindustry.toast.common.selectOne
+import com.github.kennarddh.mindustry.toast.common.toDisplayString
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -140,7 +141,7 @@ class ReadyListener : ListenerAdapter() {
                                             .minus(
                                                 userPunishment[UserPunishments.punishedAt].toInstant(TimeZone.UTC)
                                             )
-                                            .toIsoString(),
+                                            .toDisplayString(),
                                     true
                                 )
                             )

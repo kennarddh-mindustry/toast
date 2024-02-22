@@ -258,7 +258,7 @@ class UserJoinsHandler : Handler() {
                         """
                             [#ff0000]You were kicked for the reason
                             []${userPunishment[UserPunishments.reason]}
-                            [#00ff00]You can join again in ${kickTimeLeft.toIsoString()}.
+                            [#00ff00]You can join again in ${kickTimeLeft.toDisplayString()}.
                             [#00ff00]Appeal in Discord.
                             """.trimIndent()
                     )
@@ -272,7 +272,7 @@ class UserJoinsHandler : Handler() {
                         """
                             [#ff0000]You were vote kicked for the reason
                             []${userPunishment[UserPunishments.reason]}
-                            [#00ff00]You can join again in ${kickTimeLeft.toIsoString()}.
+                            [#00ff00]You can join again in ${kickTimeLeft.toDisplayString()}.
                             [#00ff00]Appeal in Discord.
                             """.trimIndent()
                     )
