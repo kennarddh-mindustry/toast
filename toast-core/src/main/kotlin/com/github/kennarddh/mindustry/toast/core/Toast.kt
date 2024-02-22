@@ -13,6 +13,7 @@ import com.github.kennarddh.mindustry.toast.core.commands.validations.validateMi
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.handlers.GameEventsHandler
+import com.github.kennarddh.mindustry.toast.core.handlers.RulesHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserJoinsHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserModerationHandler
@@ -33,8 +34,11 @@ class Toast : AbstractPlugin() {
         GenesisAPI.registerHandler(UserAccountHandler())
         GenesisAPI.registerHandler(UserJoinsHandler())
         GenesisAPI.registerHandler(UserStatsHandler())
-        GenesisAPI.registerHandler(GameEventsHandler())
         GenesisAPI.registerHandler(UserModerationHandler())
+
+        GenesisAPI.registerHandler(GameEventsHandler())
+        
+        GenesisAPI.registerHandler(RulesHandler())
 
         Messenger.publishGameEvent(
             GameEvent(
