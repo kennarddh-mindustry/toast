@@ -1,42 +1,18 @@
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization") version "1.9.10"
-    java
-    `maven-publish`
+    kotlin("jvm") version "1.9.22"
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-
-    maven {
-        url = uri("http://23.95.107.12:9999/releases")
-        isAllowInsecureProtocol = true
-    }
-}
-
-project.group = "com.github.kennarddh.mindustry"
 project.version = project.file("version.txt").readLines()[0]
-
-val exposedVersion: String = "0.46.0"
 
 dependencies {
     implementation(project(":toast-common"))
 
-    implementation(platform("org.jetbrains.exposed:exposed-bom:0.47.0"))
-    implementation("org.jetbrains.exposed:exposed-java-time")
-    implementation("org.jetbrains.exposed:exposed-core")
-    implementation("org.jetbrains.exposed:exposed-jdbc")
+    implementation("com.xpdustry:kotlin-runtime:3.1.1-k.1.9.22")
 
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.3.2")
-    implementation("com.zaxxer:HikariCP:5.1.0")
-
-    implementation("com.password4j:password4j:1.7.3")
-
-    implementation("com.rabbitmq:amqp-client:5.20.0")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
+    implementation("com.github.Anuken.Mindustry:core:v146")
+    implementation("com.github.Anuken.Mindustry:server:v146")
+    implementation("com.github.Anuken.Arc:arc-core:v146")
 
     implementation("net.dv8tion:JDA:5.0.0-beta.20") {
         exclude(module = "opus-java")
@@ -48,17 +24,6 @@ dependencies {
 
 kotlin {
     jvmToolchain(17)
-}
-
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
-sourceSets {
-    main {
-        java.srcDir("src/main/kotlin")
-    }
 }
 
 tasks {

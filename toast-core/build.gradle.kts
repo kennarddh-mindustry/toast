@@ -4,41 +4,19 @@ import fr.xpdustry.toxopid.spec.ModPlatform
 import fr.xpdustry.toxopid.task.GithubArtifactDownload
 
 plugins {
-    kotlin("jvm")
+    kotlin("jvm") version "1.9.22"
     kotlin("plugin.serialization") version "1.9.22"
-    java
-    `maven-publish`
     id("fr.xpdustry.toxopid") version "3.2.0"
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven("https://maven.xpdustry.com/releases")
-    maven("https://maven.xpdustry.com/mindustry")
-
-    maven {
-        url = uri("http://23.95.107.12:9999/releases")
-        isAllowInsecureProtocol = true
-    }
-}
-
 toxopid {
-    // The version with which your mod/plugin is compiled.
-    // If not set, will compile with v143 by default.
     compileVersion.set("v146")
-    // The version with which your mod/plugin is tested.
-    // If not set, defaults to the value of compileVersion.
     runtimeVersion.set("v146")
-
-    // The platforms you target, you can choose DESKTOP, HEADLESS or/and ANDROID.
-    // If not set, will target DESKTOP by default.
     platforms.add(ModPlatform.HEADLESS)
 }
 
 val metadata = ModMetadata.fromJson(project.file("plugin.json"))
 
-project.group = "com.github.kennarddh.mindustry"
 project.version = metadata.version
 
 val genesisVersion = "3.0.0-beta.8"
@@ -52,37 +30,7 @@ dependencies {
     compileOnly("com.github.kennarddh.mindustry:genesis-core:$genesisVersion")
     compileOnly("com.github.kennarddh.mindustry:genesis-standard:$genesisVersion")
 
-    implementation(platform("org.jetbrains.exposed:exposed-bom:0.47.0"))
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime")
-    implementation("org.jetbrains.exposed:exposed-core")
-    implementation("org.jetbrains.exposed:exposed-jdbc")
-
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.3.2")
-    implementation("com.zaxxer:HikariCP:5.1.0")
-
-    implementation("com.password4j:password4j:1.7.3")
-
-    implementation("com.rabbitmq:amqp-client:5.20.0")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
-
     implementation("org.slf4j:slf4j-api:2.0.11")
-}
-
-kotlin {
-    jvmToolchain(17)
-}
-
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
-sourceSets {
-    main {
-        java.srcDir("src/main/kotlin")
-    }
 }
 
 configurations.runtimeClasspath {
@@ -93,6 +41,10 @@ configurations.runtimeClasspath {
     exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
     exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")
     exclude("org.slf4j")
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 tasks {

@@ -1,56 +1,16 @@
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization") version "1.9.10"
-    java
-    `maven-publish`
+    kotlin("jvm") version "1.9.22"
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven("https://maven.xpdustry.com/releases")
-
-    maven {
-        url = uri("http://23.95.107.12:9999/releases")
-        isAllowInsecureProtocol = true
-    }
-}
-
-project.group = "com.github.kennarddh.mindustry"
 project.version = project.file("version.txt").readLines()[0]
 
 dependencies {
-    compileOnly("com.xpdustry:kotlin-runtime:3.1.0-k.1.9.10")
+    compileOnly("com.xpdustry:kotlin-runtime:3.1.1-k.1.9.22")
 
-    implementation(platform("org.jetbrains.exposed:exposed-bom:0.47.0"))
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime")
-    implementation("org.jetbrains.exposed:exposed-core")
-    implementation("org.jetbrains.exposed:exposed-jdbc")
-
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.3.2")
-    implementation("com.zaxxer:HikariCP:5.1.0")
-
-    implementation("com.password4j:password4j:1.7.3")
-
-    implementation("com.rabbitmq:amqp-client:5.20.0")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
-}
-
-kotlin {
-    jvmToolchain(17)
-}
-
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
-sourceSets {
-    main {
-        java.srcDir("src/main/kotlin")
-    }
+    compileOnly("com.github.Anuken.Mindustry:core:v146")
+    compileOnly("com.github.Anuken.Mindustry:server:v146")
+    compileOnly("com.github.Anuken.Arc:arc-core:v146")
 }
 
 configurations.runtimeClasspath {
@@ -61,6 +21,10 @@ configurations.runtimeClasspath {
     exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
     exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-jdk8")
     exclude("org.slf4j")
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 tasks {
