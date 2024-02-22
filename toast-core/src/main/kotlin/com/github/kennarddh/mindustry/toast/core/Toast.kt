@@ -12,6 +12,7 @@ import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRol
 import com.github.kennarddh.mindustry.toast.core.commands.validations.validateMinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.handlers.DiscordHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.GameEventsHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.RulesHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
@@ -37,8 +38,9 @@ class Toast : AbstractPlugin() {
         GenesisAPI.registerHandler(UserModerationHandler())
 
         GenesisAPI.registerHandler(GameEventsHandler())
-        
+
         GenesisAPI.registerHandler(RulesHandler())
+        GenesisAPI.registerHandler(DiscordHandler())
 
         Messenger.publishGameEvent(
             GameEvent(
