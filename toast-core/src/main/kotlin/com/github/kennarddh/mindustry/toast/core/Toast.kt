@@ -40,6 +40,8 @@ class Toast : AbstractPlugin() {
         GenesisAPI.registerHandler(ServerPresenceHandler())
         GenesisAPI.registerHandler(WelcomeHandler())
 
+        GenesisAPI.registerHandler(ServerControlHandler())
+
         Logger.info("Loaded")
     }
 
