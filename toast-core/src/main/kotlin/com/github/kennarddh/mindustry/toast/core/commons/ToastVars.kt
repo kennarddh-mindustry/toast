@@ -11,4 +11,7 @@ object ToastVars {
                 throw IllegalArgumentException("${System.getenv("SERVER")} is not a valid server")
             }
         }
+
+    val port: Int
+        get() = System.getenv("PORT").toInt()
 }

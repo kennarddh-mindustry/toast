@@ -13,11 +13,14 @@ import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kotlinx.datetime.Clock
 import mindustry.Vars
 import mindustry.game.EventType
+import mindustry.net.Administration.Config
 import mindustry.server.ServerControl
 
 class StartHandler : Handler() {
     @EventHandler
     suspend fun onLoad(event: EventType.ServerLoadEvent) {
+        Config.port.set(ToastVars.port)
+
         host()
 
         Messenger.publishGameEvent(
