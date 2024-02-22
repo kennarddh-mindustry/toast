@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.discord
 
+import com.github.kennarddh.mindustry.toast.common.Server
 import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
@@ -9,6 +10,7 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
 import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.common.toDisplayString
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import net.dv8tion.jda.api.EmbedBuilder
@@ -18,8 +20,12 @@ import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.interactions.commands.OptionType
+import net.dv8tion.jda.api.interactions.commands.build.Commands
+import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.requests.GatewayIntent
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.alias
@@ -28,22 +34,30 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 
 lateinit var jda: JDA
 
-class ReadyListener : ListenerAdapter() {
-    private lateinit var toastMindustryGuild: Guild
-    private lateinit var notificationChannel: TextChannel
-    private lateinit var reportsChannel: TextChannel
-    private lateinit var serverListChannel: TextChannel
+object ReadyListener : ListenerAdapter() {
+    lateinit var toastMindustryGuild: Guild
 
     override fun onReady(event: ReadyEvent) {
         Logger.info("Bot Ready")
 
         toastMindustryGuild = jda.getGuildById(DiscordConstant.TOAST_MINDUSTRY_GUILD_ID)!!
-        notificationChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.NOTIFICATIONS_CHANNEL_ID)!!
-        reportsChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.REPORTS_CHANNEL_ID)!!
-        serverListChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.SERVER_LIST_CHANNEL_ID)!!
+    }
+}
+
+class GameEventsListener : ListenerAdapter() {
+    private lateinit var notificationChannel: TextChannel
+    private lateinit var reportsChannel: TextChannel
+    private lateinit var serverListChannel: TextChannel
+
+    override fun onReady(event: ReadyEvent) {
+        notificationChannel =
+            ReadyListener.toastMindustryGuild.getTextChannelById(DiscordConstant.NOTIFICATIONS_CHANNEL_ID)!!
+        reportsChannel = ReadyListener.toastMindustryGuild.getTextChannelById(DiscordConstant.REPORTS_CHANNEL_ID)!!
+        serverListChannel =
+            ReadyListener.toastMindustryGuild.getTextChannelById(DiscordConstant.SERVER_LIST_CHANNEL_ID)!!
 
         Messenger.listenGameEvent("DiscordBot") {
-            val channel = toastMindustryGuild.getTextChannelById(it.server.discordChannelID)!!
+            val channel = ReadyListener.toastMindustryGuild.getTextChannelById(it.server.discordChannelID)!!
 
             val message = when (it.data) {
                 is PlayerJoinGameEvent -> "${(it.data as PlayerJoinGameEvent).playerMindustryName} joined."
@@ -164,6 +178,46 @@ class ReadyListener : ListenerAdapter() {
     }
 }
 
+class ServerControlCommands : ListenerAdapter() {
+    override fun onReady(event: ReadyEvent) {
+        val serverOptionData = OptionData(OptionType.STRING, "server", "Server").setRequired(true)
+
+        Server.entries.forEach {
+            serverOptionData.addChoice(it.displayName, it.name)
+        }
+
+        ReadyListener.toastMindustryGuild.updateCommands()
+            .addCommands(
+                Commands.slash("send-server-command", "Send server command to a mindustry server")
+                    .addOptions(serverOptionData)
+                    .addOption(OptionType.STRING, "command", "Command to send.", true)
+            )
+    }
+
+    override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
+        if (event.name == "send-server-command") {
+            val serverString = event.getOption("server")!!.asString
+            val command = event.getOption("command")!!.asString
+
+            val server = try {
+                Server.valueOf(serverString)
+            } catch (error: IllegalArgumentException) {
+                event.reply("$serverString is not a valid server").queue()
+
+                return
+            }
+
+            Messenger.publishServerControl(
+                "${server.name}.server-command",
+                ServerControl(
+                    Clock.System.now().toEpochMilliseconds(),
+                    ServerCommandServerControl(command)
+                )
+            )
+        }
+    }
+}
+
 suspend fun main() {
     Logger.info("Loaded")
 
@@ -175,7 +229,9 @@ suspend fun main() {
 
     jda = JDABuilder.createDefault(System.getenv("BOT_TOKEN"))
         .setActivity(Activity.playing("Toast Mindustry Server"))
-        .addEventListeners(ReadyListener())
+        .addEventListeners(ReadyListener)
+        .addEventListeners(GameEventsListener())
+        .addEventListeners(ServerControlCommands())
         .enableIntents(
             GatewayIntent.GUILD_MESSAGES,
             GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
