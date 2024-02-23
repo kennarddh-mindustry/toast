@@ -2,14 +2,24 @@ package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import arc.util.Align
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
+import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
+import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoPopup
+import com.github.kennarddh.mindustry.toast.common.Server
+import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
+import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.common.toDisplayString
+import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
+import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
 import com.github.kennarddh.mindustry.toast.core.commons.mindustryServerUserDataWhereClause
 import kotlinx.datetime.Clock
@@ -18,6 +28,7 @@ import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
 
@@ -128,5 +139,91 @@ class UserStatsHandler : Handler() {
     @EventHandler
     private fun onPlayerChatEvent(event: EventType.PlayerChatEvent) {
         incrementActionsCounter(event.player, 1)
+    }
+
+    enum class XPCommandType {
+        get, set, add, remove
+    }
+
+    @Command(["xp"])
+    @MinimumRole(UserRole.Admin)
+    @ClientSide
+    @ServerSide
+    suspend fun xp(
+        player: Player? = null,
+        target: Player,
+        server: Server? = null,
+        type: XPCommandType,
+        value: Int? = null
+    ): CommandResult {
+        val computedServer = server ?: ToastVars.server
+
+        return newSuspendedTransaction {
+            when (type) {
+                XPCommandType.get -> {
+                    val mindustryUserServerData = MindustryUserServerData
+                        .join(
+                            MindustryUser,
+                            JoinType.INNER,
+                            onColumn = MindustryUserServerData.mindustryUserID,
+                            otherColumn = MindustryUser.id
+                        )
+                        .selectOne {
+                            (MindustryUser.mindustryUUID eq target.uuid()) and (MindustryUserServerData.server eq computedServer)
+                        }!!
+
+                    CommandResult("${target.name} has ${mindustryUserServerData[MindustryUserServerData.xp]} xp.")
+                }
+
+                XPCommandType.add -> {
+                    if (value == null) return@newSuspendedTransaction CommandResult(
+                        "Value cannot be empty for add subcommand",
+                        CommandResultStatus.Failed
+                    )
+
+                    MindustryUserServerData.update({
+                        (MindustryUser.mindustryUUID eq target.uuid()) and (MindustryUserServerData.server eq computedServer)
+                    }) {
+                        with(SqlExpressionBuilder) {
+                            it[xp] = xp + value
+                        }
+                    }
+
+                    CommandResult("Added $value xp to ${target.name}.")
+                }
+
+                XPCommandType.set -> {
+                    if (value == null) return@newSuspendedTransaction CommandResult(
+                        "Value cannot be empty for set subcommand",
+                        CommandResultStatus.Failed
+                    )
+
+                    MindustryUserServerData.update({
+                        (MindustryUser.mindustryUUID eq target.uuid()) and (MindustryUserServerData.server eq computedServer)
+                    }) {
+                        it[xp] = value
+                    }
+
+                    CommandResult("Set ${target.name} xp to $value.")
+                }
+
+                XPCommandType.remove -> {
+                    if (value == null) return@newSuspendedTransaction CommandResult(
+                        "Value cannot be empty for remove subcommand",
+                        CommandResultStatus.Failed
+                    )
+
+                    MindustryUserServerData.update({
+                        (MindustryUser.mindustryUUID eq target.uuid()) and (MindustryUserServerData.server eq computedServer)
+                    }) {
+                        with(SqlExpressionBuilder) {
+                            it[xp] = xp - value
+                        }
+                    }
+
+                    CommandResult("Removed $value xp from ${target.name}.")
+                }
+            }
+        }
     }
 }
