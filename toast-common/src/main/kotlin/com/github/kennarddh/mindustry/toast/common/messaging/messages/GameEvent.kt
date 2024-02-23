@@ -42,9 +42,9 @@ data class PlayerPunishedGameEvent(
 @SerialName("PlayerReported")
 data class PlayerReportedGameEvent(
     val playerMindustryName: String,
-    val playerID: Int?,
+    val playerUserID: Int?,
     val targetMindustryName: String,
-    val targetID: Int?,
+    val targetUserID: Int?,
     val reason: String,
 ) : GameEventBase()
 
