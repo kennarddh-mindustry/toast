@@ -98,6 +98,8 @@ tasks.runMindustryServer {
     environment("DB_PASSWORD", "root")
     environment("RABBITMQ_URI", "amqp://root:root@localhost:5672")
     environment("SERVER", "Survival")
+    environment("DISCOVERY_REDIS_HOST", "localhost")
+    environment("DISCOVERY_REDIS_PORT", "6379")
 
     mods.setFrom(
         setOf(

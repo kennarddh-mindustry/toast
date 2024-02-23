@@ -75,6 +75,8 @@ tasks.register<JavaExec>("runBot") {
     environment("DB_USERNAME", "root")
     environment("DB_PASSWORD", "root")
     environment("RABBITMQ_URI", "amqp://root:root@localhost:5672")
+    environment("DISCOVERY_REDIS_HOST", "localhost")
+    environment("DISCOVERY_REDIS_PORT", "6379")
 
     doFirst {
         file(project.file(".env")).readLines().forEach {
