@@ -53,7 +53,7 @@ class GameEventsListener : ListenerAdapter() {
         reportsChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.REPORTS_CHANNEL_ID)!!
         serverListChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.SERVER_LIST_CHANNEL_ID)!!
 
-        Messenger.listenGameEvent("DiscordBot") {
+        Messenger.listenGameEvent("DiscordBotGameEvents") {
             val channel = toastMindustryGuild.getTextChannelById(it.server.discordChannelID)!!
 
             val message = when (it.data) {
@@ -203,6 +203,8 @@ class ServerControlCommands : ListenerAdapter() {
 
                 return
             }
+
+            Logger.info("Routing key \"${server.name}.server-command\"")
 
             Messenger.publishServerControl(
                 "${server.name}.server-command",
