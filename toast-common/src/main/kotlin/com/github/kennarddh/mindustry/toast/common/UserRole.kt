@@ -13,14 +13,10 @@ enum class UserRole(
     val applyRoleEffect: mindustry.gen.Player.() -> Unit,
 ) {
     @SerialName("Player")
-    Player({
-        admin = false
-    }),
+    Player({ }),
 
     @SerialName("Mod")
-    Mod({
-        admin = false
-    }),
+    Mod({ }),
 
     @SerialName("Admin")
     Admin({

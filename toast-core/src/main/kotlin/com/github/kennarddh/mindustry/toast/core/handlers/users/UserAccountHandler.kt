@@ -14,6 +14,7 @@ import com.github.kennarddh.mindustry.genesis.core.menus.Menu
 import com.github.kennarddh.mindustry.genesis.core.menus.Menus
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoMessage
 import com.github.kennarddh.mindustry.toast.common.UserRole
+import com.github.kennarddh.mindustry.toast.common.clearRoleEffect
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
@@ -189,6 +190,8 @@ class UserAccountHandler : Handler() {
 
             users[player]!!.userID = user[Users.id].value
 
+            user[Users.role].applyRoleEffect(player)
+
             player.infoMessage(
                 "[#00ff00]Login success. You are now logged in as ${user[Users.username]}."
             )
@@ -214,6 +217,8 @@ class UserAccountHandler : Handler() {
                 }
 
             users[player]!!.userID = null
+
+            player.clearRoleEffect()
 
             player.infoMessage(
                 "[#00ff00]Logout success. You are now no longer logged in."
@@ -253,6 +258,9 @@ class UserAccountHandler : Handler() {
             Users.update({ Users.id eq targetUser[Users.id] }) {
                 it[this.role] = newRole
             }
+
+            target.clearRoleEffect()
+            newRole.applyRoleEffect(target)
 
             return@newSuspendedTransaction CommandResult("Successfully changed ${targetUser[Users.username]} to $newRole.")
         }

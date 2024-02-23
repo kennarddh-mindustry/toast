@@ -298,10 +298,10 @@ class UserJoinsHandler : Handler() {
 
             GenesisAPI.getHandler<UserAccountHandler>()!!.users[player] = User(userID, mindustryUserID, player)
 
+            player.clearRoleEffect()
+
             if (userID != null) {
                 userAndMindustryUserAndUserServerData[Users.role].applyRoleEffect(player)
-            } else {
-                player.clearRoleEffect()
             }
         }
     }
