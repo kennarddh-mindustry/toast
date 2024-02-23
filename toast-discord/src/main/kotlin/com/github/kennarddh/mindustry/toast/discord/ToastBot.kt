@@ -65,6 +65,45 @@ class GameEventsListener : ListenerAdapter() {
                 is ServerStartGameEvent -> "Server start."
                 is ServerStopGameEvent -> "Server stop."
                 is ServerRestartGameEvent -> "Server restart."
+                is PlayerReportedGameEvent -> {
+                    val data = it.data as PlayerReportedGameEvent
+
+                    val embed = EmbedBuilder().run {
+                        setTitle("Player Reported")
+
+                        setColor(DiscordConstant.REPORTED_EMBED_COLOR)
+
+                        addField(
+                            MessageEmbed.Field(
+                                "Reporter",
+                                if (data.playerUserID != null)
+                                    "`${data.playerMindustryName}`/`${data.playerUserID}`"
+                                else
+                                    data.playerMindustryName,
+                                false
+                            )
+                        )
+
+                        addField(
+                            MessageEmbed.Field(
+                                "Target",
+                                if (data.targetUserID != null)
+                                    "`${data.targetMindustryName}`/`${data.targetUserID}`"
+                                else
+                                    data.targetMindustryName, true
+                            )
+                        )
+
+                        addField(MessageEmbed.Field("Reason", data.reason, false))
+
+                        build()
+                    }
+
+                    notificationChannel.sendMessageEmbeds(embed).queue()
+
+                    null
+                }
+
                 is PlayerPunishedGameEvent -> {
                     val data = it.data as PlayerPunishedGameEvent
 
@@ -133,7 +172,7 @@ class GameEventsListener : ListenerAdapter() {
                                     if (userPunishment[UserPunishments.targetUserID] != null)
                                         "`${data.name}`/`${userPunishment[UserPunishments.targetUserID]}`"
                                     else
-                                        data.targetPlayerMindustryName, false
+                                        data.targetPlayerMindustryName, true
                                 )
                             )
 
@@ -164,7 +203,7 @@ class GameEventsListener : ListenerAdapter() {
                             build()
                         }
 
-                        notificationChannel.sendMessageEmbeds(embed).queue()
+                        reportsChannel.sendMessageEmbeds(embed).queue()
                     }
 
                     null
