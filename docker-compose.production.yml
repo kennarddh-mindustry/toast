@@ -22,6 +22,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      discovery-redis:
+        condition: service_healthy
     restart: unless-stopped
     deploy:
       resources:
@@ -50,6 +52,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      discovery-redis:
+        condition: service_healthy
     restart: unless-stopped
     deploy:
       resources:
@@ -76,6 +80,8 @@ services:
   #        condition: service_healthy
   #      rabbitmq:
   #        condition: service_healthy
+  #      discovery-redis:
+  #        condition: service_healthy
   #    restart: unless-stopped
   #    deploy:
   #      resources:
@@ -97,12 +103,31 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      discovery-redis:
+        condition: service_healthy
     restart: unless-stopped
     deploy:
       resources:
         limits:
           memory: 400M
           cpus: 1
+
+  discovery-redis:
+    image: redis:7.2.4-alpine
+    volumes:
+      - ./dev/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ 'CMD','redis-cli ping | grep PONG' ]
+    networks:
+      - toast
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 50M
+          cpus: 0.2
 
   database:
     image: mariadb:lts
