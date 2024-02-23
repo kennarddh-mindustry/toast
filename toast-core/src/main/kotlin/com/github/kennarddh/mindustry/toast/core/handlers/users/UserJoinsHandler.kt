@@ -29,7 +29,7 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 
 class UserJoinsHandler : Handler() {
     private val usidHashFunctionInstance = Argon2Function.getInstance(
-        16384, 10, 4, 64, Argon2.ID
+        4096, 10, 2, 64, Argon2.ID
     )
 
     private val numberOnlyNameRegex = """^\d+$""".toRegex()

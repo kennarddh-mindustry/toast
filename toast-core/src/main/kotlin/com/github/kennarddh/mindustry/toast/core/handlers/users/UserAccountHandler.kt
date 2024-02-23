@@ -39,7 +39,7 @@ class UserAccountHandler : Handler() {
     val users: MutableMap<Player, User> = Collections.synchronizedMap(mutableMapOf())
 
     private val passwordHashFunctionInstance = Argon2Function.getInstance(
-        16384, 10, 4, 64, Argon2.ID
+        4096, 10, 2, 64, Argon2.ID
     )
 
     private val usernameRegex = """[a-zA-Z0-9_]{1,50}""".toRegex()
