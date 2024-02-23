@@ -47,4 +47,5 @@ bin/
 /prod/.env.common
 /prod/.env.database
 /prod/.env.discord
+/prod/.env.rabbitmq
 /prod/maps/

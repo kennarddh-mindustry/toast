@@ -139,6 +139,8 @@ services:
     volumes:
       - ./prod/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
       - rabbitmqData:/var/lib/rabbitmq/mnesia/
+    env_file:
+      - ./prod/.env.rabbitmq
     healthcheck:
       test: rabbitmq-diagnostics -q check_port_connectivity
     networks:
