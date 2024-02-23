@@ -344,6 +344,7 @@ class DiscoveryHandler : ListenerAdapter() {
 
                         appendLine("\tUptime: ${discoveryPayload.uptime.toDisplayString()}")
                         appendLine("\tTPS: ${discoveryPayload.tps}")
+                        appendLine("\tGame mode: ${it.gameMode.name}")
                         appendLine("\tMap: ${discoveryPayload.map}")
                         appendLine("\tPlayers: ${discoveryPayload.players.size}")
                     }
