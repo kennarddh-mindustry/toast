@@ -119,7 +119,7 @@ services:
     ports:
       - "6379:6379"
     healthcheck:
-      test: [ 'CMD','redis-cli ping | grep PONG' ]
+      test: [ 'CMD-SHELL','redis-cli ping | grep PONG' ]
     networks:
       - toast
     restart: unless-stopped
