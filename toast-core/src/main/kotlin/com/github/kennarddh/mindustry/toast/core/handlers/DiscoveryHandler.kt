@@ -32,7 +32,7 @@ class DiscoveryHandler : Handler() {
         val payload = DiscoveryPayload(
             Clock.System.now(),
             Groups.player.map { it.name }.toTypedArray(),
-            Vars.state.serverTps,
+            if (Vars.state.serverTps == -1) 60 else Vars.state.serverTps,
             uptime,
             Vars.state.map.name(),
             host
