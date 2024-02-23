@@ -57,6 +57,8 @@ subprojects {
 
         implementation("com.rabbitmq:amqp-client:5.20.0")
 
+        implementation("io.github.domgew:kedis-jvm:0.0.2")
+
         implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
         implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
