@@ -94,6 +94,8 @@ class GameEventsListener : ListenerAdapter() {
                             )
                         )
 
+                        addField(MessageEmbed.Field("Server", it.server.displayName, false))
+
                         addField(MessageEmbed.Field("Reason", data.reason, false))
 
                         build()
