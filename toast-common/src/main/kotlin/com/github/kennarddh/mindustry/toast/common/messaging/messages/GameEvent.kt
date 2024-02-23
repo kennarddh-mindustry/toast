@@ -38,6 +38,16 @@ data class PlayerPunishedGameEvent(
     val targetPlayerMindustryName: String,
 ) : GameEventBase()
 
+@Serializable
+@SerialName("PlayerReported")
+data class PlayerReportedGameEvent(
+    val playerMindustryName: String,
+    val playerID: Int?,
+    val targetMindustryName: String,
+    val targetID: Int?,
+    val reason: String,
+) : GameEventBase()
+
 // TODO: Implement map in database first. MapStart, MapEnd.
 //@Serializable
 //@SerialName("MapStart")
