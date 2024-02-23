@@ -99,7 +99,7 @@ class GameEventsListener : ListenerAdapter() {
                         build()
                     }
 
-                    notificationChannel.sendMessageEmbeds(embed).queue()
+                    reportsChannel.sendMessageEmbeds(embed).queue()
 
                     null
                 }
@@ -203,7 +203,7 @@ class GameEventsListener : ListenerAdapter() {
                             build()
                         }
 
-                        reportsChannel.sendMessageEmbeds(embed).queue()
+                        notificationChannel.sendMessageEmbeds(embed).queue()
                     }
 
                     null
