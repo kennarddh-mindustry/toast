@@ -1,13 +1,15 @@
 version: '3.8'
 
 services:
-  survival-server:
+  survivalServer:
     build:
       context: .
       dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
     ports:
       - "6567:6567/tcp"
       - "6567:6567/udp"
+    volumes:
+      - ./prod/maps/survival:/app/config/maps/
     networks:
       - toast
     env_file:
@@ -27,7 +29,7 @@ services:
           memory: 400M
           cpus: 1
 
-  attack-server:
+  attackServer:
     build:
       context: .
       dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
@@ -55,7 +57,7 @@ services:
           memory: 400M
           cpus: 1
   #
-  #  pvp-server:
+  #  pvpServer:
   #    build:
   #      context: .
   #      dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
