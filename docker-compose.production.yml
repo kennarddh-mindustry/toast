@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  survivalServer:
+  survival-server:
     build:
       context: .
       dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
@@ -29,7 +29,7 @@ services:
           memory: 400M
           cpus: 1
 
-  attackServer:
+  attack-server:
     build:
       context: .
       dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
@@ -57,7 +57,7 @@ services:
           memory: 400M
           cpus: 1
   #
-  #  pvpServer:
+  #  pvp-server:
   #    build:
   #      context: .
   #      dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
