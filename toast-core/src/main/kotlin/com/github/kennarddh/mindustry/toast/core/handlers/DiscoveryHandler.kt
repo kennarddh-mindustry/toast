@@ -13,8 +13,6 @@ import kotlinx.serialization.json.Json
 import mindustry.Vars
 import mindustry.gen.Groups
 import java.net.URL
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.DurationUnit
 
 class DiscoveryHandler : Handler() {
     lateinit var serverStart: Instant
@@ -23,7 +21,7 @@ class DiscoveryHandler : Handler() {
         serverStart = Clock.System.now()
     }
 
-    @TimerTask(1f, 10f)
+    @TimerTask(1f, 5f)
     suspend fun onUpdateDiscovery() {
         val uptime = Clock.System.now() - serverStart
 
@@ -46,11 +44,8 @@ class DiscoveryHandler : Handler() {
             ToastVars.server.name,
             encodedPayload,
             options = SetOptions(
-                previousKeyHandling =
-                SetOptions.PreviousKeyHandling.OVERRIDE,
-                expire = SetOptions.ExpireOption.ExpiresInMilliseconds(
-                    milliseconds = 10.milliseconds.toLong(DurationUnit.MILLISECONDS),
-                ),
+                previousKeyHandling = SetOptions.PreviousKeyHandling.OVERRIDE,
+                expire = SetOptions.ExpireOption.ExpiresInSeconds(10),
             ),
         )
     }
