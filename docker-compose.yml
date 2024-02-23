@@ -2,6 +2,17 @@ version: '3'
 
 # Development
 services:
+  serverDiscoveryRedis:
+    image: redis:7.2.4-alpine
+    volumes:
+      - ./dev/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ 'CMD','redis-cli ping | grep PONG' ]
+    networks:
+      - toast
+
   database:
     image: mariadb:lts
     environment:
@@ -24,6 +35,7 @@ services:
         ]
     networks:
       - toast
+
   rabbitMQ:
     image: rabbitmq:3.12-management
     hostname: rabbitmq
