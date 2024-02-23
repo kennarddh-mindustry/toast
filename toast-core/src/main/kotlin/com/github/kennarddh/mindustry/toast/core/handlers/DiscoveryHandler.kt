@@ -25,7 +25,7 @@ class DiscoveryHandler : Handler() {
     suspend fun onUpdateDiscovery() {
         val uptime = Clock.System.now() - serverStart
 
-        val publicIP = URL("http://checkip.amazonaws.com").readText()
+        val publicIP = URL("http://checkip.amazonaws.com").readText().trim('\n')
 
         val host = "${publicIP}:${ToastVars.port}"
 
