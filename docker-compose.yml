@@ -2,7 +2,7 @@ version: '3'
 
 # Development
 services:
-  server-discovery-redis:
+  discovery-redis:
     image: redis:7.2.4-alpine
     volumes:
       - ./dev/redis/redis.conf:/usr/local/etc/redis/redis.conf
