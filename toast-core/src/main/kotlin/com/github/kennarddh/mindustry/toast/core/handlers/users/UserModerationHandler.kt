@@ -62,6 +62,7 @@ class UserModerationHandler : Handler() {
                 )
 
             val punishmentID = UserPunishments.insertAndGetId {
+                it[this.server] = ToastVars.server
                 it[this.reason] = reason
                 it[this.endAt] =
                     Clock.System.now().plus(duration).toLocalDateTime(TimeZone.UTC)
@@ -127,6 +128,7 @@ class UserModerationHandler : Handler() {
                 )
 
             val punishmentID = UserPunishments.insertAndGetId {
+                it[this.server] = ToastVars.server
                 it[this.reason] = reason
                 it[this.type] = PunishmentType.Ban
 

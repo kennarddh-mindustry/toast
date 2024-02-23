@@ -110,6 +110,7 @@ class VoteKickCommandHandler : Handler() {
             val targetUser = target!!.getUserAndMindustryUserAndUserServerData()
 
             val punishmentID = UserPunishments.insertAndGetId {
+                it[this.server] = ToastVars.server
                 it[this.reason] = reason
                 it[this.endAt] =
                     Clock.System.now().plus(duration).toLocalDateTime(TimeZone.UTC)
