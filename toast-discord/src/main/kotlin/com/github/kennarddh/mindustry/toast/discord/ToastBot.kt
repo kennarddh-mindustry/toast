@@ -16,6 +16,7 @@ import kotlinx.datetime.toInstant
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -23,6 +24,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
@@ -188,6 +190,9 @@ class ServerControlCommands : ListenerAdapter() {
                 Commands.slash("send-server-command", "Send server command to a mindustry server")
                     .addOptions(serverOptionData)
                     .addOption(OptionType.STRING, "command", "Command to send.", true)
+                    .setDefaultPermissions(
+                        DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)
+                    )
             ).queue()
     }
 
