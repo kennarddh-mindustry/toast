@@ -63,7 +63,7 @@ object Messenger {
     fun listenServerControl(queueName: String, bindingKey: String, callback: (ServerControl) -> Unit) {
         channel.queueDeclare(queueName, true, false, false, mapOf("x-queue-type" to "quorum"))
 
-        channel.queueBind(queueName, GAME_EVENTS_EXCHANGE_NAME, bindingKey)
+        channel.queueBind(queueName, SERVER_CONTROL_EXCHANGE_NAME, bindingKey)
 
         val deliverCallback = DeliverCallback { _, delivery ->
             val message = delivery.body.toString(Charsets.UTF_8)
