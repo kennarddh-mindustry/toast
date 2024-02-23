@@ -23,7 +23,7 @@ class DiscoveryHandler : Handler() {
         serverStart = Clock.System.now()
     }
 
-    @TimerTask(10f)
+    @TimerTask(1f, 10f)
     suspend fun onUpdateDiscovery() {
         val uptime = Clock.System.now() - serverStart
 
