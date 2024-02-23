@@ -8,6 +8,6 @@ ADD https://github.com/xpdustry/kotlin-runtime/releases/download/v3.1.1-k.1.9.22
 ADD https://github.com/kennarddh-mindustry/genesis/releases/download/v3.0.0-beta.11/genesis-core-3.0.0-beta.11.jar config/mods/genesis-core-3.0.0-beta.11.jar
 ADD https://github.com/kennarddh-mindustry/genesis/releases/download/v3.0.0-beta.11/genesis-standard-3.0.0-beta.11.jar config/mods/genesis-standard-3.0.0-beta.11.jar
 
-ADD https://github.com/kennarddh-mindustry/toast/releases/download/v0.0.11/toast-core-0.0.11.jar config/mods/toast-core-0.0.11.jar
+ADD https://github.com/kennarddh-mindustry/toast/releases/download/v0.0.12/toast-core-0.0.12.jar config/mods/toast-core-0.0.12.jar
 
 ENTRYPOINT java -jar server-release.jar
