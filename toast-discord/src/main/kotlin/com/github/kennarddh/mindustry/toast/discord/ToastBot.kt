@@ -5,15 +5,18 @@ import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
+import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryPayload
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
 import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.common.toDisplayString
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlinx.serialization.json.Json
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -33,10 +36,15 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import kotlin.time.Duration.Companion.seconds
 
 
 lateinit var jda: JDA
 lateinit var toastMindustryGuild: Guild
+
+private lateinit var notificationChannel: TextChannel
+private lateinit var reportsChannel: TextChannel
+private lateinit var serverListChannel: TextChannel
 
 object ReadyListener : ListenerAdapter() {
     override fun onReady(event: ReadyEvent) {
@@ -47,9 +55,6 @@ object ReadyListener : ListenerAdapter() {
 }
 
 class GameEventsListener : ListenerAdapter() {
-    private lateinit var notificationChannel: TextChannel
-    private lateinit var reportsChannel: TextChannel
-    private lateinit var serverListChannel: TextChannel
 
     override fun onReady(event: ReadyEvent) {
         notificationChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.NOTIFICATIONS_CHANNEL_ID)!!
@@ -305,6 +310,46 @@ class ServerControlCommands : ListenerAdapter() {
     }
 }
 
+
+class DiscoveryHandler : ListenerAdapter() {
+    override fun onReady(event: ReadyEvent) {
+        CoroutineScopes.Main.launch {
+            while (true) {
+                serverListChannel.sendMessage(buildString {
+                    appendLine("Last update: <t:${Clock.System.now().toEpochMilliseconds() / 1000}:R>")
+
+                    appendLine()
+
+                    Server.entries.forEach {
+                        val discoveryPayloadEncoded = DiscoveryRedis.client.get(it.name)
+
+                        if (discoveryPayloadEncoded == null) {
+                            appendLine("${it.displayName}: Offline")
+
+                            return@forEach
+                        }
+
+                        val discoveryPayload = Json.decodeFromString<DiscoveryPayload>(discoveryPayloadEncoded)
+
+                        appendLine("${it.displayName}: Online")
+
+                        // Prevent exposing developers ip
+                        if (jda.selfUser.idLong == DiscordConstant.PRODUCTION_TOAST_BOT_USER_ID)
+                            appendLine("\tIP: ${discoveryPayload.host}")
+
+                        appendLine("\tUptime: ${discoveryPayload.uptime.toDisplayString()}")
+                        appendLine("\tTPS: ${discoveryPayload.tps}")
+                        appendLine("\tMap: ${discoveryPayload.map}")
+                        appendLine("\tPlayers: ${discoveryPayload.players.size}")
+                    }
+                }.trimEnd('\n')).queue()
+
+                delay(10.seconds)
+            }
+        }
+    }
+}
+
 suspend fun main() {
     Logger.info("Loaded")
 
@@ -319,6 +364,7 @@ suspend fun main() {
         .addEventListeners(ReadyListener)
         .addEventListeners(GameEventsListener())
         .addEventListeners(ServerControlCommands())
+        .addEventListeners(DiscoveryHandler())
         .enableIntents(
             GatewayIntent.GUILD_MESSAGES,
             GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
