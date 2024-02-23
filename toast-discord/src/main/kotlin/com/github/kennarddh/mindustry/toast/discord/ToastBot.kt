@@ -80,7 +80,7 @@ class GameEventsListener : ListenerAdapter() {
                                     "`${data.playerMindustryName}`/`${data.playerUserID}`"
                                 else
                                     data.playerMindustryName,
-                                false
+                                true
                             )
                         )
 
@@ -164,7 +164,7 @@ class GameEventsListener : ListenerAdapter() {
                                         "`${data.name}`/`${userPunishment[UserPunishments.userID]}`"
                                     else
                                         data.name,
-                                    false
+                                    true
                                 )
                             )
 
@@ -204,7 +204,7 @@ class GameEventsListener : ListenerAdapter() {
                                 MessageEmbed.Field(
                                     "Server",
                                     userPunishment[UserPunishments.server].displayName,
-                                    false
+                                    true
                                 )
                             )
 
