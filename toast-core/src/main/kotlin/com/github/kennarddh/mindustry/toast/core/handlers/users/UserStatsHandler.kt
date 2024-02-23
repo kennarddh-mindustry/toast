@@ -9,16 +9,17 @@ import com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoPopup
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
+import com.github.kennarddh.mindustry.toast.common.toDisplayString
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
 import com.github.kennarddh.mindustry.toast.core.commons.mindustryServerUserDataWhereClause
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
-import java.time.Instant
 
 
 class UserStatsHandler : Handler() {
@@ -31,7 +32,7 @@ class UserStatsHandler : Handler() {
     // Unsaved xp
     private val playersXPDelta: MutableMap<Player, Int> = mutableMapOf()
 
-    private val playersLastPlayTimeSave: MutableMap<Player, Long> = mutableMapOf()
+    private val playersLastPlayTimeSave: MutableMap<Player, Instant> = mutableMapOf()
 
     @TimerTask(0f, 10f)
     private suspend fun savePlayerDelta() {
@@ -44,7 +45,7 @@ class UserStatsHandler : Handler() {
             val playerActionsCount = playersActionsCounter[player]!!
             val lastPlayTimeSave = playersLastPlayTimeSave[player]!!
 
-            val now = Clock.System.now().toEpochMilliseconds()
+            val now = Clock.System.now()
             val playTimeChanges = now - lastPlayTimeSave
 
             // It's like this for easier change if later xp can be incremented in other places
@@ -86,10 +87,10 @@ class UserStatsHandler : Handler() {
             val mindustryUserServerData = player.getMindustryUserAndUserServerData()!!
 
             val xp = mindustryUserServerData[MindustryUserServerData.xp]
-            val playTimeMillis = mindustryUserServerData[MindustryUserServerData.playTime]
+            val playTime = mindustryUserServerData[MindustryUserServerData.playTime]
 
             player.infoPopup(
-                "XP: ${xp}\nRank: Duo 1\nPlay Time: ${playTimeMillis / 1000}s",
+                "XP: ${xp}\nRank: Duo 1\nPlay Time: ${playTime.toDisplayString()}",
                 10.5f, Align.topRight, 200, 0, 0, 10
             )
         }
@@ -104,7 +105,7 @@ class UserStatsHandler : Handler() {
         playersActionsCounter[event.player] = 0
         playersXPDelta[event.player] = 0
 
-        playersLastPlayTimeSave[event.player] = Instant.now().toEpochMilli()
+        playersLastPlayTimeSave[event.player] = Clock.System.now()
     }
 
     @EventHandler
