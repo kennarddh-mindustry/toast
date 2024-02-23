@@ -127,7 +127,7 @@ services:
       resources:
         limits:
           memory: 50M
-          cpus: 0.2
+          cpus: '0.4'
 
   database:
     image: mariadb:lts
