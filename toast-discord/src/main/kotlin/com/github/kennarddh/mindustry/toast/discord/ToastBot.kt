@@ -313,9 +313,14 @@ class ServerControlCommands : ListenerAdapter() {
 
 class DiscoveryHandler : ListenerAdapter() {
     override fun onReady(event: ReadyEvent) {
+        if (
+            !System.getenv("ENABLE_DEV_SERVER_LIST").toBoolean() &&
+            jda.selfUser.idLong != DiscordConstant.PRODUCTION_TOAST_BOT_USER_ID
+        ) return
+
         CoroutineScopes.Main.launch {
             while (true) {
-                serverListChannel.sendMessage(buildString {
+                val message = buildString {
                     appendLine("Last update: <t:${Clock.System.now().toEpochMilliseconds() / 1000}:R>")
 
                     appendLine()
@@ -342,7 +347,15 @@ class DiscoveryHandler : ListenerAdapter() {
                         appendLine("\tMap: ${discoveryPayload.map}")
                         appendLine("\tPlayers: ${discoveryPayload.players.size}")
                     }
-                }.trimEnd('\n')).queue()
+                }.trimEnd('\n')
+
+                if (System.getenv("SERVER_LIST_MESSAGE_ID") == null) {
+                    serverListChannel.sendMessage(message).queue()
+                } else {
+                    serverListChannel.retrieveMessageById(System.getenv("SERVER_LIST_MESSAGE_ID").toLong()).queue {
+                        it.editMessage(message).queue()
+                    }
+                }
 
                 delay(10.seconds)
             }
