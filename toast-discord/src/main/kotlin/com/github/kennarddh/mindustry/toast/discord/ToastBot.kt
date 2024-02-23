@@ -242,6 +242,10 @@ class ServerControlCommands : ListenerAdapter() {
                     .setDefaultPermissions(
                         DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)
                     )
+            ).addCommands(
+                Commands.slash("send-chat", "Send chat message to a mindustry server")
+                    .addOptions(serverOptionData)
+                    .addOption(OptionType.STRING, "message", "Message to send.", true)
             ).queue()
     }
 
@@ -265,6 +269,33 @@ class ServerControlCommands : ListenerAdapter() {
                 ServerControl(
                     Clock.System.now().toEpochMilliseconds(),
                     ServerCommandServerControl(command)
+                )
+            )
+
+            event.reply("Done").queue()
+        } else if (event.name == "send-chat") {
+            val serverString = event.getOption("server")!!.asString
+            val message = event.getOption("message")!!.asString
+
+            val server = try {
+                Server.valueOf(serverString)
+            } catch (error: IllegalArgumentException) {
+                event.reply("$serverString is not a valid server").queue()
+
+                return
+            }
+
+            if (message == "") {
+                event.reply("Message cannot be empty").queue()
+
+                return
+            }
+
+            Messenger.publishServerControl(
+                "${server.name}.chat",
+                ServerControl(
+                    Clock.System.now().toEpochMilliseconds(),
+                    ChatServerControl(event.user.effectiveName, message)
                 )
             )
 
