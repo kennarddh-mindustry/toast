@@ -8,8 +8,8 @@ import kotlinx.serialization.json.Json
 
 
 object Messenger {
-    const val GAME_EVENTS_EXCHANGE_NAME = "GameEvents"
-    const val SERVER_CONTROL_EXCHANGE_NAME = "ServerControl"
+    private const val GAME_EVENTS_EXCHANGE_NAME = "GameEvents"
+    private const val SERVER_CONTROL_EXCHANGE_NAME = "ServerControl"
     private lateinit var connection: Connection
     private lateinit var channel: Channel
 
