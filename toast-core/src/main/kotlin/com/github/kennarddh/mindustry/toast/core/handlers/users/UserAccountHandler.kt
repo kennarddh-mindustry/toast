@@ -221,7 +221,7 @@ class UserAccountHandler : Handler() {
         }
     }
 
-    @Command(["changeRole"])
+    @Command(["changerole", "change-role"])
     @ClientSide
     @ServerSide
     @MinimumRole(UserRole.Admin)

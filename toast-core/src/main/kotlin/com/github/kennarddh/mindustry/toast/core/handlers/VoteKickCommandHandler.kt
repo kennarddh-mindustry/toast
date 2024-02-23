@@ -71,7 +71,7 @@ class VoteKickCommandHandler : Handler() {
         voteSession!!.vote(player, vote)
     }
 
-    @Command(["voteCancel", "voteKickCancel", "votekickCancel"])
+    @Command(["vote-cancel", "vote-kick-cancel", "votekick-cancel"])
     @ClientSide
     suspend fun cancel(player: Player): CommandResult? {
         val user = player.getUserAndMindustryUserAndUserServerData()
