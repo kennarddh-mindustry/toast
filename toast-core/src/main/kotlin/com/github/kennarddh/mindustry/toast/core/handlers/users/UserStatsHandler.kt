@@ -181,11 +181,16 @@ class UserStatsHandler : Handler() {
                         CommandResultStatus.Failed
                     )
 
-                    MindustryUserServerData.update({
+                    MindustryUserServerData.join(
+                        MindustryUser,
+                        JoinType.INNER,
+                        onColumn = MindustryUserServerData.mindustryUserID,
+                        otherColumn = MindustryUser.id
+                    ).update({
                         (MindustryUser.mindustryUUID eq target.uuid()) and (MindustryUserServerData.server eq computedServer)
                     }) {
                         with(SqlExpressionBuilder) {
-                            it[xp] = xp + value
+                            it[MindustryUserServerData.xp] = MindustryUserServerData.xp + value
                         }
                     }
 
@@ -198,10 +203,15 @@ class UserStatsHandler : Handler() {
                         CommandResultStatus.Failed
                     )
 
-                    MindustryUserServerData.update({
+                    MindustryUserServerData.join(
+                        MindustryUser,
+                        JoinType.INNER,
+                        onColumn = MindustryUserServerData.mindustryUserID,
+                        otherColumn = MindustryUser.id
+                    ).update({
                         (MindustryUser.mindustryUUID eq target.uuid()) and (MindustryUserServerData.server eq computedServer)
                     }) {
-                        it[xp] = value
+                        it[MindustryUserServerData.xp] = value
                     }
 
                     CommandResult("Set ${target.name} xp to $value.")
@@ -213,11 +223,16 @@ class UserStatsHandler : Handler() {
                         CommandResultStatus.Failed
                     )
 
-                    MindustryUserServerData.update({
+                    MindustryUserServerData.join(
+                        MindustryUser,
+                        JoinType.INNER,
+                        onColumn = MindustryUserServerData.mindustryUserID,
+                        otherColumn = MindustryUser.id
+                    ).update({
                         (MindustryUser.mindustryUUID eq target.uuid()) and (MindustryUserServerData.server eq computedServer)
                     }) {
                         with(SqlExpressionBuilder) {
-                            it[xp] = xp - value
+                            it[MindustryUserServerData.xp] = MindustryUserServerData.xp - value
                         }
                     }
 
