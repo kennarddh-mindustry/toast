@@ -299,9 +299,9 @@ class UserJoinsHandler : Handler() {
             GenesisAPI.getHandler<UserAccountHandler>()!!.users[player] = User(userID, mindustryUserID, player)
 
             if (userID != null) {
-                if (userAndMindustryUserAndUserServerData[Users.role] >= UserRole.Admin) {
-                    player.admin = true
-                }
+                userAndMindustryUserAndUserServerData[Users.role].applyRoleEffect(player)
+            } else {
+                player.clearRoleEffect()
             }
         }
     }
