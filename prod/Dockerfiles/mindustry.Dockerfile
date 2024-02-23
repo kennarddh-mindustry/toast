@@ -10,4 +10,4 @@ ADD https://github.com/kennarddh-mindustry/genesis/releases/download/v3.0.0-beta
 
 ADD https://github.com/kennarddh-mindustry/toast/releases/download/v0.0.10/toast-core-0.0.10.jar config/mods/toast-core-0.0.10.jar
 
-ENTRYPOINT java -XX:MinRAMPercentage=20 -XX:MaxRAMPercentage=95 -jar server-release.jar
+ENTRYPOINT java -jar server-release.jar
