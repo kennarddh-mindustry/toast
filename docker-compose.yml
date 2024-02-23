@@ -44,7 +44,7 @@ services:
       - "15672:15672"
     volumes:
       - ./dev/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
-      - rabbitmqData:/var/lib/rabbitmq/mnesia/
+      - rabbitmq-data:/var/lib/rabbitmq/mnesia/
     healthcheck:
       test: rabbitmq-diagnostics -q check_port_connectivity
     networks:
@@ -52,7 +52,7 @@ services:
 
 volumes:
   data:
-  rabbitmqData:
+  rabbitmq-data:
 
 networks:
   toast:
