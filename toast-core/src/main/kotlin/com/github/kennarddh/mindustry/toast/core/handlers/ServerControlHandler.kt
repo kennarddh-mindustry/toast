@@ -10,12 +10,9 @@ import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 class ServerControlHandler : Handler() {
     override suspend fun onInit() {
         Messenger.listenServerControl("${ToastVars.server.name}ServerServerControl", "${ToastVars.server.name}.#") {
-            Logger.info("Received server control $it")
             val data = it.data
 
             if (data is ServerCommandServerControl) {
-                Logger.info("Received server command server control ${data.command}")
-
                 try {
                     GenesisAPI.commandRegistry.invokeServerCommand(data.command)
                 } catch (_: IllegalArgumentException) {
