@@ -213,7 +213,7 @@ class UserAccountHandler : Handler() {
                     it[userID] = null
                 }
 
-            users.remove(player)
+            users[player]!!.userID = null
 
             player.infoMessage(
                 "[#00ff00]Logout success. You are now no longer logged in."
