@@ -200,6 +200,14 @@ class GameEventsListener : ListenerAdapter() {
                                 )
                             )
 
+                            addField(
+                                MessageEmbed.Field(
+                                    "Server",
+                                    userPunishment[UserPunishments.server].displayName,
+                                    false
+                                )
+                            )
+
                             addField(MessageEmbed.Field("Reason", userPunishment[UserPunishments.reason], false))
 
                             build()
