@@ -43,7 +43,15 @@ class ToastPlayerParameter : CommandParameter<Player> {
             if (user == null)
                 throw CommandParameterParsingException("Cannot convert $input into player for parameter :parameterName:. Cannot find player with the id $inputInt.")
 
-            GenesisAPI.getHandler<UserAccountHandler>()!!.users.filter { it.value.userID == user[Users.id].value }.keys.first()
+            // TODO: Use first or null
+
+            val storedUser =
+                GenesisAPI.getHandler<UserAccountHandler>()!!.users.filter { it.value.userID == user[Users.id].value }.keys.firstOrNull()
+
+            if (storedUser == null)
+                throw CommandParameterParsingException("Cannot convert $input into active player for parameter :parameterName:. Player with the id $inputInt is not here.")
+
+            storedUser
         }
     }
 
