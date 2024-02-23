@@ -42,7 +42,7 @@ $schema("Users") {
     $table("MindustryUserServerData") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
         * $fk("mindustryUserID") INTEGER
-        * $column("serverID") VARCHAR(255)
+        * $column("server") VARCHAR(255)
         * $column("xp") INTEGER DEFAULT 0
         * $column("playTime") BIGINT DEFAULT 0
         * $column("activePlayTime") BIGINT DEFAULT 0
@@ -70,6 +70,7 @@ $schema("Users") {
 
     $table("UserPunishments") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
+        * $column("server") VARCHAR(255)
         * $column("reason") TEXT
         * $column("punishedAt") DATETIME
           $column("endAt") DATETIME
