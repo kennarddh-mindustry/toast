@@ -22,11 +22,11 @@ object VerifyDiscordRedis {
         client.connect()
     }
 
-    suspend fun set(userID: Int, code: String) {
-        client.set(userID.toString(), code)
+    suspend fun set(userID: Int, pin: Int) {
+        client.set(userID.toString(), pin.toString())
     }
 
-    suspend fun get(userID: Int): String? {
-        return client.get(userID.toString())
+    suspend fun get(userID: Int): Int? {
+        return client.get(userID.toString())?.toInt()
     }
 }
