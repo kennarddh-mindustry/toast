@@ -35,7 +35,7 @@ class UserDiscordVerify : Handler() {
         // 6 digits pin
         val pin = pinSecureRandom.nextInt(100000, 999999)
 
-        VerifyDiscordRedis.set(user[Users.id].value, pin.toString())
+        VerifyDiscordRedis.set(user[Users.id].value, pin)
 
         return CommandResult(
             """
