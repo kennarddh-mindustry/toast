@@ -61,7 +61,7 @@ class GameEventsListener : ListenerAdapter() {
         reportsChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.REPORTS_CHANNEL_ID)!!
         serverListChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.SERVER_LIST_CHANNEL_ID)!!
 
-        Messenger.listenGameEvent("DiscordBotGameEvents") {
+        Messenger.listenGameEvent("DiscordBotGameEvents", "#") {
             val channel = toastMindustryGuild.getTextChannelById(it.server.discordChannelID)!!
 
             val message = when (it.data) {

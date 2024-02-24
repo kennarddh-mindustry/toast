@@ -139,6 +139,7 @@ class VoteKickCommandHandler : Handler() {
 
             CoroutineScopes.Main.launch {
                 Messenger.publishGameEvent(
+                    "${ToastVars.server.name}.punishment.vote-kick",
                     GameEvent(
                         ToastVars.server,
                         Clock.System.now().toEpochMilliseconds(),

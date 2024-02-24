@@ -24,6 +24,7 @@ class StartHandler : Handler() {
         host()
 
         Messenger.publishGameEvent(
+            "${ToastVars.server.name}.start",
             GameEvent(
                 ToastVars.server, Clock.System.now().toEpochMilliseconds(),
                 ServerStartGameEvent()

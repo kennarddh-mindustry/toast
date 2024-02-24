@@ -18,13 +18,14 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 class UserReportHandler : Handler() {
     @Command(["report"])
     @ClientSide
-    @Description("Report a  player.")
+    @Description("Report a player.")
     suspend fun kick(player: Player, target: Player, reason: String): CommandResult {
         newSuspendedTransaction {
             val user = player.getUserOptionalAndMindustryUserAndUserServerData()
             val targetUser = player.getUserOptionalAndMindustryUserAndUserServerData()
 
             Messenger.publishGameEvent(
+                "${ToastVars.server.name}.report",
                 GameEvent(
                     ToastVars.server, Clock.System.now().toEpochMilliseconds(),
                     PlayerReportedGameEvent(

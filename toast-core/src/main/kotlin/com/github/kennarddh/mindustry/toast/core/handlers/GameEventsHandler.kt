@@ -13,6 +13,7 @@ import mindustry.game.EventType
 class GameEventsHandler : Handler() {
     override suspend fun onDispose() {
         Messenger.publishGameEvent(
+            "${ToastVars.server.name}.stop",
             GameEvent(
                 ToastVars.server, Clock.System.now().toEpochMilliseconds(),
                 ServerStopGameEvent()
@@ -25,6 +26,7 @@ class GameEventsHandler : Handler() {
         val player = event.player
 
         Messenger.publishGameEvent(
+            "${ToastVars.server.name}.player.join",
             GameEvent(
                 ToastVars.server,
                 Clock.System.now().toEpochMilliseconds(),
@@ -38,6 +40,7 @@ class GameEventsHandler : Handler() {
         val player = event.player
 
         Messenger.publishGameEvent(
+            "${ToastVars.server.name}.player.leave",
             GameEvent(
                 ToastVars.server,
                 Clock.System.now().toEpochMilliseconds(),
@@ -54,6 +57,7 @@ class GameEventsHandler : Handler() {
         if (event.message.startsWith(GenesisAPI.commandRegistry.clientPrefix)) return
 
         Messenger.publishGameEvent(
+            "${ToastVars.server.name}.player.chat",
             GameEvent(
                 ToastVars.server, Clock.System.now().toEpochMilliseconds(),
                 PlayerChatGameEvent(player.name, player.uuid(), event.message.stripFooMessageInvisibleCharacters())

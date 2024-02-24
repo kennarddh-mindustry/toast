@@ -93,6 +93,7 @@ class UserModerationHandler : Handler() {
 
             CoroutineScopes.Main.launch {
                 Messenger.publishGameEvent(
+                    "${ToastVars.server.name}.punishment.kick",
                     GameEvent(
                         ToastVars.server,
                         Clock.System.now().toEpochMilliseconds(),
@@ -156,6 +157,7 @@ class UserModerationHandler : Handler() {
 
             CoroutineScopes.Main.launch {
                 Messenger.publishGameEvent(
+                    "${ToastVars.server.name}.punishment.ban",
                     GameEvent(
                         ToastVars.server,
                         Clock.System.now().toEpochMilliseconds(),
