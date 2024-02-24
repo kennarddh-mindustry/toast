@@ -22,6 +22,7 @@ object DatabaseSettings {
         config.jdbcUrl = System.getenv("DB_HOST")
         config.username = System.getenv("DB_USERNAME")
         config.password = System.getenv("DB_PASSWORD")
+        config.connectionTimeout = 20000
 
         val dataSource = HikariDataSource(config)
 

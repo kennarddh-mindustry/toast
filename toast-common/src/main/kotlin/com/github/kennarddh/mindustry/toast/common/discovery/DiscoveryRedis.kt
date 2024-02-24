@@ -15,7 +15,7 @@ object DiscoveryRedis {
                     port = System.getenv("DISCOVERY_REDIS_PORT").toInt(),
                 ),
                 authentication = KedisConfiguration.Authentication.NoAutoAuth,
-                connectionTimeoutMillis = 250,
+                connectionTimeoutMillis = 20000,
             ),
         )
     }

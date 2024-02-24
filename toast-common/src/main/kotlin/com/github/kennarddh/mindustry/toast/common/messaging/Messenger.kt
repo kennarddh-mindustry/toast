@@ -19,6 +19,7 @@ object Messenger {
         val connectionFactory = ConnectionFactory()
 
         connectionFactory.setUri(uri)
+        connectionFactory.connectionTimeout = 20000
 
         connection = connectionFactory.newConnection()
 
