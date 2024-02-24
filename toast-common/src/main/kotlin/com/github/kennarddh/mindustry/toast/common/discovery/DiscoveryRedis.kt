@@ -7,7 +7,7 @@ object DiscoveryRedis {
     lateinit var client: KedisClient
         private set
 
-    fun init() {
+    suspend fun init() {
         client = KedisClient.newClient(
             configuration = KedisConfiguration(
                 endpoint = KedisConfiguration.Endpoint.HostPort(
@@ -18,5 +18,7 @@ object DiscoveryRedis {
                 connectionTimeoutMillis = 20000,
             ),
         )
+
+        client.connect()
     }
 }
