@@ -19,7 +19,7 @@ import org.jetbrains.exposed.sql.alias
 
 class UserModerationSyncHandler : Handler() {
     override suspend fun onInit() {
-        Messenger.listenGameEvent("${ToastVars.server.name}ServerGameEvents", "*.punishment.*") {
+        Messenger.listenGameEvent("${ToastVars.server.name}ServerPunishmentSync", "*.punishment.*") {
             val data = it.data
 
             if (it.server == ToastVars.server) return@listenGameEvent
