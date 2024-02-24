@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.jetbrains.exposed.sql.update
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -309,7 +310,6 @@ class ServerControlCommands : ListenerAdapter() {
     }
 }
 
-
 class DiscoveryHandler : ListenerAdapter() {
     override fun onReady(event: ReadyEvent) {
         if (
@@ -361,6 +361,75 @@ class DiscoveryHandler : ListenerAdapter() {
     }
 }
 
+class VerifyDiscordHandler : ListenerAdapter() {
+    override fun onReady(event: ReadyEvent) {
+        jda.updateCommands()
+            .addCommands(
+                Commands.slash("verify", "Verify your mindustry account with discord")
+                    .addOption(OptionType.STRING, "username", "Mindustry account username.", true)
+                    .addOption(OptionType.NUMBER, "pin", "Pin.", true)
+            ).queue()
+    }
+
+    override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
+        if (event.name == "verify") {
+            val username = event.getOption("username")!!.asString
+            val pin = event.getOption("pin")!!.asInt
+
+            CoroutineScopes.Main.launch {
+                newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                    val userWithCurrentDiscord = Users.selectOne { Users.discordID eq event.user.id }
+
+                    if (userWithCurrentDiscord != null) {
+                        event.reply("This discord account has already been used to verify ${userWithCurrentDiscord[Users.username]} account.")
+                            .queue()
+
+                        return@newSuspendedTransaction
+                    }
+
+                    val user = Users.selectOne { Users.username eq username }
+
+                    if (user == null) {
+                        event.reply("Cannot find user with the username $username.").queue()
+
+                        return@newSuspendedTransaction
+                    }
+
+                    if (user[Users.discordID] != null) {
+                        event.reply("User ${user[Users.username]} has already verified with other discord account.")
+                            .queue()
+
+                        return@newSuspendedTransaction
+                    }
+
+                    val correctPin = VerifyDiscordRedis.get(user[Users.id].value)
+
+                    if (correctPin == null) {
+                        event.reply("Cannot find pin generated for the user. Join Toast Mindustry Server and do /verify to generate new pin.")
+                            .queue()
+
+                        return@newSuspendedTransaction
+                    }
+
+                    if (correctPin == pin) {
+                        event.reply("Wrong pin.").queue()
+
+                        return@newSuspendedTransaction
+                    }
+
+                    Users.update({
+                        Users.id eq user[Users.id]
+                    }) {
+                        it[discordID] = event.user.id
+                    }
+
+                    event.reply("Successfully verified user $username with this discord account.").queue()
+                }
+            }
+        }
+    }
+}
+
 suspend fun main() {
     Logger.info("Loaded")
 
@@ -377,6 +446,7 @@ suspend fun main() {
         .addEventListeners(GameEventsListener())
         .addEventListeners(ServerControlCommands())
         .addEventListeners(DiscoveryHandler())
+        .addEventListeners(VerifyDiscordHandler())
         .enableIntents(
             GatewayIntent.GUILD_MESSAGES,
             GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
