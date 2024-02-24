@@ -5,11 +5,8 @@ import com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryPayload
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
-import io.github.domgew.kedis.arguments.SetOptions
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import mindustry.Vars
 import mindustry.gen.Groups
 import java.net.URL
@@ -38,15 +35,6 @@ class DiscoveryHandler : Handler() {
             host
         )
 
-        val encodedPayload = Json.encodeToString(payload)
-
-        DiscoveryRedis.client.set(
-            ToastVars.server.name,
-            encodedPayload,
-            options = SetOptions(
-                previousKeyHandling = SetOptions.PreviousKeyHandling.OVERRIDE,
-                expire = SetOptions.ExpireOption.ExpiresInSeconds(10),
-            ),
-        )
+        DiscoveryRedis.post(ToastVars.server, payload)
     }
 }

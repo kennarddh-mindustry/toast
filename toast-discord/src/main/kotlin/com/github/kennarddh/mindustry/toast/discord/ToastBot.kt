@@ -5,7 +5,6 @@ import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
-import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryPayload
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
@@ -16,7 +15,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import kotlinx.serialization.json.Json
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -326,15 +324,13 @@ class DiscoveryHandler : ListenerAdapter() {
                     appendLine()
 
                     Server.entries.forEach {
-                        val discoveryPayloadEncoded = DiscoveryRedis.client.get(it.name)
+                        val discoveryPayload = DiscoveryRedis.get(it)
 
-                        if (discoveryPayloadEncoded == null) {
+                        if (discoveryPayload == null) {
                             appendLine("${it.displayName}: Offline")
 
                             return@forEach
                         }
-
-                        val discoveryPayload = Json.decodeFromString<DiscoveryPayload>(discoveryPayloadEncoded)
 
                         appendLine("${it.displayName}: Online")
 
