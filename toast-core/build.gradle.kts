@@ -100,6 +100,8 @@ tasks.runMindustryServer {
     environment("SERVER", "Survival")
     environment("DISCOVERY_REDIS_HOST", "localhost")
     environment("DISCOVERY_REDIS_PORT", "6379")
+    environment("LINK_DISCORD_REDIS_HOST", "localhost")
+    environment("LINK_DISCORD_REDIS_PORT", "6380")
 
     mods.setFrom(
         setOf(
