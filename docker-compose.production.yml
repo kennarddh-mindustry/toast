@@ -17,6 +17,8 @@ services:
     environment:
       SERVER: Survival
       PORT: 6567
+    healthcheck:
+      test: [ 'CMD-SHELL', 'ss -lt | grep $PORT' ]
     depends_on:
       database:
         condition: service_healthy
@@ -47,6 +49,8 @@ services:
     environment:
       SERVER: Attack
       PORT: 6568
+    healthcheck:
+      test: [ 'CMD-SHELL', 'ss -lt | grep $PORT' ]
     depends_on:
       database:
         condition: service_healthy
@@ -91,7 +95,7 @@ services:
     ports:
       - "6379:6379"
     healthcheck:
-      test: [ 'CMD-SHELL','redis-cli ping | grep PONG' ]
+      test: [ 'CMD-SHELL', 'redis-cli ping | grep PONG' ]
     networks:
       - toast
     restart: unless-stopped
