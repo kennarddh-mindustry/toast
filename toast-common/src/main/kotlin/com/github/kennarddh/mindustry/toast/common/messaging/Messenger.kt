@@ -25,7 +25,7 @@ object Messenger {
 
         channel = connection.createChannel()
 
-        channel.exchangeDeclare(GAME_EVENTS_EXCHANGE_NAME, BuiltinExchangeType.FANOUT, true)
+        channel.exchangeDeclare(GAME_EVENTS_EXCHANGE_NAME, BuiltinExchangeType.TOPIC, true)
         channel.exchangeDeclare(SERVER_CONTROL_EXCHANGE_NAME, BuiltinExchangeType.TOPIC, true)
     }
 
@@ -34,10 +34,10 @@ object Messenger {
         connection.close()
     }
 
-    fun publishGameEvent(gameEvent: GameEvent) {
+    fun publishGameEvent(routingKey: String, gameEvent: GameEvent) {
         val data = Json.encodeToString(gameEvent)
 
-        channel.basicPublish(GAME_EVENTS_EXCHANGE_NAME, "", null, data.toByteArray())
+        channel.basicPublish(GAME_EVENTS_EXCHANGE_NAME, routingKey, null, data.toByteArray())
     }
 
     fun publishServerControl(routingKey: String, serverControl: ServerControl) {
@@ -46,10 +46,10 @@ object Messenger {
         channel.basicPublish(SERVER_CONTROL_EXCHANGE_NAME, routingKey, null, data.toByteArray())
     }
 
-    fun listenGameEvent(queueName: String, callback: (GameEvent) -> Unit) {
+    fun listenGameEvent(queueName: String, bindingKey: String, callback: (GameEvent) -> Unit) {
         channel.queueDeclare(queueName, true, false, false, mapOf("x-queue-type" to "quorum"))
 
-        channel.queueBind(queueName, GAME_EVENTS_EXCHANGE_NAME, "")
+        channel.queueBind(queueName, GAME_EVENTS_EXCHANGE_NAME, bindingKey)
 
         val deliverCallback = DeliverCallback { _, delivery ->
             val message = delivery.body.toString(Charsets.UTF_8)
