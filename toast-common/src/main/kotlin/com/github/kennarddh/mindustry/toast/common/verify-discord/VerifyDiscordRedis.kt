@@ -2,6 +2,8 @@ package com.github.kennarddh.mindustry.toast.common.discovery
 
 import io.github.domgew.kedis.KedisClient
 import io.github.domgew.kedis.KedisConfiguration
+import io.github.domgew.kedis.arguments.SetOptions
+import kotlin.time.Duration.Companion.minutes
 
 object VerifyDiscordRedis {
     lateinit var client: KedisClient
@@ -23,7 +25,13 @@ object VerifyDiscordRedis {
     }
 
     suspend fun set(userID: Int, pin: Int) {
-        client.set(userID.toString(), pin.toString())
+        client.set(
+            userID.toString(), pin.toString(),
+            options = SetOptions(
+                previousKeyHandling = SetOptions.PreviousKeyHandling.OVERRIDE,
+                expire = SetOptions.ExpireOption.ExpiresInSeconds(5.minutes.inWholeSeconds),
+            ),
+        )
     }
 
     suspend fun get(userID: Int): Int? {
