@@ -21,4 +21,12 @@ object LinkDiscordRedis {
 
         client.connect()
     }
+
+    suspend fun set(userID: Int, code: String) {
+        client.set(userID.toString(), code)
+    }
+
+    suspend fun get(userID: Int): String? {
+        return client.get(userID.toString())
+    }
 }
