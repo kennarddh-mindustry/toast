@@ -18,7 +18,7 @@ services:
       SERVER: Survival
       PORT: 6567
     healthcheck:
-      test: [ 'CMD-SHELL', 'ss -lt | grep $PORT' ]
+      test: [ 'CMD-SHELL', 'ss -ltu | grep 6567 | wc -l | grep 2' ]
     depends_on:
       database:
         condition: service_healthy
@@ -50,7 +50,7 @@ services:
       SERVER: Attack
       PORT: 6568
     healthcheck:
-      test: [ 'CMD-SHELL', 'ss -lt | grep $PORT' ]
+      test: [ 'CMD-SHELL', 'ss -ltu | grep 6567 | wc -l | grep 2' ]
     depends_on:
       database:
         condition: service_healthy
