@@ -8,7 +8,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
-import com.github.kennarddh.mindustry.toast.common.discovery.LinkDiscordRedis
+import com.github.kennarddh.mindustry.toast.common.discovery.VerifyDiscordRedis
 import com.github.kennarddh.mindustry.toast.core.commands.validations.LoggedIn
 import com.github.kennarddh.mindustry.toast.core.commons.getUser
 import mindustry.gen.Player
@@ -35,7 +35,7 @@ class UserDiscordVerify : Handler() {
         // 6 digits pin
         val pin = pinSecureRandom.nextInt(100000, 999999)
 
-        LinkDiscordRedis.set(user[Users.id].value, pin.toString())
+        VerifyDiscordRedis.set(user[Users.id].value, pin.toString())
 
         return CommandResult(
             """

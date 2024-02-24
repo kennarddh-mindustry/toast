@@ -6,7 +6,7 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
-import com.github.kennarddh.mindustry.toast.common.discovery.LinkDiscordRedis
+import com.github.kennarddh.mindustry.toast.common.discovery.VerifyDiscordRedis
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
 import com.github.kennarddh.mindustry.toast.common.selectOne
@@ -367,7 +367,7 @@ suspend fun main() {
     DatabaseSettings.init(CoroutineScopes.IO.coroutineContext)
     Messenger.init()
     DiscoveryRedis.init()
-    LinkDiscordRedis.init()
+    VerifyDiscordRedis.init()
 
     addShutdownHook()
 

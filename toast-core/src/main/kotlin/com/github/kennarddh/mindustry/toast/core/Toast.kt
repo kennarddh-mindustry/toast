@@ -5,7 +5,7 @@ import com.github.kennarddh.mindustry.genesis.core.commons.AbstractPlugin
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
-import com.github.kennarddh.mindustry.toast.common.discovery.LinkDiscordRedis
+import com.github.kennarddh.mindustry.toast.common.discovery.VerifyDiscordRedis
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.ToastPlayerParameter
 import com.github.kennarddh.mindustry.toast.core.commands.validations.LoggedIn
@@ -24,7 +24,7 @@ class Toast : AbstractPlugin() {
         DatabaseSettings.init(CoroutineScopes.IO.coroutineContext)
         Messenger.init()
         DiscoveryRedis.init()
-        LinkDiscordRedis.init()
+        VerifyDiscordRedis.init()
 
         GenesisAPI.commandRegistry.registerCommandValidationAnnotation(MinimumRole::class, ::validateMinimumRole)
         GenesisAPI.commandRegistry.registerCommandValidationAnnotation(LoggedIn::class, ::validateLoggedIn)
