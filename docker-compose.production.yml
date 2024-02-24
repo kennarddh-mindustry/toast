@@ -58,6 +58,8 @@ services:
         condition: service_healthy
       discovery-redis:
         condition: service_healthy
+      verify-discord-redis:
+        condition: service_healthy
     restart: unless-stopped
     deploy:
       resources:
@@ -80,6 +82,8 @@ services:
       rabbitmq:
         condition: service_healthy
       discovery-redis:
+        condition: service_healthy
+      verify-discord-redis:
         condition: service_healthy
     restart: unless-stopped
     deploy:
