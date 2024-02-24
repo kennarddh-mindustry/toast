@@ -103,10 +103,10 @@ services:
           memory: 40M
           cpus: '0.2'
 
-  link-discord-redis:
+  verify-discord-redis:
     image: redis:7.2.4-alpine
     volumes:
-      - ./dev/link-discord-redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./dev/verify-discord-redis/redis.conf:/usr/local/etc/redis/redis.conf
     healthcheck:
       test: [ 'CMD-SHELL', 'redis-cli ping | grep PONG' ]
     networks:
