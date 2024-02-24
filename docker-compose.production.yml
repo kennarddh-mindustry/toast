@@ -91,9 +91,7 @@ services:
   discovery-redis:
     image: redis:7.2.4-alpine
     volumes:
-      - ./dev/redis/redis.conf:/usr/local/etc/redis/redis.conf
-    ports:
-      - "6379:6379"
+      - ./dev/discovery-redis/redis.conf:/usr/local/etc/redis/redis.conf
     healthcheck:
       test: [ 'CMD-SHELL', 'redis-cli ping | grep PONG' ]
     networks:
@@ -102,8 +100,23 @@ services:
     deploy:
       resources:
         limits:
-          memory: 50M
-          cpus: '0.4'
+          memory: 40M
+          cpus: '0.2'
+
+  link-discord-redis:
+    image: redis:7.2.4-alpine
+    volumes:
+      - ./dev/link-discord-redis/redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: [ 'CMD-SHELL', 'redis-cli ping | grep PONG' ]
+    networks:
+      - toast
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 40M
+          cpus: '0.2'
 
   database:
     image: mariadb:lts

@@ -5,13 +5,25 @@ services:
   discovery-redis:
     image: redis:7.2.4-alpine
     volumes:
-      - ./dev/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./dev/discovery-redis/redis.conf:/usr/local/etc/redis/redis.conf
     ports:
       - "6379:6379"
     healthcheck:
       test: [ 'CMD-SHELL', 'redis-cli ping | grep PONG' ]
     networks:
       - toast
+
+  link-discord-redis:
+    image: redis:7.2.4-alpine
+    volumes:
+      - ./dev/link-discord-redis/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ 'CMD-SHELL', 'redis-cli ping | grep PONG' ]
+    networks:
+      - toast
+
 
   database:
     image: mariadb:lts
