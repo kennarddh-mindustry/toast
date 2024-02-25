@@ -21,6 +21,8 @@ enum class UserRank(val displayName: String, val minXP: Int) {
     Lancer2("Lancer 2", 53000),
     Lancer3("Lancer 3", 59000);
 
+    override fun toString(): String = this.displayName
+
     companion object {
         val sortedDescending: List<UserRank> = entries.sortedByDescending { it.minXP }
 
