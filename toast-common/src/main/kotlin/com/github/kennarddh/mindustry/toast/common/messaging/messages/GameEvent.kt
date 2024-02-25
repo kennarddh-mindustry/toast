@@ -1,6 +1,7 @@
 package com.github.kennarddh.mindustry.toast.common.messaging.messages
 
 import com.github.kennarddh.mindustry.toast.common.Server
+import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -66,5 +67,5 @@ class ServerStopGameEvent : GameEventBase()
 class ServerRestartGameEvent : GameEventBase()
 
 @Serializable
-data class GameEvent(val server: Server, val time: Long, val data: GameEventBase)
+data class GameEvent(val server: Server, val time: Instant, val data: GameEventBase)
 

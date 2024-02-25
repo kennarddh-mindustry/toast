@@ -15,7 +15,7 @@ class GameEventsHandler : Handler() {
         Messenger.publishGameEvent(
             "${ToastVars.server.name}.stop",
             GameEvent(
-                ToastVars.server, Clock.System.now().toEpochMilliseconds(),
+                ToastVars.server, Clock.System.now(),
                 ServerStopGameEvent()
             )
         )
@@ -29,7 +29,7 @@ class GameEventsHandler : Handler() {
             "${ToastVars.server.name}.player.join",
             GameEvent(
                 ToastVars.server,
-                Clock.System.now().toEpochMilliseconds(),
+                Clock.System.now(),
                 PlayerJoinGameEvent(player.name, player.uuid())
             )
         )
@@ -43,7 +43,7 @@ class GameEventsHandler : Handler() {
             "${ToastVars.server.name}.player.leave",
             GameEvent(
                 ToastVars.server,
-                Clock.System.now().toEpochMilliseconds(),
+                Clock.System.now(),
                 PlayerLeaveGameEvent(player.name, player.uuid())
             )
         )
@@ -59,7 +59,7 @@ class GameEventsHandler : Handler() {
         Messenger.publishGameEvent(
             "${ToastVars.server.name}.player.chat",
             GameEvent(
-                ToastVars.server, Clock.System.now().toEpochMilliseconds(),
+                ToastVars.server, Clock.System.now(),
                 PlayerChatGameEvent(player.name, player.uuid(), event.message.stripFooMessageInvisibleCharacters())
             )
         )

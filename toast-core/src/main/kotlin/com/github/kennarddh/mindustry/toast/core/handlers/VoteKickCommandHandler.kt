@@ -142,7 +142,7 @@ class VoteKickCommandHandler : Handler() {
                     "${ToastVars.server.name}.punishment.vote-kick",
                     GameEvent(
                         ToastVars.server,
-                        Clock.System.now().toEpochMilliseconds(),
+                        Clock.System.now(),
                         PlayerPunishedGameEvent(
                             punishmentID.value,
                             starter!!.name,

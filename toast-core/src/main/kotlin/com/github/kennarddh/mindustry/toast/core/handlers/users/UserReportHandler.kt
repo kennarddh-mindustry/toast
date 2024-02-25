@@ -27,7 +27,7 @@ class UserReportHandler : Handler() {
             Messenger.publishGameEvent(
                 "${ToastVars.server.name}.report",
                 GameEvent(
-                    ToastVars.server, Clock.System.now().toEpochMilliseconds(),
+                    ToastVars.server, Clock.System.now(),
                     PlayerReportedGameEvent(
                         player.name,
                         user?.get(Users.id)?.value,
