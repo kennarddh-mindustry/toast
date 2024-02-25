@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.transactions.TransactionManager
 fun addShutdownHook() {
     Runtime.getRuntime().addShutdownHook(Thread {
         runBlocking {
-            println("Gracefully shutting down")
+            Logger.info("Gracefully shutting down")
 
             jda.shutdown()
 
@@ -21,7 +21,7 @@ fun addShutdownHook() {
 
             TransactionManager.closeAndUnregister(Database.database)
 
-            println("Stopped")
+            Logger.info("Stopped")
         }
     })
 }
