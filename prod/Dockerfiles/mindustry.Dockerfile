@@ -10,4 +10,7 @@ ADD https://github.com/kennarddh-mindustry/genesis/releases/download/v3.0.0-beta
 
 ADD https://github.com/kennarddh-mindustry/toast/releases/download/v0.0.15/toast-core-0.0.15.jar config/mods/toast-core-0.0.15.jar
 
+# For ss command. ss command is used for healthcheck
+RUN apt update && apt install -y iproute2
+
 ENTRYPOINT java -jar server-release.jar
