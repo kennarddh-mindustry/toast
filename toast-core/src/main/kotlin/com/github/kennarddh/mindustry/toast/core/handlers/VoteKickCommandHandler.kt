@@ -65,10 +65,14 @@ class VoteKickCommandHandler : Handler() {
 
     @Command(["vote"])
     @ClientSide
-    suspend fun vote(player: Player, vote: Boolean) {
+    suspend fun vote(player: Player, vote: Boolean): CommandResult? {
+        if (voteSession == null) return CommandResult("No one is currently vote kicked.", CommandResultStatus.Failed)
+
         Call.sendMessage("${player.name} voted ${if (vote) "yes" else "no"} to kick ${target!!.name}.")
 
         voteSession!!.vote(player, vote)
+
+        return null
     }
 
     @Command(["vote-cancel", "vote-kick-cancel", "votekick-cancel"])
