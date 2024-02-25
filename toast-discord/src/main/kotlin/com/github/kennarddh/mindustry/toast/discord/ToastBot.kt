@@ -1,7 +1,7 @@
 package com.github.kennarddh.mindustry.toast.discord
 
 import com.github.kennarddh.mindustry.toast.common.Server
-import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
+import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
@@ -435,7 +435,7 @@ class VerifyDiscordHandler : ListenerAdapter() {
 suspend fun main() {
     Logger.info("Loaded")
 
-    DatabaseSettings.init(CoroutineScopes.IO.coroutineContext, Logger)
+    Database.init(CoroutineScopes.IO.coroutineContext, Logger)
     Messenger.init()
     DiscoveryRedis.init()
     VerifyDiscordRedis.init()

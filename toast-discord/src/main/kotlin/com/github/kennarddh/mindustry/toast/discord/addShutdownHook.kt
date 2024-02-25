@@ -1,6 +1,6 @@
 package com.github.kennarddh.mindustry.toast.discord
 
-import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
+import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 
@@ -12,7 +12,7 @@ fun addShutdownHook() {
 
         jda.shutdown()
 
-        TransactionManager.closeAndUnregister(DatabaseSettings.database)
+        TransactionManager.closeAndUnregister(Database.database)
 
         println("Stopped")
     })

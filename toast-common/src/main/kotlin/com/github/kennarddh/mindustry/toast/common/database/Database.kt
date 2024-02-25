@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.slf4j.Logger
 import kotlin.coroutines.CoroutineContext
 
-object DatabaseSettings {
+object Database {
     lateinit var database: Database
     lateinit var coroutineContext: CoroutineContext
     lateinit var logger: Logger

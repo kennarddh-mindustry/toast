@@ -3,7 +3,7 @@ package com.github.kennarddh.mindustry.toast.core
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commons.AbstractPlugin
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
-import com.github.kennarddh.mindustry.toast.common.database.DatabaseSettings
+import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.verify.discord.VerifyDiscordRedis
@@ -20,7 +20,7 @@ class Toast : AbstractPlugin() {
     override suspend fun onInit() {
         Logger.info("Connecting to external services")
 
-        DatabaseSettings.init(CoroutineScopes.IO.coroutineContext, Logger)
+        Database.init(CoroutineScopes.IO.coroutineContext, Logger)
         Messenger.init()
         DiscoveryRedis.init()
         VerifyDiscordRedis.init()
@@ -62,6 +62,6 @@ class Toast : AbstractPlugin() {
     override suspend fun onDispose() {
         Messenger.close()
 
-        TransactionManager.closeAndUnregister(DatabaseSettings.database)
+        TransactionManager.closeAndUnregister(Database.database)
     }
 }
