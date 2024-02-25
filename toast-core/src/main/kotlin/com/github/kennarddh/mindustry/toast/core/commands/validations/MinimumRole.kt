@@ -32,5 +32,5 @@ suspend fun validateMinimumRole(annotation: Annotation, player: Player?): Boolea
 @Retention(AnnotationRetention.RUNTIME)
 @MustBeDocumented
 @CommandValidation
-@CommandValidationDescription("Command your role must be equal or greater than :minimumRole: to use :commandName:.")
+@CommandValidationDescription("Your role must be equal or greater than :minimumRole: to use :commandName:.")
 annotation class MinimumRole(val minimumRole: UserRole)
