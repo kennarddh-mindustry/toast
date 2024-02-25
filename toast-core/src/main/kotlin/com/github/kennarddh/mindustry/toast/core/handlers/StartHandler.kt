@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 class StartHandler : Handler() {
     @EventHandler
     suspend fun onLoad(event: EventType.ServerLoadEvent) {
-        Logger.info("ServerLoad... Will host in 1 second.")
+        Logger.info("Server load... Will host in 1 second.")
 
         Config.port.set(ToastVars.port)
 
