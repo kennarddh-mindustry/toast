@@ -10,16 +10,20 @@ import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStartGameEvent
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import mindustry.Vars
 import mindustry.game.EventType
 import mindustry.net.Administration.Config
 import mindustry.server.ServerControl
+import kotlin.time.Duration.Companion.seconds
 
 class StartHandler : Handler() {
     @EventHandler
     suspend fun onLoad(event: EventType.ServerLoadEvent) {
         Config.port.set(ToastVars.port)
+
+        delay(1.seconds)
 
         host()
 
@@ -36,11 +40,9 @@ class StartHandler : Handler() {
         runOnMindustryThreadSuspended {
             // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
             Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
-        }
 
-        val map = Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
+            val map = Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
 
-        runOnMindustryThreadSuspended {
             Vars.logic.reset()
 
             ServerControl.instance.lastMode = ToastVars.server.gameMode.mindustryGameMode
