@@ -34,7 +34,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.requests.GatewayIntent
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.alias
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
 import kotlin.time.Duration.Companion.seconds
 
@@ -116,7 +115,7 @@ class GameEventsListener : ListenerAdapter() {
                     val data = it.data as PlayerPunishedGameEvent
 
                     CoroutineScopes.Main.launch {
-                        val userPunishment = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                        val userPunishment = Database.newTransaction {
                             val targetUserAlias = Users.alias("targetUser")
                             val targetMindustryUserAlias = MindustryUser.alias("targetMindustryUser")
 
@@ -377,14 +376,14 @@ class VerifyDiscordHandler : ListenerAdapter() {
             val pin = event.getOption("pin")!!.asInt
 
             CoroutineScopes.Main.launch {
-                newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+                Database.newTransaction {
                     val userWithCurrentDiscord = Users.selectOne { Users.discordID eq event.user.id }
 
                     if (userWithCurrentDiscord != null) {
                         event.reply("This discord account has already been used to verify ${userWithCurrentDiscord[Users.username]} account.")
                             .queue()
 
-                        return@newSuspendedTransaction
+                        return@newTransaction
                     }
 
                     val user = Users.selectOne { Users.username eq username }
@@ -392,14 +391,14 @@ class VerifyDiscordHandler : ListenerAdapter() {
                     if (user == null) {
                         event.reply("Cannot find user with the username $username.").queue()
 
-                        return@newSuspendedTransaction
+                        return@newTransaction
                     }
 
                     if (user[Users.discordID] != null) {
                         event.reply("User ${user[Users.username]} has already verified with other discord account.")
                             .queue()
 
-                        return@newSuspendedTransaction
+                        return@newTransaction
                     }
 
                     val correctPin = VerifyDiscordRedis.get(user[Users.id].value)
@@ -408,13 +407,13 @@ class VerifyDiscordHandler : ListenerAdapter() {
                         event.reply("Cannot find pin generated for the user. Join Toast Mindustry Server and do /verify to generate new pin.")
                             .queue()
 
-                        return@newSuspendedTransaction
+                        return@newTransaction
                     }
 
                     if (correctPin != pin) {
                         event.reply("Wrong pin.").queue()
 
-                        return@newSuspendedTransaction
+                        return@newTransaction
                     }
 
                     VerifyDiscordRedis.del(user[Users.id].value)

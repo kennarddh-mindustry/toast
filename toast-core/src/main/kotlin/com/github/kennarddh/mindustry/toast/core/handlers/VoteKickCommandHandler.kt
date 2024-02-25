@@ -11,6 +11,7 @@ import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
 import com.github.kennarddh.mindustry.toast.common.PunishmentType
 import com.github.kennarddh.mindustry.toast.common.UserRole
+import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserVoteKickVotes
@@ -33,7 +34,6 @@ import mindustry.gen.Groups
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -114,7 +114,7 @@ class VoteKickCommandHandler : Handler() {
 
         Call.sendMessage("Vote kick success. Kicked ${target!!.name} for ${duration.toDisplayString()}.")
 
-        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+        Database.newTransaction {
             val mindustryUser = starter!!.getMindustryUser()!!
             val targetMindustryUser = target!!.getMindustryUser()!!
             val user = starter!!.getUserAndMindustryUserAndUserServerData()

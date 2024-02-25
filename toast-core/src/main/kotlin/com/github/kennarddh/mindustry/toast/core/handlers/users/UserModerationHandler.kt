@@ -12,6 +12,7 @@ import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
 import com.github.kennarddh.mindustry.toast.common.PunishmentType
 import com.github.kennarddh.mindustry.toast.common.UserRole
+import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
@@ -30,7 +31,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import kotlin.time.Duration
 
 class UserModerationHandler : Handler() {
@@ -49,14 +49,14 @@ class UserModerationHandler : Handler() {
     @ServerSide
     @Description("Kick player.")
     suspend fun kick(player: Player? = null, target: Player, duration: Duration, reason: String): CommandResult {
-        return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+        return Database.newTransaction {
             val mindustryUser = player?.getMindustryUser()
             val targetMindustryUser = target.getMindustryUser()!!
             val user = player?.getUserAndMindustryUserAndUserServerData()
             val targetUser = target.getUserAndMindustryUserAndUserServerData()
 
             if (targetUser != null && user != null && user[Users.role] > targetUser[Users.role])
-                return@newSuspendedTransaction CommandResult(
+                return@newTransaction CommandResult(
                     "Your role must be higher than target's role to kick.",
                     CommandResultStatus.Failed
                 )
@@ -116,14 +116,14 @@ class UserModerationHandler : Handler() {
     @ServerSide
     @Description("Ban player.")
     suspend fun ban(player: Player? = null, target: Player, reason: String): CommandResult {
-        return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+        return Database.newTransaction {
             val mindustryUser = player?.getMindustryUser()
             val targetMindustryUser = target.getMindustryUser()!!
             val user = player?.getUserAndMindustryUserAndUserServerData()
             val targetUser = target.getUserAndMindustryUserAndUserServerData()
 
             if (targetUser != null && user != null && user[Users.role] > targetUser[Users.role])
-                return@newSuspendedTransaction CommandResult(
+                return@newTransaction CommandResult(
                     "Your role must be higher than target's role to kick.",
                     CommandResultStatus.Failed
                 )

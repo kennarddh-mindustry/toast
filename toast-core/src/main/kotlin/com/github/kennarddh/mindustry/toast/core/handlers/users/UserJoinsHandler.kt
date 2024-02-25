@@ -2,7 +2,6 @@ package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import arc.util.Strings
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
-import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.commons.priority.PriorityEnum
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
@@ -10,6 +9,7 @@ import com.github.kennarddh.mindustry.genesis.core.server.packets.annotations.Se
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoMessage
 import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
 import com.github.kennarddh.mindustry.toast.common.*
+import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.getUserOptionalAndMindustryUserAndUserServerData
@@ -25,7 +25,6 @@ import mindustry.net.NetConnection
 import mindustry.net.Packets
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.kotlin.datetime.CurrentDateTime
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 class UserJoinsHandler : Handler() {
     private val usidHashFunctionInstance = Argon2Function.getInstance(
@@ -71,7 +70,7 @@ class UserJoinsHandler : Handler() {
 
     @ServerPacketHandler(PriorityEnum.Important)
     suspend fun checkIsSameUserAlreadyJoined(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
-        val user = newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+        val user = Database.newTransaction {
             Users.join(
                 MindustryUserServerData,
                 JoinType.INNER,
@@ -102,7 +101,7 @@ class UserJoinsHandler : Handler() {
     suspend fun onConnectPacket(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
         val ip = con.address.packIP()
 
-        return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+        return Database.newTransaction {
             val mindustryUser = MindustryUser.insertIfNotExistAndGet({
                 MindustryUser.mindustryUUID eq packet.uuid
             }) {
@@ -249,7 +248,7 @@ class UserJoinsHandler : Handler() {
                             """.trimIndent()
                     )
 
-                    return@newSuspendedTransaction false
+                    return@newTransaction false
                 } else if (userPunishment[UserPunishments.type] == PunishmentType.Kick) {
                     val kickTimeLeft =
                         userPunishment[UserPunishments.endAt]!!.toInstant(TimeZone.UTC).minus(Clock.System.now())
@@ -263,7 +262,7 @@ class UserJoinsHandler : Handler() {
                             """.trimIndent()
                     )
 
-                    return@newSuspendedTransaction false
+                    return@newTransaction false
                 } else if (userPunishment[UserPunishments.type] == PunishmentType.VoteKick) {
                     val kickTimeLeft =
                         userPunishment[UserPunishments.endAt]!!.toInstant(TimeZone.UTC).minus(Clock.System.now())
@@ -277,11 +276,11 @@ class UserJoinsHandler : Handler() {
                             """.trimIndent()
                     )
 
-                    return@newSuspendedTransaction false
+                    return@newTransaction false
                 }
             }
 
-            return@newSuspendedTransaction true
+            return@newTransaction true
         }
     }
 
@@ -289,7 +288,7 @@ class UserJoinsHandler : Handler() {
     suspend fun onPlayerConnect(event: EventType.PlayerConnect) {
         val player = event.player
 
-        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+        Database.newTransaction {
             val userAndMindustryUserAndUserServerData = player.getUserOptionalAndMindustryUserAndUserServerData()
 
             val userID = userAndMindustryUserAndUserServerData?.get(Users.id)?.value

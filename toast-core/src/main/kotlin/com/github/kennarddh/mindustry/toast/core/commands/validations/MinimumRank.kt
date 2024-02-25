@@ -2,12 +2,11 @@ package com.github.kennarddh.mindustry.toast.core.commands.validations
 
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validations.CommandValidation
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validations.CommandValidationDescription
-import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.UserRank
+import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
 import mindustry.gen.Player
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 
 suspend fun validateMinimumRank(annotation: Annotation, player: Player?): Boolean {
@@ -18,7 +17,7 @@ suspend fun validateMinimumRank(annotation: Annotation, player: Player?): Boolea
 
     val minimumRank = (annotation as MinimumRank).minimumRank
 
-    return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+    return Database.newTransaction {
         // If user is null it means the user is not logged in
         val mindustryUserAndUserServerData = player.getMindustryUserAndUserServerData()!!
 
@@ -26,7 +25,7 @@ suspend fun validateMinimumRank(annotation: Annotation, player: Player?): Boolea
 
         val rank = UserRank.getRank(xp)
 
-        return@newSuspendedTransaction rank >= minimumRank
+        return@newTransaction rank >= minimumRank
     }
 }
 

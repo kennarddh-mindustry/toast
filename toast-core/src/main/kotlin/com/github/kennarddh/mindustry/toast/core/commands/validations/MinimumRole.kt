@@ -2,12 +2,11 @@ package com.github.kennarddh.mindustry.toast.core.commands.validations
 
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validations.CommandValidation
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validations.CommandValidationDescription
-import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.UserRole
+import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.core.commons.getUser
 import mindustry.gen.Player
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 
 suspend fun validateMinimumRole(annotation: Annotation, player: Player?): Boolean {
@@ -18,13 +17,13 @@ suspend fun validateMinimumRole(annotation: Annotation, player: Player?): Boolea
 
     val minimumRole = (annotation as MinimumRole).minimumRole
 
-    return newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+    return Database.newTransaction {
         // If user is null it means the user is not logged in
-        val user = player.getUser() ?: return@newSuspendedTransaction false
+        val user = player.getUser() ?: return@newTransaction false
 
         val userRole = user[Users.role]
 
-        return@newSuspendedTransaction userRole >= minimumRole
+        return@newTransaction userRole >= minimumRole
     }
 }
 

@@ -7,7 +7,6 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Descript
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
-import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.menus.Menu
@@ -15,6 +14,7 @@ import com.github.kennarddh.mindustry.genesis.core.menus.Menus
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoMessage
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.clearRoleEffect
+import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
@@ -32,7 +32,6 @@ import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
 import java.util.*
 
@@ -108,9 +107,9 @@ class UserAccountHandler : Handler() {
             "[#ff0000]Confirm password is not same as password."
         )
 
-        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+        Database.newTransaction {
             if (Users.exists { Users.username eq username })
-                return@newSuspendedTransaction player.infoMessage(
+                return@newTransaction player.infoMessage(
                     "[#ff0000]Your username is already taken."
                 )
 
@@ -157,14 +156,14 @@ class UserAccountHandler : Handler() {
                 "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers. Min length is 8 and max is 50 characters."
             )
 
-        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+        Database.newTransaction {
             val user = Users.selectOne { Users.username eq username }
-                ?: return@newSuspendedTransaction player.infoMessage(
+                ?: return@newTransaction player.infoMessage(
                     "[#ff0000]User not found."
                 )
 
             if (users.count { it.value.userID == user[Users.id].value } >= 1) {
-                return@newSuspendedTransaction player.infoMessage(
+                return@newTransaction player.infoMessage(
                     "[#ff0000]There is someone with the same user already on this server."
                 )
             }
@@ -173,7 +172,7 @@ class UserAccountHandler : Handler() {
                 !Password.check(password, user[Users.password])
                     .with(passwordHashFunctionInstance)
             )
-                return@newSuspendedTransaction player.infoMessage(
+                return@newTransaction player.infoMessage(
                     "[#ff0000]Wrong password."
                 )
 
@@ -207,7 +206,7 @@ class UserAccountHandler : Handler() {
                 "[#ff0000]You are not logged in."
             )
 
-        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+        Database.newTransaction {
             MindustryUserServerData
                 .update({
                     MindustryUserServerData.userID eq users[player]!!.userID
@@ -232,9 +231,9 @@ class UserAccountHandler : Handler() {
     @MinimumRole(UserRole.Admin)
     @Description("Change someone's role.")
     suspend fun changeRole(player: Player? = null, target: Player, newRole: UserRole): CommandResult =
-        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+        Database.newTransaction {
             val targetUser =
-                target.getUserAndMindustryUserAndUserServerData() ?: return@newSuspendedTransaction CommandResult(
+                target.getUserAndMindustryUserAndUserServerData() ?: return@newTransaction CommandResult(
                     "Target is not logged in.",
                     CommandResultStatus.Failed
                 )
@@ -243,13 +242,13 @@ class UserAccountHandler : Handler() {
                 val playerUser = player.getUserAndMindustryUserAndUserServerData()!!
 
                 if (playerUser[Users.role] <= targetUser[Users.role])
-                    return@newSuspendedTransaction CommandResult(
+                    return@newTransaction CommandResult(
                         "Your role must be higher than target's role to change target's role.",
                         CommandResultStatus.Failed
                     )
 
                 if (playerUser[Users.role] <= newRole)
-                    return@newSuspendedTransaction CommandResult(
+                    return@newTransaction CommandResult(
                         "Your role must be higher than new role.",
                         CommandResultStatus.Failed
                     )
@@ -262,6 +261,6 @@ class UserAccountHandler : Handler() {
             target.clearRoleEffect()
             newRole.applyRoleEffect(target)
 
-            return@newSuspendedTransaction CommandResult("Successfully changed ${targetUser[Users.username]} to $newRole.")
+            return@newTransaction CommandResult("Successfully changed ${targetUser[Users.username]} to $newRole.")
         }
 }

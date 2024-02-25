@@ -7,12 +7,12 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
-import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoPopup
 import com.github.kennarddh.mindustry.toast.common.*
+import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
@@ -26,7 +26,6 @@ import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
 
 
@@ -63,7 +62,7 @@ class UserStatsHandler : Handler() {
             val xpDelta = playersXPDelta[player]!!
             val isPlayerActive = xpDelta > 0
 
-            newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+            Database.newTransaction {
                 // TODO: Only update once even if the player is in multiple servers. Use redis with set ttl to lock which server will generate xp for each player
                 MindustryUserServerData.join(
                     MindustryUser,
@@ -91,7 +90,7 @@ class UserStatsHandler : Handler() {
     }
 
     private suspend fun updateStatsPopup(player: Player) {
-        newSuspendedTransaction(CoroutineScopes.IO.coroutineContext) {
+        Database.newTransaction {
             val mindustryUserServerData = player.getMindustryUserAndUserServerData()!!
 
             val xp = mindustryUserServerData[MindustryUserServerData.xp]
@@ -159,7 +158,7 @@ class UserStatsHandler : Handler() {
     ): CommandResult {
         val computedServer = server ?: ToastVars.server
 
-        return newSuspendedTransaction {
+        return Database.newTransaction {
             when (type) {
                 XPCommandType.get -> {
                     val mindustryUserServerData = MindustryUserServerData
@@ -181,7 +180,7 @@ class UserStatsHandler : Handler() {
                 }
 
                 XPCommandType.add -> {
-                    if (value == null) return@newSuspendedTransaction CommandResult(
+                    if (value == null) return@newTransaction CommandResult(
                         "Value cannot be empty for add subcommand",
                         CommandResultStatus.Failed
                     )
@@ -207,7 +206,7 @@ class UserStatsHandler : Handler() {
                 }
 
                 XPCommandType.set -> {
-                    if (value == null) return@newSuspendedTransaction CommandResult(
+                    if (value == null) return@newTransaction CommandResult(
                         "Value cannot be empty for set subcommand",
                         CommandResultStatus.Failed
                     )
@@ -231,7 +230,7 @@ class UserStatsHandler : Handler() {
                 }
 
                 XPCommandType.remove -> {
-                    if (value == null) return@newSuspendedTransaction CommandResult(
+                    if (value == null) return@newTransaction CommandResult(
                         "Value cannot be empty for remove subcommand",
                         CommandResultStatus.Failed
                     )
