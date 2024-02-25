@@ -1,19 +1,27 @@
 package com.github.kennarddh.mindustry.toast.discord
 
 import com.github.kennarddh.mindustry.toast.common.database.Database
+import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
+import com.github.kennarddh.mindustry.toast.common.verify.discord.VerifyDiscordRedis
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 
 fun addShutdownHook() {
     Runtime.getRuntime().addShutdownHook(Thread {
-        println("Gracefully shutting down")
+        runBlocking {
+            println("Gracefully shutting down")
 
-        Messenger.close()
+            jda.shutdown()
 
-        jda.shutdown()
+            DiscoveryRedis.close()
+            VerifyDiscordRedis.close()
 
-        TransactionManager.closeAndUnregister(Database.database)
+            Messenger.close()
 
-        println("Stopped")
+            TransactionManager.closeAndUnregister(Database.database)
+
+            println("Stopped")
+        }
     })
 }

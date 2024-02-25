@@ -1,6 +1,7 @@
 package com.github.kennarddh.mindustry.toast.common.discovery
 
 import com.github.kennarddh.mindustry.toast.common.Server
+import com.github.kennarddh.mindustry.toast.common.verify.discord.VerifyDiscordRedis
 import io.github.domgew.kedis.KedisClient
 import io.github.domgew.kedis.KedisConfiguration
 import io.github.domgew.kedis.arguments.SetOptions
@@ -45,5 +46,9 @@ object DiscoveryRedis {
         val payload = Json.decodeFromString<DiscoveryPayload>(payloadEncoded)
 
         return payload
+    }
+
+    suspend fun close() {
+        VerifyDiscordRedis.client.closeSuspended()
     }
 }

@@ -41,4 +41,8 @@ object VerifyDiscordRedis {
     suspend fun del(userID: Int) {
         client.del(userID.toString())
     }
+
+    suspend fun close() {
+        client.closeSuspended()
+    }
 }

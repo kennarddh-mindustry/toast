@@ -60,6 +60,9 @@ class Toast : AbstractPlugin() {
     }
 
     override suspend fun onDispose() {
+        DiscoveryRedis.close()
+        VerifyDiscordRedis.close()
+
         Messenger.close()
 
         TransactionManager.closeAndUnregister(Database.database)
