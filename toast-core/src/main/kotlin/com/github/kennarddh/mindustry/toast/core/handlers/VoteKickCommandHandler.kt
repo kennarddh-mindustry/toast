@@ -56,6 +56,7 @@ class VoteKickCommandHandler : Handler() {
             "There must be at least 3 players to start a vote kick.",
             CommandResultStatus.Failed
         )
+        if (player == target) return CommandResult("You cannot vote kick your self.", CommandResultStatus.Failed)
 
         voteSession = VoteSession(1.minutes, player, ::getRequiredVotes, ::onSuccess, ::onTimeout, ::onCancel)
         this.target = target
