@@ -50,8 +50,12 @@ class VoteKickCommandHandler : Handler() {
 
     @Command(["votekick", "voteKick"])
     @ClientSide
-    fun startVoteKick(player: Player, target: Player, reason: String): CommandResult? {
+    suspend fun startVoteKick(player: Player, target: Player, reason: String): CommandResult? {
         if (voteSession != null) return CommandResult("Vote kick is already in progress.", CommandResultStatus.Failed)
+        if (Groups.player.size() < 3) return CommandResult(
+            "There must be at least 3 players to start a vote kick.",
+            CommandResultStatus.Failed
+        )
 
         voteSession = VoteSession(1.minutes, player, ::getRequiredVotes, ::onSuccess, ::onTimeout, ::onCancel)
         this.target = target
@@ -59,6 +63,8 @@ class VoteKickCommandHandler : Handler() {
         this.reason = reason
 
         Call.sendMessage("Vote kick started to kick ${target.name} with the reason \"$reason\".")
+
+        vote(player, true)
 
         return null
     }
@@ -68,7 +74,7 @@ class VoteKickCommandHandler : Handler() {
     suspend fun vote(player: Player, vote: Boolean): CommandResult? {
         if (voteSession == null) return CommandResult("No one is currently vote kicked.", CommandResultStatus.Failed)
 
-        Call.sendMessage("${player.name} voted ${if (vote) "yes" else "no"} to kick ${target!!.name}.")
+        Call.sendMessage("${player.name} voted ${if (vote) "yes" else "no"} to kick ${target!!.name}. ${voteSession!!.votes}/${getRequiredVotes()} votes")
 
         voteSession!!.vote(player, vote)
 
