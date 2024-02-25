@@ -3,6 +3,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers
 import arc.Core
 import arc.util.Reflect
 import arc.util.Timer
+import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThreadSuspended
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
@@ -12,6 +13,7 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStar
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import mindustry.Vars
 import mindustry.game.EventType
@@ -34,15 +36,17 @@ class StartHandler : Handler() {
 
         Logger.info("Hosted")
 
-        Messenger.publishGameEvent(
-            "${ToastVars.server.name}.start",
-            GameEvent(
-                ToastVars.server, Clock.System.now(),
-                ServerStartGameEvent()
+        CoroutineScopes.Main.launch {
+            Messenger.publishGameEvent(
+                "${ToastVars.server.name}.start",
+                GameEvent(
+                    ToastVars.server, Clock.System.now(),
+                    ServerStartGameEvent()
+                )
             )
-        )
 
-        Logger.info("ServerStartGameEvent published")
+            Logger.info("ServerStartGameEvent published")
+        }
     }
 
     private suspend fun host() {
