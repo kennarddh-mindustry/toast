@@ -12,6 +12,7 @@ import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.commons.applyName
 import com.github.kennarddh.mindustry.toast.core.commons.getUserOptionalAndMindustryUserAndUserServerData
 import com.password4j.Argon2Function
 import com.password4j.Password
@@ -295,12 +296,17 @@ class UserJoinsHandler : Handler() {
 
             val mindustryUserID = userAndMindustryUserAndUserServerData?.get(MindustryUser.id)!!.value
 
-            GenesisAPI.getHandler<UserAccountHandler>()!!.users[player] = User(userID, mindustryUserID, player)
+            GenesisAPI.getHandler<UserAccountHandler>()!!.users[player] =
+                User(userID, mindustryUserID, player, player.name)
 
             player.clearRoleEffect()
 
             if (userID != null) {
-                userAndMindustryUserAndUserServerData[Users.role].applyRoleEffect(player)
+                val role = userAndMindustryUserAndUserServerData[Users.role]
+
+                role.applyRoleEffect(player)
+
+                player.applyName(role)
             }
         }
     }

@@ -1,10 +1,12 @@
 package com.github.kennarddh.mindustry.toast.core.commons
 
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
+import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.selectOne
+import com.github.kennarddh.mindustry.toast.core.handlers.users.User
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
@@ -19,14 +21,28 @@ val Player.mindustryServerUserDataWhereClause: Op<Boolean>
  * Cannot be used before user is added to the users map
  */
 fun Player.getUser(): ResultRow? {
-    val userID = GenesisAPI.getHandler<UserAccountHandler>()!!.users[this@getUser]!!.userID
-        ?: return null
+    val userID = getStoredUser()?.userID ?: return null
 
     return Users.selectOne {
         Users.id eq userID
     }
 }
 
+fun Player.getStoredUser(): User? {
+    return GenesisAPI.getHandler<UserAccountHandler>()!!.users[this]
+}
+
+fun Player.applyName(role: UserRole?): Player {
+    val user = getStoredUser()!!
+
+    name = if (role == null) {
+        user.originalName
+    } else {
+        "[accent]<${role.displayName}> [#${color}]${user.originalName}"
+    }
+
+    return this
+}
 
 fun Player.getMindustryUserAndUserServerData() =
     MindustryUserServerData

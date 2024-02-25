@@ -22,6 +22,7 @@ import com.github.kennarddh.mindustry.toast.common.exists
 import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.commons.applyName
 import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
 import com.github.kennarddh.mindustry.toast.core.commons.mindustryServerUserDataWhereClause
 import com.password4j.Argon2Function
@@ -190,6 +191,7 @@ class UserAccountHandler : Handler() {
             users[player]!!.userID = user[Users.id].value
 
             user[Users.role].applyRoleEffect(player)
+            player.applyName(user[Users.role])
 
             player.infoMessage(
                 "[#00ff00]Login success. You are now logged in as ${user[Users.username]}."
@@ -218,6 +220,7 @@ class UserAccountHandler : Handler() {
             users[player]!!.userID = null
 
             player.clearRoleEffect()
+            player.applyName(null)
 
             player.infoMessage(
                 "[#00ff00]Logout success. You are now no longer logged in."
@@ -260,6 +263,7 @@ class UserAccountHandler : Handler() {
 
             target.clearRoleEffect()
             newRole.applyRoleEffect(target)
+            target.applyName(newRole)
 
             return@newTransaction CommandResult("Successfully changed ${targetUser[Users.username]} to $newRole.")
         }
