@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.common.discovery
+package com.github.kennarddh.mindustry.toast.common.verify.discord
 
 import io.github.domgew.kedis.KedisClient
 import io.github.domgew.kedis.KedisConfiguration
