@@ -5,8 +5,10 @@ import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ChatServerControl
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerCommandServerControl
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerControl
+import com.github.kennarddh.mindustry.toast.discord.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.discord.Logger
 import com.github.kennarddh.mindustry.toast.discord.jda
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -56,13 +58,15 @@ object ServerControlListener : ListenerAdapter() {
 
             Logger.info("Routing key \"${server.name}.server-command\"")
 
-            Messenger.publishServerControl(
-                "${server.name}.server-command",
-                ServerControl(
-                    Clock.System.now().toEpochMilliseconds(),
-                    ServerCommandServerControl(command)
+            CoroutineScopes.Main.launch {
+                Messenger.publishServerControl(
+                    "${server.name}.server-command",
+                    ServerControl(
+                        Clock.System.now().toEpochMilliseconds(),
+                        ServerCommandServerControl(command)
+                    )
                 )
-            )
+            }
 
             event.reply("Done").queue()
         } else if (event.name == "send-chat") {
@@ -83,14 +87,16 @@ object ServerControlListener : ListenerAdapter() {
                 return
             }
 
-            Messenger.publishServerControl(
-                "${server.name}.chat",
-                ServerControl(
-                    Clock.System.now().toEpochMilliseconds(),
-                    ChatServerControl(event.user.effectiveName, message)
+            CoroutineScopes.Main.launch {
+                Messenger.publishServerControl(
+                    "${server.name}.chat",
+                    ServerControl(
+                        Clock.System.now().toEpochMilliseconds(),
+                        ChatServerControl(event.user.effectiveName, message)
+                    )
                 )
-            )
-
+            }
+            
             event.reply("Done").queue()
         }
     }

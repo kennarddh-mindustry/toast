@@ -15,7 +15,7 @@ import mindustry.game.EventType
 
 class GameEventsHandler : Handler() {
     @EventHandler
-    fun onPlayerJoin(event: EventType.PlayerJoin) {
+    suspend fun onPlayerJoin(event: EventType.PlayerJoin) {
         val player = event.player
 
         Messenger.publishGameEvent(
@@ -29,7 +29,7 @@ class GameEventsHandler : Handler() {
     }
 
     @EventHandler
-    fun onPlayerLeave(event: EventType.PlayerLeave) {
+    suspend fun onPlayerLeave(event: EventType.PlayerLeave) {
         val player = event.player
 
         Messenger.publishGameEvent(
@@ -43,7 +43,7 @@ class GameEventsHandler : Handler() {
     }
 
     @EventHandler
-    fun onPlayerChat(event: EventType.PlayerChatEvent) {
+    suspend fun onPlayerChat(event: EventType.PlayerChatEvent) {
         val player = event.player
 
         // Ignore client command
