@@ -5,22 +5,15 @@ import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandl
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.extensions.stripFooMessageInvisibleCharacters
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
-import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerChatGameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerJoinGameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerLeaveGameEvent
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kotlinx.datetime.Clock
 import mindustry.game.EventType
 
 class GameEventsHandler : Handler() {
-    override suspend fun onDispose() {
-        Messenger.publishGameEvent(
-            "${ToastVars.server.name}.stop",
-            GameEvent(
-                ToastVars.server, Clock.System.now(),
-                ServerStopGameEvent()
-            )
-        )
-    }
-
     @EventHandler
     fun onPlayerJoin(event: EventType.PlayerJoin) {
         val player = event.player

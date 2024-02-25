@@ -6,12 +6,16 @@ import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStopGameEvent
 import com.github.kennarddh.mindustry.toast.common.verify.discord.VerifyDiscordRedis
 import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.ToastPlayerParameter
 import com.github.kennarddh.mindustry.toast.core.commands.validations.*
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
+import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.handlers.*
 import com.github.kennarddh.mindustry.toast.core.handlers.users.*
+import kotlinx.datetime.Clock
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 
@@ -60,6 +64,14 @@ class Toast : AbstractPlugin() {
     }
 
     override suspend fun onDispose() {
+        Messenger.publishGameEvent(
+            "${ToastVars.server.name}.stop",
+            GameEvent(
+                ToastVars.server, Clock.System.now(),
+                ServerStopGameEvent()
+            )
+        )
+
         DiscoveryRedis.close()
         VerifyDiscordRedis.close()
 
