@@ -8,10 +8,7 @@ import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
 import com.github.kennarddh.mindustry.toast.common.discovery.VerifyDiscordRedis
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.ToastPlayerParameter
-import com.github.kennarddh.mindustry.toast.core.commands.validations.LoggedIn
-import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
-import com.github.kennarddh.mindustry.toast.core.commands.validations.validateLoggedIn
-import com.github.kennarddh.mindustry.toast.core.commands.validations.validateMinimumRole
+import com.github.kennarddh.mindustry.toast.core.commands.validations.*
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.handlers.*
 import com.github.kennarddh.mindustry.toast.core.handlers.users.*
@@ -28,6 +25,7 @@ class Toast : AbstractPlugin() {
 
         GenesisAPI.commandRegistry.registerCommandValidationAnnotation(MinimumRole::class, ::validateMinimumRole)
         GenesisAPI.commandRegistry.registerCommandValidationAnnotation(LoggedIn::class, ::validateLoggedIn)
+        GenesisAPI.commandRegistry.registerCommandValidationAnnotation(MinimumRank::class, ::validateMinimumRank)
         GenesisAPI.commandRegistry.replaceParameterType(Player::class, ToastPlayerParameter())
 
         GenesisAPI.registerHandler(UserAccountHandler())
