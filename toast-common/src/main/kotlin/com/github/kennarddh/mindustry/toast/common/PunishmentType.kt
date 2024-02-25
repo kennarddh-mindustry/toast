@@ -15,5 +15,7 @@ enum class PunishmentType(val displayName: String) {
     Ban("Ban"),
 
     @SerialName("Mute")
-    Mute("Mute")
+    Mute("Mute");
+
+    override fun toString(): String = this.displayName
 }

@@ -20,5 +20,7 @@ enum class Server(
     Attack("Attack", "Toast Attack", GameMode.Attack, 1209544700189610025L, { }, { }),
 
     @SerialName("PvP")
-    PvP("PvP", "Toast Pvp", GameMode.PvP, 1209544729499275295L, { }, { }),
+    PvP("PvP", "Toast Pvp", GameMode.PvP, 1209544729499275295L, { }, { });
+
+    override fun toString(): String = this.displayName
 }

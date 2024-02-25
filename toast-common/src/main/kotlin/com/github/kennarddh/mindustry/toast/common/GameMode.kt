@@ -28,5 +28,7 @@ enum class GameMode(
         buildSpeedMultiplier = 2f
     }, {
         Config.autoPause.set(true)
-    }),
+    });
+
+    override fun toString(): String = this.displayName
 }
