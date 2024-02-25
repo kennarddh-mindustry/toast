@@ -37,6 +37,8 @@ class StartHandler : Handler() {
         Logger.info("Hosted")
 
         CoroutineScopes.Main.launch {
+            Logger.info("ServerStartGameEvent publishing")
+
             Messenger.publishGameEvent(
                 "${ToastVars.server.name}.start",
                 GameEvent(
