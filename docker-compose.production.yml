@@ -18,7 +18,7 @@ services:
       SERVER: Survival
       PORT: 6567
     healthcheck:
-      test: [ 'CMD-SHELL', 'ss -ltu | grep $PORT | wc -l | grep 2' ]
+      test: [ 'CMD-SHELL', 'ss -ltu | grep $$PORT | wc -l | grep 2' ]
       interval: 30s
       timeout: 20s
       retries: 5
@@ -54,7 +54,7 @@ services:
       SERVER: Attack
       PORT: 6568
     healthcheck:
-      test: [ 'CMD-SHELL', 'ss -ltu | grep $PORT | wc -l | grep 2' ]
+      test: [ 'CMD-SHELL', 'ss -ltu | grep $$PORT | wc -l | grep 2' ]
       interval: 30s
       timeout: 20s
       retries: 5
