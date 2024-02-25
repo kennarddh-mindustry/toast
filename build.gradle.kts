@@ -25,7 +25,7 @@ subprojects {
     repositories {
         mavenCentral()
         maven("https://maven.xpdustry.com/releases")
-        maven("https://maven.xpdustry.com/mindustry")
+        maven("https://maven.xpdustry.com/anuken")
 
         maven {
             url = uri("http://23.95.107.12:9999/releases")
