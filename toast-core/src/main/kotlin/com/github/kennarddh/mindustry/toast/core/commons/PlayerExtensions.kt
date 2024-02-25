@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.commons
 
+import arc.math.Mathf
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
@@ -12,6 +13,9 @@ import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.ResultRow
+
+fun Player.distanceFrom(other: Player): Float =
+    Mathf.sqrt(Mathf.pow(x - other.x, 2f) + Mathf.pow(y - other.y, 2f))
 
 val Player.mindustryServerUserDataWhereClause: Op<Boolean>
     get() = con.mindustryServerUserDataWhereClause
