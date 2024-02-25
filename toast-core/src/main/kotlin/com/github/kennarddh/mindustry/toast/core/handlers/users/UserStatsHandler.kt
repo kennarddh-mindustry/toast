@@ -171,9 +171,13 @@ class UserStatsHandler : Handler() {
                         )
                         .selectOne {
                             (MindustryUser.mindustryUUID eq target.uuid()) and (MindustryUserServerData.server eq computedServer)
-                        }!!
+                        }
 
-                    CommandResult("${target.name} has ${mindustryUserServerData[MindustryUserServerData.xp]} xp.")
+                    if (mindustryUserServerData == null) {
+                        CommandResult("${target.name} doesn't have xp in ${computedServer.displayName} server.")
+                    } else {
+                        CommandResult("${target.name} has ${mindustryUserServerData[MindustryUserServerData.xp]} xp.")
+                    }
                 }
 
                 XPCommandType.add -> {
@@ -182,7 +186,7 @@ class UserStatsHandler : Handler() {
                         CommandResultStatus.Failed
                     )
 
-                    MindustryUserServerData.join(
+                    val updatedCount = MindustryUserServerData.join(
                         MindustryUser,
                         JoinType.INNER,
                         onColumn = MindustryUserServerData.mindustryUserID,
@@ -195,7 +199,11 @@ class UserStatsHandler : Handler() {
                         }
                     }
 
-                    CommandResult("Added $value xp to ${target.name}.")
+                    if (updatedCount == 0) {
+                        CommandResult("${target.name} doesn't have xp in ${computedServer.displayName} server.")
+                    } else {
+                        CommandResult("Added $value xp to ${target.name}.")
+                    }
                 }
 
                 XPCommandType.set -> {
@@ -204,7 +212,7 @@ class UserStatsHandler : Handler() {
                         CommandResultStatus.Failed
                     )
 
-                    MindustryUserServerData.join(
+                    val updatedCount = MindustryUserServerData.join(
                         MindustryUser,
                         JoinType.INNER,
                         onColumn = MindustryUserServerData.mindustryUserID,
@@ -215,7 +223,11 @@ class UserStatsHandler : Handler() {
                         it[MindustryUserServerData.xp] = value
                     }
 
-                    CommandResult("Set ${target.name} xp to $value.")
+                    if (updatedCount == 0) {
+                        CommandResult("${target.name} doesn't have xp in ${computedServer.displayName} server.")
+                    } else {
+                        CommandResult("Set ${target.name} xp to $value.")
+                    }
                 }
 
                 XPCommandType.remove -> {
@@ -224,7 +236,7 @@ class UserStatsHandler : Handler() {
                         CommandResultStatus.Failed
                     )
 
-                    MindustryUserServerData.join(
+                    val updatedCount = MindustryUserServerData.join(
                         MindustryUser,
                         JoinType.INNER,
                         onColumn = MindustryUserServerData.mindustryUserID,
@@ -237,7 +249,11 @@ class UserStatsHandler : Handler() {
                         }
                     }
 
-                    CommandResult("Removed $value xp from ${target.name}.")
+                    if (updatedCount == 0) {
+                        CommandResult("${target.name} doesn't have xp in ${computedServer.displayName} server.")
+                    } else {
+                        CommandResult("Removed $value xp from ${target.name}.")
+                    }
                 }
             }
         }
