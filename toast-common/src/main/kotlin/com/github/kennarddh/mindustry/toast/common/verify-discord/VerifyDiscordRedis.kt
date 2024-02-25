@@ -37,4 +37,8 @@ object VerifyDiscordRedis {
     suspend fun get(userID: Int): Int? {
         return client.get(userID.toString())?.toInt()
     }
+
+    suspend fun del(userID: Int) {
+        client.del(userID.toString())
+    }
 }

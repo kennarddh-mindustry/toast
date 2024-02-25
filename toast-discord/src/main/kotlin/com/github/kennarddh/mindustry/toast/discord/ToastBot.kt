@@ -417,6 +417,8 @@ class VerifyDiscordHandler : ListenerAdapter() {
                         return@newSuspendedTransaction
                     }
 
+                    VerifyDiscordRedis.del(user[Users.id].value)
+
                     Users.update({
                         Users.id eq user[Users.id]
                     }) {
