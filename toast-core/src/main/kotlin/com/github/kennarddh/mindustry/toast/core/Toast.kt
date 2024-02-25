@@ -18,15 +18,21 @@ import org.jetbrains.exposed.sql.transactions.TransactionManager
 @Suppress("unused")
 class Toast : AbstractPlugin() {
     override suspend fun onInit() {
+        Logger.info("Connecting to external services")
+
         DatabaseSettings.init(CoroutineScopes.IO.coroutineContext)
         Messenger.init()
         DiscoveryRedis.init()
         VerifyDiscordRedis.init()
 
+        Logger.info("Registering command and parameter")
+
         GenesisAPI.commandRegistry.registerCommandValidationAnnotation(MinimumRole::class, ::validateMinimumRole)
         GenesisAPI.commandRegistry.registerCommandValidationAnnotation(LoggedIn::class, ::validateLoggedIn)
         GenesisAPI.commandRegistry.registerCommandValidationAnnotation(MinimumRank::class, ::validateMinimumRank)
         GenesisAPI.commandRegistry.replaceParameterType(Player::class, ToastPlayerParameter())
+
+        Logger.info("Registering handlers")
 
         GenesisAPI.registerHandler(UserAccountHandler())
         GenesisAPI.registerHandler(UserJoinsHandler())
