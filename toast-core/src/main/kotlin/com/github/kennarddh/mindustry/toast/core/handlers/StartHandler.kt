@@ -4,7 +4,7 @@ import arc.Core
 import arc.util.Reflect
 import arc.util.Timer
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
-import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThreadSuspended
+import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThread
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
@@ -34,8 +34,6 @@ class StartHandler : Handler() {
 
         host()
 
-        Logger.info("Hosted")
-
         CoroutineScopes.Main.launch {
             Logger.info("ServerStartGameEvent publishing")
 
@@ -51,8 +49,8 @@ class StartHandler : Handler() {
         }
     }
 
-    private suspend fun host() {
-        runOnMindustryThreadSuspended {
+    private fun host() {
+        runOnMindustryThread {
             // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
             Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
 
@@ -68,6 +66,8 @@ class StartHandler : Handler() {
             Vars.logic.play()
 
             Vars.netServer.openServer()
+
+            Logger.info("Hosted")
         }
     }
 }
