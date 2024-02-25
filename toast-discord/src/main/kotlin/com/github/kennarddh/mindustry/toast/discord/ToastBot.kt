@@ -25,7 +25,7 @@ suspend fun main() {
     Logger.info("Loaded")
 
     Database.init(CoroutineScopes.IO.coroutineContext, Logger)
-    Messenger.init()
+    Messenger.init(CoroutineScopes.IO.coroutineContext)
     DiscoveryRedis.init()
     VerifyDiscordRedis.init()
 

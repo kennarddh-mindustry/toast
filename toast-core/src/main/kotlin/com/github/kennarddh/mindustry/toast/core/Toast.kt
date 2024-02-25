@@ -25,7 +25,7 @@ class Toast : AbstractPlugin() {
         Logger.info("Connecting to external services")
 
         Database.init(CoroutineScopes.IO.coroutineContext, Logger)
-        Messenger.init()
+        Messenger.init(CoroutineScopes.IO.coroutineContext)
         DiscoveryRedis.init()
         VerifyDiscordRedis.init()
 

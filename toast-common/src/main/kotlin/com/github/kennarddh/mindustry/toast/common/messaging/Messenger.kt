@@ -3,8 +3,10 @@ package com.github.kennarddh.mindustry.toast.common.messaging
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerControl
 import com.rabbitmq.client.*
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlin.coroutines.CoroutineContext
 
 
 object Messenger {
@@ -12,8 +14,11 @@ object Messenger {
     private const val SERVER_CONTROL_EXCHANGE_NAME = "ServerControl"
     private lateinit var connection: Connection
     private lateinit var channel: Channel
+    private lateinit var coroutineContext: CoroutineContext
 
-    fun init() {
+    fun init(coroutineContext: CoroutineContext) {
+        this.coroutineContext = coroutineContext
+
         val uri = System.getenv("RABBITMQ_URI")
 
         val connectionFactory = ConnectionFactory()
@@ -34,16 +39,20 @@ object Messenger {
         connection.close()
     }
 
-    fun publishGameEvent(routingKey: String, gameEvent: GameEvent) {
-        val data = Json.encodeToString(gameEvent)
+    suspend fun publishGameEvent(routingKey: String, gameEvent: GameEvent) {
+        withContext(coroutineContext) {
+            val data = Json.encodeToString(gameEvent)
 
-        channel.basicPublish(GAME_EVENTS_EXCHANGE_NAME, routingKey, null, data.toByteArray())
+            channel.basicPublish(GAME_EVENTS_EXCHANGE_NAME, routingKey, null, data.toByteArray())
+        }
     }
 
-    fun publishServerControl(routingKey: String, serverControl: ServerControl) {
-        val data = Json.encodeToString(serverControl)
+    suspend fun publishServerControl(routingKey: String, serverControl: ServerControl) {
+        withContext(coroutineContext) {
+            val data = Json.encodeToString(serverControl)
 
-        channel.basicPublish(SERVER_CONTROL_EXCHANGE_NAME, routingKey, null, data.toByteArray())
+            channel.basicPublish(SERVER_CONTROL_EXCHANGE_NAME, routingKey, null, data.toByteArray())
+        }
     }
 
     fun listenGameEvent(queueName: String, bindingKey: String, callback: (GameEvent) -> Unit) {
