@@ -5,15 +5,21 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.slf4j.Logger
 import kotlin.coroutines.CoroutineContext
 
 object DatabaseSettings {
     lateinit var database: Database
+    lateinit var coroutineContext: CoroutineContext
+    lateinit var logger: Logger
 
-    suspend fun init(coroutineContext: CoroutineContext) {
+    suspend fun init(coroutineContext: CoroutineContext, logger: Logger) {
+        this.coroutineContext = coroutineContext
+        this.logger = logger
+
         val config = HikariConfig()
 
         config.minimumIdle = 2
@@ -28,9 +34,7 @@ object DatabaseSettings {
 
         database = Database.connect(dataSource)
 
-        newSuspendedTransaction(coroutineContext) {
-            addLogger(StdOutSqlLogger)
-
+        newTransaction {
             SchemaUtils.createMissingTablesAndColumns(Users)
             SchemaUtils.createMissingTablesAndColumns(MindustryUser)
             SchemaUtils.createMissingTablesAndColumns(MindustryUserServerData)
@@ -40,4 +44,12 @@ object DatabaseSettings {
             SchemaUtils.createMissingTablesAndColumns(UserVoteKickVotes)
         }
     }
+
+    suspend fun <T> newTransaction(log: Boolean = true, statement: suspend Transaction.() -> T): T =
+        newSuspendedTransaction(coroutineContext, database) {
+            if (log)
+                addLogger(SimpleSqlLogger(logger))
+
+            statement(this)
+        }
 }
