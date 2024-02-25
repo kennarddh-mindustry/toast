@@ -5,26 +5,13 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.common.verify.discord.VerifyDiscordRedis
 import com.github.kennarddh.mindustry.toast.discord.CoroutineScopes
-import com.github.kennarddh.mindustry.toast.discord.jda
 import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import net.dv8tion.jda.api.interactions.commands.OptionType
-import net.dv8tion.jda.api.interactions.commands.build.Commands
 import org.jetbrains.exposed.sql.update
 
 
 object VerifyDiscordHandler : ListenerAdapter() {
-    override fun onReady(event: ReadyEvent) {
-        jda.updateCommands()
-            .addCommands(
-                Commands.slash("verify", "Verify your mindustry account with discord")
-                    .addOption(OptionType.STRING, "username", "Mindustry account username.", true)
-                    .addOption(OptionType.INTEGER, "pin", "Pin.", true)
-            ).queue()
-    }
-
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (event.name == "verify") {
             val username = event.getOption("username")!!.asString

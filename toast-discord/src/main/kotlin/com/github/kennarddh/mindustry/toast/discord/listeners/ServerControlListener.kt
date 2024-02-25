@@ -7,42 +7,13 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerComm
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerControl
 import com.github.kennarddh.mindustry.toast.discord.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.discord.Logger
-import com.github.kennarddh.mindustry.toast.discord.jda
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
-import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
-import net.dv8tion.jda.api.interactions.commands.OptionType
-import net.dv8tion.jda.api.interactions.commands.build.Commands
-import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
 
 object ServerControlListener : ListenerAdapter() {
-    override fun onReady(event: ReadyEvent) {
-        val serverOptionData = OptionData(OptionType.STRING, "server", "Server").setRequired(true)
-
-        Server.entries.forEach {
-            serverOptionData.addChoice(it.displayName, it.name)
-        }
-
-        jda.updateCommands()
-            .addCommands(
-                Commands.slash("send-server-command", "Send server command to a mindustry server")
-                    .addOptions(serverOptionData)
-                    .addOption(OptionType.STRING, "command", "Command to send.", true)
-                    .setDefaultPermissions(
-                        DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)
-                    )
-            ).addCommands(
-                Commands.slash("send-chat", "Send chat message to a mindustry server")
-                    .addOptions(serverOptionData)
-                    .addOption(OptionType.STRING, "message", "Message to send.", true)
-            ).queue()
-    }
-
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (event.name == "send-server-command") {
             val serverString = event.getOption("server")!!.asString
@@ -96,7 +67,7 @@ object ServerControlListener : ListenerAdapter() {
                     )
                 )
             }
-            
+
             event.reply("Done").queue()
         }
     }
