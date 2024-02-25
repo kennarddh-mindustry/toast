@@ -435,7 +435,7 @@ class VerifyDiscordHandler : ListenerAdapter() {
 suspend fun main() {
     Logger.info("Loaded")
 
-    DatabaseSettings.init(CoroutineScopes.IO.coroutineContext)
+    DatabaseSettings.init(CoroutineScopes.IO.coroutineContext, Logger)
     Messenger.init()
     DiscoveryRedis.init()
     VerifyDiscordRedis.init()
