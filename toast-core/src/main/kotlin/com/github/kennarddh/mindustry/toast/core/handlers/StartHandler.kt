@@ -9,6 +9,7 @@ import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStartGameEvent
+import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
@@ -21,11 +22,17 @@ import kotlin.time.Duration.Companion.seconds
 class StartHandler : Handler() {
     @EventHandler
     suspend fun onLoad(event: EventType.ServerLoadEvent) {
+        Logger.info("ServerLoad... Will host in 1 second.")
+
         Config.port.set(ToastVars.port)
 
         delay(1.seconds)
 
+        Logger.info("Hosting")
+
         host()
+
+        Logger.info("Hosted")
 
         Messenger.publishGameEvent(
             "${ToastVars.server.name}.start",
@@ -34,6 +41,8 @@ class StartHandler : Handler() {
                 ServerStartGameEvent()
             )
         )
+
+        Logger.info("ServerStartGameEvent published")
     }
 
     private suspend fun host() {
