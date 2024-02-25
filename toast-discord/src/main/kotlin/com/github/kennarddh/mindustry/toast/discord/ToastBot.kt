@@ -367,7 +367,7 @@ class VerifyDiscordHandler : ListenerAdapter() {
             .addCommands(
                 Commands.slash("verify", "Verify your mindustry account with discord")
                     .addOption(OptionType.STRING, "username", "Mindustry account username.", true)
-                    .addOption(OptionType.NUMBER, "pin", "Pin.", true)
+                    .addOption(OptionType.INTEGER, "pin", "Pin.", true)
             ).queue()
     }
 
@@ -411,7 +411,7 @@ class VerifyDiscordHandler : ListenerAdapter() {
                         return@newSuspendedTransaction
                     }
 
-                    if (correctPin == pin) {
+                    if (correctPin != pin) {
                         event.reply("Wrong pin.").queue()
 
                         return@newSuspendedTransaction
