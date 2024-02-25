@@ -32,6 +32,7 @@ class DiscoveryHandler : Handler() {
             if (Vars.state.serverTps == -1) 60 else Vars.state.serverTps,
             uptime,
             Vars.state.map.name(),
+            Vars.state.isPaused,
             host
         )
 

@@ -47,6 +47,7 @@ object DiscoveryHandler : ListenerAdapter() {
                         appendLine("\tTPS: ${discoveryPayload.tps}")
                         appendLine("\tGame mode: ${it.gameMode.name}")
                         appendLine("\tMap: ${discoveryPayload.map}")
+                        appendLine("\tIs Paused: ${if (discoveryPayload.isPaused) ":green_square:" else ":red_square:"}")
                         appendLine("\tPlayers: ${discoveryPayload.players.size}")
                     }
                 }.trimEnd('\n')

@@ -11,6 +11,7 @@ data class DiscoveryPayload(
     val tps: Int,
     val uptime: Duration,
     val map: String,
+    val isPaused: Boolean,
     val host: String,
 ) {
     override fun equals(other: Any?): Boolean {
@@ -24,6 +25,8 @@ data class DiscoveryPayload(
         if (tps != other.tps) return false
         if (uptime != other.uptime) return false
         if (map != other.map) return false
+        if (isPaused != other.isPaused) return false
+        if (host != other.host) return false
 
         return true
     }
@@ -34,6 +37,8 @@ data class DiscoveryPayload(
         result = 31 * result + tps
         result = 31 * result + uptime.hashCode()
         result = 31 * result + map.hashCode()
+        result = 31 * result + isPaused.hashCode()
+        result = 31 * result + host.hashCode()
         return result
     }
 }
