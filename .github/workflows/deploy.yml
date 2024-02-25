@@ -50,11 +50,11 @@ jobs:
           echo "TOAST_COMMON_ARTIFACT_PATH=$(./gradlew :toast-common:getArtifactPath -q)" >> $GITHUB_ENV
           echo "TOAST_DISCORD_ARTIFACT_PATH=$(./gradlew :toast-discord:getArtifactPath -q)" >> $GITHUB_ENV
 
-      - name: Publish
-        run: |
-          ./gradlew publish \
-          -PreposiliteUsername=${{ secrets.MAVEN_NAME }} \
-          -PreposilitePassword=${{ secrets.MAVEN_SECRET }}
+      #      - name: Publish
+      #        run: |
+      #          ./gradlew publish \
+      #          -PreposiliteUsername=${{ secrets.MAVEN_NAME }} \
+      #          -PreposilitePassword=${{ secrets.MAVEN_SECRET }}
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
