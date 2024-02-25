@@ -10,26 +10,29 @@ fun Player.clearRoleEffect() {
 
 @Serializable
 enum class UserRole(
+    val displayName: String,
     val applyRoleEffect: mindustry.gen.Player.() -> Unit,
 ) {
     @SerialName("Player")
-    Player({ }),
+    Player("Player", { }),
 
     @SerialName("Mod")
-    Mod({ }),
+    Mod("Mod", { }),
 
     @SerialName("Admin")
-    Admin({
+    Admin("Admin", {
         admin = true
     }),
 
     @SerialName("CoOwner")
-    CoOwner({
+    CoOwner("CoOwner", {
         admin = true
     }),
 
     @SerialName("Owner")
-    Owner({
+    Owner("Owner", {
         admin = true
-    }),
+    });
+
+    override fun toString(): String = this.displayName
 }
