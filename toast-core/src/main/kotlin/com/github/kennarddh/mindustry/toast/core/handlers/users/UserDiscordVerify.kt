@@ -40,6 +40,7 @@ class UserDiscordVerify : Handler() {
         return CommandResult(
             """
             Your pin is $pin.
+            Do not share your pin to anyone.
             Do /verify in Toast Mindustry discord and enter your pin to be verified.
             Your pin will expire in 5 minutes.
             Do /discord to join Toast Mindustry discord.
