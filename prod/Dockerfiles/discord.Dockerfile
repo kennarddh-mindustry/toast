@@ -2,6 +2,6 @@ FROM eclipse-temurin:17
 
 WORKDIR /app
 
-ADD https://github.com/kennarddh-mindustry/toast/releases/download/v0.0.20/toast-discord-0.0.20.jar bot.jar
+ADD https://github.com/kennarddh-mindustry/toast/releases/download/v0.0.21/toast-discord-0.0.21.jar bot.jar
 
 ENTRYPOINT java -jar bot.jar
