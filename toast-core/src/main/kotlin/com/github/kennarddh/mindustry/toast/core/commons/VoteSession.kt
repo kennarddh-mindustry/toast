@@ -46,23 +46,34 @@ class VoteSession(
     suspend fun vote(player: Player, vote: Boolean) {
         backingVoted[player] = vote
 
-        if (votes >= getRequiredVotes())
+        if (votes >= getRequiredVotes()) {
+            task.cancel()
+
             onSuccess()
+        }
     }
 
     suspend fun cancel() {
+        task.cancel()
+
         onCancel()
     }
 
     suspend fun onPlayerLeave(player: Player) {
         backingVoted.remove(player)
 
-        if (votes >= getRequiredVotes())
+        if (votes >= getRequiredVotes()) {
+            task.cancel()
+
             onSuccess()
+        }
     }
 
     suspend fun onPlayerJoin(player: Player) {
-        if (votes >= getRequiredVotes())
+        if (votes >= getRequiredVotes()) {
+            task.cancel()
+
             onSuccess()
+        }
     }
 }
