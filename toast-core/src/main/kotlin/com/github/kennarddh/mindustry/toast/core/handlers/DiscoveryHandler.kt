@@ -9,10 +9,12 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import mindustry.Vars
 import mindustry.gen.Groups
+import java.io.IOException
 import java.net.URL
 
 class DiscoveryHandler : Handler() {
     lateinit var serverStart: Instant
+    var publicIP: String? = null
 
     override suspend fun onInit() {
         serverStart = Clock.System.now()
@@ -22,7 +24,13 @@ class DiscoveryHandler : Handler() {
     suspend fun onUpdateDiscovery() {
         val uptime = Clock.System.now() - serverStart
 
-        val publicIP = URL("http://checkip.amazonaws.com").readText().trim('\n')
+        if (publicIP == null) {
+            publicIP = try {
+                URL("http://checkip.amazonaws.com").readText().trim('\n')
+            } catch (err: IOException) {
+                null
+            }
+        }
 
         val host = "${publicIP}:${ToastVars.port}"
 
@@ -33,7 +41,7 @@ class DiscoveryHandler : Handler() {
             uptime,
             Vars.state.map.name(),
             Vars.state.isPaused,
-            host
+            if (publicIP == null) null else host
         )
 
         DiscoveryRedis.post(ToastVars.server, payload)

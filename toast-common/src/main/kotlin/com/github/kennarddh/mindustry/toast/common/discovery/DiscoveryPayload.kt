@@ -12,7 +12,7 @@ data class DiscoveryPayload(
     val uptime: Duration,
     val map: String,
     val isPaused: Boolean,
-    val host: String,
+    val host: String?,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
