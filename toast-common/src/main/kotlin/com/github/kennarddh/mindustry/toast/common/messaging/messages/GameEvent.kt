@@ -26,7 +26,7 @@ data class PlayerLeaveGameEvent(val playerMindustryName: String, val playerMindu
 @SerialName("PlayerChat")
 data class PlayerChatGameEvent(
     val playerMindustryName: String,
-    val playerMindustryUUID: String,
+    val playerMindustryUUID: String?,
     val message: String
 ) :
     GameEventBase()
