@@ -6,6 +6,7 @@ import com.rabbitmq.client.*
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.slf4j.Logger
 import kotlin.coroutines.CoroutineContext
 
 
@@ -15,9 +16,11 @@ object Messenger {
     private lateinit var connection: Connection
     private lateinit var channel: Channel
     private lateinit var coroutineContext: CoroutineContext
+    private lateinit var logger: Logger
 
-    fun init(coroutineContext: CoroutineContext) {
+    fun init(coroutineContext: CoroutineContext, logger: Logger) {
         this.coroutineContext = coroutineContext
+        this.logger = logger
 
         val uri = System.getenv("RABBITMQ_URI")
 
@@ -64,7 +67,11 @@ object Messenger {
             val message = delivery.body.toString(Charsets.UTF_8)
             val data = Json.decodeFromString<GameEvent>(message)
 
-            callback(data)
+            try {
+                callback(data)
+            } catch (error: Exception) {
+                logger.error("Unknown GameEvent listener for queue $queueName error.", error)
+            }
         }
 
         channel.basicConsume(queueName, true, deliverCallback) { _ -> }
@@ -79,7 +86,11 @@ object Messenger {
             val message = delivery.body.toString(Charsets.UTF_8)
             val data = Json.decodeFromString<ServerControl>(message)
 
-            callback(data)
+            try {
+                callback(data)
+            } catch (error: Exception) {
+                logger.error("Unknown ServerControl listener for queue $queueName error.", error)
+            }
         }
 
         channel.basicConsume(queueName, true, deliverCallback) { _ -> }
