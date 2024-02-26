@@ -102,8 +102,12 @@ services:
 
   discovery-redis:
     image: redis:7.2.4-alpine
+    command: >
+      --requirepass $$REDIS_PASS
+    env_file:
+      - ./prod/.env.discovery-redis
     volumes:
-      - ./dev/discovery-redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./prod/discovery-redis/redis.conf:/usr/local/etc/redis/redis.conf
     healthcheck:
       test: [ 'CMD-SHELL', 'redis-cli ping | grep PONG' ]
     networks:
@@ -117,8 +121,12 @@ services:
 
   verify-discord-redis:
     image: redis:7.2.4-alpine
+    command: >
+      --requirepass $$REDIS_PASS
+    env_file:
+      - ./prod/.env.verify-discord-redis
     volumes:
-      - ./dev/verify-discord-redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./prod/verify-discord-redis/redis.conf:/usr/local/etc/redis/redis.conf
     healthcheck:
       test: [ 'CMD-SHELL', 'redis-cli ping | grep PONG' ]
     networks:
