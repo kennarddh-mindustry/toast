@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
+import arc.util.Strings
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
@@ -53,7 +54,10 @@ class GameEventsHandler : Handler() {
             "${ToastVars.server.name}.player.chat",
             GameEvent(
                 ToastVars.server, Clock.System.now(),
-                PlayerChatGameEvent(player.name, player.uuid(), event.message.stripFooMessageInvisibleCharacters())
+                PlayerChatGameEvent(
+                    player.name, player.uuid(),
+                    Strings.stripColors(event.message.stripFooMessageInvisibleCharacters())
+                )
             )
         )
     }
