@@ -111,7 +111,7 @@ services:
     volumes:
       - ./prod/discovery-redis/redis.conf:/usr/local/etc/redis/redis.conf
     healthcheck:
-      test: [ 'CMD-SHELL', 'redis-cli ping | grep PONG' ]
+      test: [ 'CMD-SHELL', 'redis-cli --pass $$REDIS_PASS ping | grep PONG' ]
     networks:
       - toast
     restart: unless-stopped
@@ -132,7 +132,7 @@ services:
     volumes:
       - ./prod/verify-discord-redis/redis.conf:/usr/local/etc/redis/redis.conf
     healthcheck:
-      test: [ 'CMD-SHELL', 'redis-cli ping | grep PONG' ]
+      test: [ 'CMD-SHELL', 'redis-cli --pass $$REDIS_PASS ping | grep PONG' ]
     networks:
       - toast
     restart: unless-stopped
