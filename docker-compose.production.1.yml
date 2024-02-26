@@ -102,7 +102,7 @@ services:
 
   discovery-redis:
     image: redis:7.2.4-alpine
-    command: redis-server /usr/local/etc/redis/redis.conf --requirepass $$REDIS_PASS
+    command: redis-server --requirepass $$REDIS_PASS /usr/local/etc/redis/redis.conf
     ports:
       - "6379:6379"
     env_file:
@@ -122,7 +122,7 @@ services:
 
   verify-discord-redis:
     image: redis:7.2.4-alpine
-    command: redis-server /usr/local/etc/redis/redis.conf --requirepass $$REDIS_PASS
+    command: redis-server --requirepass $$REDIS_PASS /usr/local/etc/redis/redis.conf
     ports:
       - "6380:6379"
     env_file:
