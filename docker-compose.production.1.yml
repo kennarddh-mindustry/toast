@@ -104,6 +104,8 @@ services:
     image: redis:7.2.4-alpine
     command: >
       --requirepass $$REDIS_PASS
+    ports:
+      - "6379:6379"
     env_file:
       - ./prod/.env.discovery-redis
     volumes:
@@ -123,6 +125,8 @@ services:
     image: redis:7.2.4-alpine
     command: >
       --requirepass $$REDIS_PASS
+    ports:
+      - "6380:6379"
     env_file:
       - ./prod/.env.verify-discord-redis
     volumes:
