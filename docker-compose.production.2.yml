@@ -17,10 +17,5 @@ services:
           memory: 40M
           cpus: '0.5'
 
-volumes:
-  data:
-  rabbitmq-data:
-  portainer-data:
-
 networks:
   toast:
