@@ -180,9 +180,27 @@ services:
           memory: 300M
           cpus: '1'
 
+  portainer:
+    image: portainer/portainer-ce:latest
+    ports:
+      - "8000:8000"
+      - "9443:9443"
+    volumes:
+      - portainer-data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - toast
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+          cpus: '0.5'
+
 volumes:
   data:
   rabbitmq-data:
+  portainer-data:
 
 networks:
   toast:
