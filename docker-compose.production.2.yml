@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  portainer-agent:
+    image: portainer/agent:2.19.4
+    ports:
+      - "9001:9001"
+    volumes:
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - toast
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 40M
+          cpus: '0.5'
+
+volumes:
+  data:
+  rabbitmq-data:
+  portainer-data:
+
+networks:
+  toast:
