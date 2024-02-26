@@ -35,7 +35,7 @@ services:
       resources:
         limits:
           memory: 400M
-          cpus: 1
+          cpus: '1'
 
   attack-server:
     build:
@@ -73,7 +73,7 @@ services:
       resources:
         limits:
           memory: 400M
-          cpus: 1
+          cpus: '1'
 
   discord-bot:
     build:
@@ -98,7 +98,7 @@ services:
       resources:
         limits:
           memory: 400M
-          cpus: 1
+          cpus: '1'
 
   discovery-redis:
     image: redis:7.2.4-alpine
@@ -156,7 +156,7 @@ services:
       resources:
         limits:
           memory: 300M
-          cpus: 1
+          cpus: '1'
 
   rabbitmq:
     image: rabbitmq:3.12-management
@@ -178,7 +178,7 @@ services:
       resources:
         limits:
           memory: 300M
-          cpus: 1
+          cpus: '1'
 
 volumes:
   data:
