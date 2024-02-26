@@ -21,7 +21,7 @@ class ServerControlHandler : Handler() {
                     Logger.warn("Command from ServerCommandServerControl should not be empty")
                 }
             } else if (data is ChatServerControl) {
-                Call.sendMessage("[gold]<Discord> [accent][${data.sender}][]: ${data.message}")
+                Call.sendMessage("[gold]<Discord> [accent][${data.sender}][white]: ${data.message}")
             }
         }
     }
