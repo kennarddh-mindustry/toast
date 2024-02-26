@@ -31,7 +31,7 @@ class ToastPlayerParameter : CommandParameter<Player> {
         }
 
         if (inputInt == null)
-            return Groups.player.find { it.name == input }
+            return Groups.player.find { it.plainName() == input }
                 ?: throw CommandParameterParsingException("Cannot convert $input into player for parameter :parameterName:. Cannot find player with the name $input.")
 
         return Database.newTransaction {
