@@ -174,7 +174,7 @@ services:
     image: rabbitmq:3.12-management
     hostname: rabbitmq
     ports:
-      - "127.0.0.1:5672:5672"
+      - "5672:5672"
       - "15672:15672"
     volumes:
       - ./prod/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
