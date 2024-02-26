@@ -102,7 +102,7 @@ services:
 
   discovery-redis:
     image: redis:7.2.4-alpine
-    command: redis-server /usr/local/etc/redis/redis.conf --requirepass "$$REDIS_PASS"
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass $REDIS_PASS
     ports:
       - "6379:6379"
     env_file:
@@ -110,7 +110,7 @@ services:
     volumes:
       - ./prod/discovery-redis/redis.conf:/usr/local/etc/redis/redis.conf
     healthcheck:
-      test: [ 'CMD-SHELL', 'redis-cli --pass $$REDIS_PASS ping | grep PONG' ]
+      test: [ 'CMD-SHELL', 'redis-cli -a $REDIS_PASS ping | grep PONG' ]
     networks:
       - toast
     restart: unless-stopped
@@ -122,7 +122,7 @@ services:
 
   verify-discord-redis:
     image: redis:7.2.4-alpine
-    command: redis-server /usr/local/etc/redis/redis.conf --requirepass "$$REDIS_PASS"
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass $REDIS_PASS
     ports:
       - "6380:6379"
     env_file:
@@ -130,7 +130,7 @@ services:
     volumes:
       - ./prod/verify-discord-redis/redis.conf:/usr/local/etc/redis/redis.conf
     healthcheck:
-      test: [ 'CMD-SHELL', 'redis-cli --pass $$REDIS_PASS ping | grep PONG' ]
+      test: [ 'CMD-SHELL', 'redis-cli -a $REDIS_PASS ping | grep PONG' ]
     networks:
       - toast
     restart: unless-stopped
