@@ -4,8 +4,6 @@ import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.parameters.types.CommandParameter
 import com.github.kennarddh.mindustry.genesis.core.commands.parameters.types.CommandParameterParsingException
 import com.github.kennarddh.mindustry.toast.common.database.Database
-import com.github.kennarddh.mindustry.toast.common.database.tables.Users
-import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
 import mindustry.gen.Groups
 import mindustry.gen.Player
@@ -35,20 +33,13 @@ class ToastPlayerParameter : CommandParameter<Player> {
                 ?: throw CommandParameterParsingException("Cannot convert $input into player for parameter :parameterName:. Cannot find player with the name $input.")
 
         return Database.newTransaction {
-            val user = Users.selectOne {
-                Users.id eq inputInt
-            }
+            val player =
+                GenesisAPI.getHandler<UserAccountHandler>()!!.users.filter { it.value.userID == inputInt }.keys.firstOrNull()
 
-            if (user == null)
-                throw CommandParameterParsingException("Cannot convert $input into player for parameter :parameterName:. Cannot find player with the id $inputInt.")
-
-            val storedUser =
-                GenesisAPI.getHandler<UserAccountHandler>()!!.users.filter { it.value.userID == user[Users.id].value }.keys.firstOrNull()
-
-            if (storedUser == null)
+            if (player == null)
                 throw CommandParameterParsingException("Cannot convert $input into active player for parameter :parameterName:. Player with the id $inputInt is not here.")
 
-            storedUser
+            player
         }
     }
 
