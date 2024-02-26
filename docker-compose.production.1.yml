@@ -151,7 +151,7 @@ services:
       - data:/var/lib/mysql
     command: bash -c "chmod 644 /etc/mysql/*.cnf && /usr/local/bin/docker-entrypoint.sh mysqld"
     ports:
-      - "127.0.0.1:3306:3306"
+      - "3306:3306"
     healthcheck:
       test:
         [
