@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
+import arc.util.Strings
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
@@ -29,9 +30,9 @@ class UserReportHandler : Handler() {
                 GameEvent(
                     ToastVars.server, Clock.System.now(),
                     PlayerReportedGameEvent(
-                        player.name,
+                        Strings.stripColors(player.name),
                         user?.get(Users.id)?.value,
-                        target.name,
+                        Strings.stripColors(target.name),
                         targetUser?.get(Users.id)?.value,
                         reason
                     )

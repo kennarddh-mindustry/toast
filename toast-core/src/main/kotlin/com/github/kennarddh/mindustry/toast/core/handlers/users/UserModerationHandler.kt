@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
+import arc.util.Strings
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
@@ -99,7 +100,7 @@ class UserModerationHandler : Handler() {
                         Clock.System.now(),
                         PlayerPunishedGameEvent(
                             punishmentID.value,
-                            player?.name ?: "Server",
+                            Strings.stripColors(player?.name ?: "Server"),
                             target.name
                         )
                     )
@@ -163,7 +164,7 @@ class UserModerationHandler : Handler() {
                         Clock.System.now(),
                         PlayerPunishedGameEvent(
                             punishmentID.value,
-                            player?.name ?: "Server",
+                            Strings.stripColors(player?.name ?: "Server"),
                             target.name
                         )
                     )

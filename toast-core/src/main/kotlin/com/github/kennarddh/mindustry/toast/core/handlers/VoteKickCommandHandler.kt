@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
+import arc.util.Strings
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
@@ -156,8 +157,8 @@ class VoteKickCommandHandler : Handler() {
                         Clock.System.now(),
                         PlayerPunishedGameEvent(
                             punishmentID.value,
-                            starter!!.name,
-                            target!!.name
+                            Strings.stripColors(starter!!.name),
+                            Strings.stripColors(target!!.name)
                         )
                     )
                 )
