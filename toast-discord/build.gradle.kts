@@ -77,8 +77,12 @@ tasks.register<JavaExec>("runBot") {
     environment("RABBITMQ_URI", "amqp://root:root@localhost:5672")
     environment("DISCOVERY_REDIS_HOST", "localhost")
     environment("DISCOVERY_REDIS_PORT", "6379")
+    environment("DISCOVERY_REDIS_USERNAME", "root")
+    environment("DISCOVERY_REDIS_PASSWORD", "root")
     environment("VERIFY_DISCORD_REDIS_HOST", "localhost")
     environment("VERIFY_DISCORD_REDIS_PORT", "6380")
+    environment("VERIFY_DISCORD_REDIS_USERNAME", "root")
+    environment("VERIFY_DISCORD_REDIS_PASSWORD", "root")
     environment("ENABLE_DEV_SERVER_LIST", "false")
 
     doFirst {
