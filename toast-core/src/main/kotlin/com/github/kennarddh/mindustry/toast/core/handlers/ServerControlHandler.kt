@@ -34,7 +34,7 @@ class ServerControlHandler : Handler() {
                         GameEvent(
                             ToastVars.server, Clock.System.now(),
                             PlayerChatGameEvent(
-                                data.sender,
+                                "<Discord> ${data.sender}",
                                 null,
                                 data.message
                             )
