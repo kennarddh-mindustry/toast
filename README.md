@@ -1,4 +1,5 @@
 # Toast
+[![Deploy](https://github.com/kennarddh-mindustry/toast/actions/workflows/deploy.yml/badge.svg)](https://github.com/kennarddh-mindustry/toast/actions/workflows/deploy.yml)
 
 Toast Mindustry Server
 
