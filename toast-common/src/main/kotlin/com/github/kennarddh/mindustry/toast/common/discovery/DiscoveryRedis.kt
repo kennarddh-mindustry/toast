@@ -19,15 +19,16 @@ object DiscoveryRedis {
                     host = System.getenv("DISCOVERY_REDIS_HOST"),
                     port = System.getenv("DISCOVERY_REDIS_PORT").toInt(),
                 ),
-                authentication = KedisConfiguration.Authentication.AutoAuth(
-                    System.getenv("DISCOVERY_REDIS_USERNAME"),
-                    System.getenv("DISCOVERY_REDIS_PASSWORD")
-                ),
+                authentication = KedisConfiguration.Authentication.NoAutoAuth,
                 connectionTimeoutMillis = 20000,
             ),
         )
 
         client.connect()
+        client.auth(
+            System.getenv("DISCOVERY_REDIS_USERNAME"),
+            System.getenv("DISCOVERY_REDIS_PASSWORD")
+        )
     }
 
     suspend fun post(server: Server, payload: DiscoveryPayload) {

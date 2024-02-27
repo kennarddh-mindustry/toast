@@ -16,15 +16,16 @@ object VerifyDiscordRedis {
                     host = System.getenv("VERIFY_DISCORD_REDIS_HOST"),
                     port = System.getenv("VERIFY_DISCORD_REDIS_PORT").toInt(),
                 ),
-                authentication = KedisConfiguration.Authentication.AutoAuth(
-                    System.getenv("VERIFY_DISCORD_REDIS_USERNAME"),
-                    System.getenv("VERIFY_DISCORD_REDIS_PASSWORD"),
-                ),
+                authentication = KedisConfiguration.Authentication.NoAutoAuth,
                 connectionTimeoutMillis = 20000,
             ),
         )
 
         client.connect()
+        client.auth(
+            System.getenv("VERIFY_DISCORD_REDIS_USERNAME"),
+            System.getenv("VERIFY_DISCORD_REDIS_PASSWORD"),
+        )
     }
 
     suspend fun set(userID: Int, pin: Int) {
