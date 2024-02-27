@@ -102,15 +102,14 @@ services:
 
   discovery-redis:
     image: redis:7.2.4-alpine
-    entrypoint: [ "redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "$$REDIS_PASS" ]
+    command: redis-server /usr/local/etc/redis/redis.conf
     ports:
       - "6379:6379"
-    env_file:
-      - ./prod/.env.discovery-redis
     volumes:
       - ./prod/discovery-redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./prod/discovery-redis/users.acl:/usr/local/etc/redis/users.acl
     healthcheck:
-      test: [ 'CMD-SHELL', 'redis-cli -a $$REDIS_PASS ping | grep PONG' ]
+      test: [ 'CMD-SHELL', 'redis-cli ping | grep PONG' ]
     networks:
       - toast
     restart: unless-stopped
@@ -122,15 +121,14 @@ services:
 
   verify-discord-redis:
     image: redis:7.2.4-alpine
-    entrypoint: [ "redis-server", "/usr/local/etc/redis/redis.conf", "--requirepass", "$$REDIS_PASS" ]
+    command: redis-server /usr/local/etc/redis/redis.conf
     ports:
       - "6380:6379"
-    env_file:
-      - ./prod/.env.verify-discord-redis
     volumes:
       - ./prod/verify-discord-redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./prod/verify-discord-redis/users.acl:/usr/local/etc/redis/users.acl
     healthcheck:
-      test: [ 'CMD-SHELL', 'redis-cli -a $$REDIS_PASS ping | grep PONG' ]
+      test: [ 'CMD-SHELL', 'redis-cli ping | grep PONG' ]
     networks:
       - toast
     restart: unless-stopped

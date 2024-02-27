@@ -49,3 +49,5 @@ bin/
 /prod/.env.discord
 /prod/.env.rabbitmq
 /prod/maps/
+/prod/discovery-redis/users.acl
+/prod/verify-discord-redis/users.acl
