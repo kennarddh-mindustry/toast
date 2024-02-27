@@ -16,12 +16,14 @@ class MessageHandler : Handler() {
     @ClientSide
     @Description("Send a message to a player. Won't be logged in Discord.")
     fun whisper(player: Player, target: Player, message: String) {
-        val computedMessage = Vars.netServer.chatFormatter.format(player, message)
+        val computedMessage = Vars.netServer.chatFormatter.format(player, "[accent]<W> [white]$message")
 
         Logger.info("${player.name} whisper(${target.name}): $computedMessage")
 
         player.sendMessage(computedMessage)
         target.sendMessage(computedMessage)
+
+        Groups.player
     }
 
     @Command(["broadcast", "b"])
@@ -30,7 +32,7 @@ class MessageHandler : Handler() {
     fun broadcast(player: Player, @GTE(1) range: Float, message: String) {
         val filteredMessage = Vars.netServer.admins.filterMessage(player, message) ?: return
 
-        val computedMessage = Vars.netServer.chatFormatter.format(player, filteredMessage)
+        val computedMessage = Vars.netServer.chatFormatter.format(player, "[accent]<B> [white]$message")
         val tileRange = Vars.tilesize * range
 
         Logger.info("${player.name} broadcast(${tileRange}): $filteredMessage")
