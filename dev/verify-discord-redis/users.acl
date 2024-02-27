@@ -1,2 +1,2 @@
-user default off
-user root +@all on >root
+user default -@all +ping on nopass
+user root +get +set +expire ~* on >root
