@@ -20,8 +20,8 @@ object DiscoveryRedis {
                     port = System.getenv("DISCOVERY_REDIS_PORT").toInt(),
                 ),
                 authentication = KedisConfiguration.Authentication.AutoAuth(
-                    System.getenv("DISCOVERY_REDIS_USERNAME"),
-                    System.getenv("DISCOVERY_REDIS_PASSWORD")
+                    username = System.getenv("DISCOVERY_REDIS_USERNAME"),
+                    password = System.getenv("DISCOVERY_REDIS_PASSWORD")
                 ),
                 connectionTimeoutMillis = 20000,
             ),

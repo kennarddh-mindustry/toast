@@ -17,8 +17,8 @@ object VerifyDiscordRedis {
                     port = System.getenv("VERIFY_DISCORD_REDIS_PORT").toInt(),
                 ),
                 authentication = KedisConfiguration.Authentication.AutoAuth(
-                    System.getenv("VERIFY_DISCORD_REDIS_USERNAME"),
-                    System.getenv("VERIFY_DISCORD_REDIS_PASSWORD"),
+                    username = System.getenv("VERIFY_DISCORD_REDIS_USERNAME"),
+                    password = System.getenv("VERIFY_DISCORD_REDIS_PASSWORD"),
                 ),
                 connectionTimeoutMillis = 20000,
             ),
