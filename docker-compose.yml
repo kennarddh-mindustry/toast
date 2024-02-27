@@ -6,6 +6,7 @@ services:
     image: redis:7.2.4-alpine
     volumes:
       - ./dev/discovery-redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./dev/verify-discord-redis/users.acl:/usr/local/etc/redis/users.acl
     command: redis-server /usr/local/etc/redis/redis.conf
     ports:
       - "6379:6379"
@@ -18,6 +19,7 @@ services:
     image: redis:7.2.4-alpine
     volumes:
       - ./dev/verify-discord-redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./dev/verify-discord-redis/users.acl:/usr/local/etc/redis/users.acl
     command: redis-server /usr/local/etc/redis/redis.conf
     ports:
       - "6380:6379"
