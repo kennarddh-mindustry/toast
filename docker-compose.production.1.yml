@@ -193,8 +193,6 @@ services:
     ports:
       - "8000:8000"
       - "9443:9443"
-    healthcheck:
-      test: "wget --no-check-certificate --no-verbose --tries=1 --spider --header='Content-Type:application/json' http://127.0.0.1:9000/api/system/status || exit 1 || exit 1"
     volumes:
       - portainer-data:/data
       - /var/run/docker.sock:/var/run/docker.sock
