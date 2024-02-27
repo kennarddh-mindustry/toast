@@ -116,7 +116,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 40M
+          memory: 15M
           cpus: '0.2'
 
   verify-discord-redis:
@@ -135,7 +135,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 40M
+          memory: 15M
           cpus: '0.2'
 
   database:
