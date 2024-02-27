@@ -189,7 +189,7 @@ services:
           cpus: '1'
 
   portainer:
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer-ce:2.19.4-alpine
     ports:
       - "8000:8000"
       - "9443:9443"

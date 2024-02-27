@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   portainer-agent:
-    image: portainer/agent:2.19.4
+    image: portainer/agent:2.19.4-alpine
     ports:
       - "9001:9001"
     volumes:
