@@ -19,7 +19,7 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
 
     private val sessionMutex = Mutex()
 
-    protected fun start(initiator: Player, objective: T): Boolean {
+    protected suspend fun start(initiator: Player, objective: T): Boolean {
         if (session != null) {
             initiator.sendMessage("[#ff0000]There is $name vote in progress.")
 
@@ -40,7 +40,11 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
 
         session = VoteSession(initiator, objective, task)
 
-        Call.sendMessage("[#00ff00]${initiator.plainName()} started $name vote. ${session!!.votes}/${getRequiredVotes()} is required.")
+        vote(initiator, true)
+
+        sessionMutex.withLock {
+            Call.sendMessage("[#00ff00]${initiator.plainName()} started $name vote. ${session!!.votes}/${getRequiredVotes()} is required.")
+        }
 
         return true
     }
