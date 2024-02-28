@@ -46,7 +46,7 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
 
     protected open fun canPlayerStart(player: Player, session: T): Boolean = true
 
-    protected abstract fun onSuccess()
+    protected abstract suspend fun onSuccess(session: VoteSession<T>)
 
     protected suspend fun vote(player: Player, vote: Boolean): Boolean {
         sessionMutex.withLock {
@@ -97,7 +97,9 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
             if (session!!.votes >= getRequiredVotes()) {
                 Call.sendMessage("[#00ff00]The $name vote succeeded.")
 
-                onSuccess()
+                onSuccess(session!!)
+
+                cleanUp()
             }
         }
     }
