@@ -59,7 +59,7 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
                 return false
             }
 
-            if (canPlayerVote(player, session!!)) {
+            if (!canPlayerVote(player, session!!)) {
                 player.sendMessage("[#ff0000]You cannot vote in $name vote.")
 
                 return false
