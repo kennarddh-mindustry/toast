@@ -11,7 +11,6 @@ import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandl
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.menus.Menu
 import com.github.kennarddh.mindustry.genesis.core.menus.Menus
-import com.github.kennarddh.mindustry.genesis.standard.extensions.infoMessage
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.clearRoleEffect
 import com.github.kennarddh.mindustry.toast.common.database.Database
@@ -23,6 +22,7 @@ import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.applyName
+import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
 import com.github.kennarddh.mindustry.toast.core.commons.mindustryServerUserDataWhereClause
 import com.password4j.Argon2Function
@@ -34,11 +34,8 @@ import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.update
-import java.util.*
 
 class UserAccountHandler : Handler() {
-    val users: MutableMap<Player, User> = Collections.synchronizedMap(mutableMapOf())
-
     private val passwordHashFunctionInstance = Argon2Function.getInstance(
         4096, 10, 2, 64, Argon2.ID
     )
@@ -68,50 +65,52 @@ class UserAccountHandler : Handler() {
 
     @EventHandler
     fun onPlayerLeave(event: EventType.PlayerLeave) {
-        users.remove(event.player)
+        Entities.players.remove(event.player)
     }
 
     @Command(["register"])
     @ClientSide
     @Description("Register.")
-    suspend fun register(player: Player) {
-        if (users[player]!!.userID != null)
-            return player.sendMessage(
-                "[#ff0000]You are already logged in."
-            )
+    suspend fun register(player: Player): CommandResult {
+        val playerData = Entities.players[player]
+            ?: return CommandResult("Cannot find user. Please try again later.", CommandResultStatus.Failed)
+
+        if (playerData.userID != null)
+            return CommandResult("You are already logged in.", CommandResultStatus.Failed)
 
         val output = registerMenu.open(player)
-            ?: return player.infoMessage(
-                "[#ff0000]Register canceled."
-            )
+            ?: return CommandResult("Register canceled.", CommandResultStatus.Failed)
 
         val username = output["username"]!!
         val password = output["password"]!!
         val confirmPassword = output["confirmPassword"]!!
 
         if (!username.matches(usernameRegex))
-            return player.infoMessage(
-                "[#ff0000]Invalid username. Username may only contains lowercase, uppercase, and numbers. Min length is 1 and max is 50 characters."
+            return CommandResult(
+                "Invalid username. Username may only contains lowercase, uppercase, and numbers. Min length is 1 and max is 50 characters.",
+                CommandResultStatus.Failed
             )
 
         if (!password.matches(passwordRegex))
-            return player.infoMessage(
-                "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers. Min length is 8 and max is 50 characters."
+            return CommandResult(
+                "Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers. Min length is 8 and max is 50 characters.",
+                CommandResultStatus.Failed
             )
 
         if (!confirmPassword.matches(passwordRegex))
-            return player.infoMessage(
-                "[#ff0000]Invalid confirm password. Confirm password may only contains lowercase, uppercase, symbols, and numbers."
+            return CommandResult(
+                "Invalid confirm password. Confirm password may only contains lowercase, uppercase, symbols, and numbers. Min length is 8 and max is 50 characters.",
+                CommandResultStatus.Failed
             )
 
-        if (confirmPassword != password) return player.infoMessage(
-            "[#ff0000]Confirm password is not same as password."
-        )
+        if (confirmPassword != password)
+            return CommandResult("Confirm password is not same as password.", CommandResultStatus.Failed)
 
-        Database.newTransaction {
+        return Database.newTransaction {
             if (Users.exists { Users.username eq username })
-                return@newTransaction player.infoMessage(
-                    "[#ff0000]Your username is already taken."
+                return@newTransaction CommandResult(
+                    "Your username is already taken.",
+                    CommandResultStatus.Failed
                 )
 
             val hashedPassword = Password.hash(SecureString(password.toCharArray()))
@@ -124,57 +123,54 @@ class UserAccountHandler : Handler() {
                 it[this.role] = UserRole.Player
             }
 
-            player.infoMessage(
-                "[#00ff00]Register success. Login with /login to use your account."
-            )
+            CommandResult("Register success. Login with /login to use your account.")
         }
     }
 
     @Command(["login"])
     @ClientSide
     @Description("Login.")
-    suspend fun login(player: Player) {
-        if (users[player]!!.userID != null)
-            return player.sendMessage(
-                "[#ff0000]You are already logged in."
-            )
+    suspend fun login(player: Player): CommandResult {
+        val playerData = Entities.players[player]
+            ?: return CommandResult("Cannot find user. Please try again later.", CommandResultStatus.Failed)
+
+        if (playerData.userID != null)
+            return CommandResult("You are already logged in.", CommandResultStatus.Failed)
 
         val output = loginMenu.open(player)
-            ?: return player.infoMessage(
-                "[#ff0000]Login canceled."
-            )
+            ?: return CommandResult("Login cancelled.", CommandResultStatus.Failed)
 
         val username = output["username"]!!
         val password = output["password"]!!
 
         if (!username.matches(usernameRegex))
-            return player.infoMessage(
-                "[#ff0000]Invalid username. Username may only contains lowercase, uppercase, and numbers. Min length is 1 and max is 50 characters."
+            return CommandResult(
+                "Invalid username. Username may only contains lowercase, uppercase, and numbers. Min length is 1 and max is 50 characters.",
+                CommandResultStatus.Failed
             )
 
         if (!password.matches(passwordRegex))
-            return player.infoMessage(
-                "[#ff0000]Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers. Min length is 8 and max is 50 characters."
+            return CommandResult(
+                "Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers. Min length is 8 and max is 50 characters.",
+                CommandResultStatus.Failed
             )
 
-        Database.newTransaction {
+        return Database.newTransaction {
             val user = Users.selectOne { Users.username eq username }
-                ?: return@newTransaction player.infoMessage(
-                    "[#ff0000]User not found."
+                ?: return@newTransaction CommandResult(
+                    "User not found.", CommandResultStatus.Failed
                 )
 
-            if (users.count { it.value.userID == user[Users.id].value } >= 1) {
-                return@newTransaction player.infoMessage(
-                    "[#ff0000]There is someone with the same user already on this server."
+            if (Entities.players.count { it.value.userID == user[Users.id].value } >= 1) {
+                return@newTransaction CommandResult(
+                    "There is someone with the same user already on this server.",
+                    CommandResultStatus.Failed
                 )
             }
 
-            if (
-                !Password.check(password, user[Users.password])
-                    .with(passwordHashFunctionInstance)
-            )
-                return@newTransaction player.infoMessage(
-                    "[#ff0000]Wrong password."
+            if (!Password.check(password, user[Users.password]).with(passwordHashFunctionInstance))
+                return@newTransaction CommandResult(
+                    "Wrong password.", CommandResultStatus.Failed
                 )
 
             MindustryUserServerData
@@ -188,13 +184,14 @@ class UserAccountHandler : Handler() {
                     it[MindustryUserServerData.userID] = user[Users.id]
                 }
 
-            users[player]!!.userID = user[Users.id].value
+            playerData.userID = user[Users.id].value
+            playerData.userID = user[Users.id].value
 
             user[Users.role].applyRoleEffect(player)
             player.applyName(user[Users.role])
 
-            player.infoMessage(
-                "[#00ff00]Login success. You are now logged in as ${user[Users.username]}."
+            CommandResult(
+                "Login success. You are now logged in as ${user[Users.username]}."
             )
         }
     }
@@ -202,29 +199,28 @@ class UserAccountHandler : Handler() {
     @Command(["logout"])
     @ClientSide
     @Description("Logout.")
-    suspend fun logout(player: Player) {
-        if (users[player]!!.userID == null)
-            return player.sendMessage(
-                "[#ff0000]You are not logged in."
-            )
+    suspend fun logout(player: Player): CommandResult {
+        val playerData = Entities.players[player]
+            ?: return CommandResult("Cannot find user. Please try again later.", CommandResultStatus.Failed)
 
-        Database.newTransaction {
+        if (playerData.userID == null)
+            return CommandResult("You are not logged in.", CommandResultStatus.Failed)
+
+        return Database.newTransaction {
             MindustryUserServerData
                 .update({
-                    MindustryUserServerData.userID eq users[player]!!.userID
+                    MindustryUserServerData.userID eq playerData.userID
                     MindustryUserServerData.server eq ToastVars.server
                 }) {
                     it[userID] = null
                 }
 
-            users[player]!!.userID = null
+            playerData.userID = null
 
             player.clearRoleEffect()
             player.applyName(null)
 
-            player.infoMessage(
-                "[#00ff00]Logout success. You are now no longer logged in."
-            )
+            CommandResult("Logout success. You are now no longer logged in.")
         }
     }
 
