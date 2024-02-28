@@ -116,7 +116,7 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
     /**
      * Must be called with locked sessionMutex
      */
-    private suspend fun cleanUp() {
+    private fun cleanUp() {
         session!!.task.cancel()
         println("CANCEL")
 
