@@ -14,11 +14,10 @@ import kotlin.coroutines.CoroutineContext
 object Database {
     lateinit var database: Database
     lateinit var coroutineContext: CoroutineContext
-    lateinit var logger: Logger
 
     suspend fun init(coroutineContext: CoroutineContext, logger: Logger) {
         this.coroutineContext = coroutineContext
-        this.logger = logger
+        SimpleSqlLogger.logger = logger
 
         val config = HikariConfig()
 
@@ -48,7 +47,7 @@ object Database {
     suspend fun <T> newTransaction(log: Boolean = true, statement: suspend Transaction.() -> T): T =
         newSuspendedTransaction(coroutineContext, database) {
             if (log)
-                addLogger(SimpleSqlLogger(logger))
+                addLogger(SimpleSqlLogger)
 
             statement(this)
         }
