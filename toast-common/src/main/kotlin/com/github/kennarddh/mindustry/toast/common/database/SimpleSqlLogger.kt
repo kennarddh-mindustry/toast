@@ -8,6 +8,6 @@ import org.slf4j.Logger
 
 class SimpleSqlLogger(val logger: Logger) : SqlLogger {
     override fun log(context: StatementContext, transaction: Transaction) {
-        logger.info("SQL: ${context.expandArgs(transaction)}")
+        logger.debug("SQL: ${context.expandArgs(transaction)}")
     }
 }
