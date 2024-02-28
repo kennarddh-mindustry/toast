@@ -43,7 +43,13 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
         vote(initiator, true)
 
         sessionMutex.withLock {
-            Call.sendMessage("[#00ff00]${initiator.plainName()} started $name vote. ${session!!.votes}/${getRequiredVotes()} is required.")
+            Call.sendMessage(
+                """
+                [#00ff00]${initiator.plainName()} started $name vote.
+                ${session!!.votes}/${getRequiredVotes()} is required.
+                ${getSessionDetails(session!!)}
+                """.trimIndent()
+            )
         }
 
         return true
@@ -56,6 +62,8 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
     protected open fun canPlayerStart(player: Player, session: T): Boolean = true
 
     protected abstract suspend fun onSuccess(session: VoteSession<T>)
+
+    protected abstract suspend fun getSessionDetails(session: VoteSession<T>): String
 
     protected suspend fun vote(player: Player, vote: Boolean): Boolean {
         sessionMutex.withLock {
