@@ -4,8 +4,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validati
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validations.CommandValidationDescription
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.Database
-import com.github.kennarddh.mindustry.toast.common.database.tables.Users
-import com.github.kennarddh.mindustry.toast.core.commons.getUser
+import com.github.kennarddh.mindustry.toast.core.commons.safeGetPlayerData
 import mindustry.gen.Player
 
 
@@ -19,11 +18,11 @@ suspend fun validateMinimumRole(annotation: Annotation, player: Player?): Boolea
 
     return Database.newTransaction {
         // If user is null it means the user is not logged in
-        val user = player.getUser() ?: return@newTransaction false
+        val playerData = player.safeGetPlayerData() ?: return@newTransaction false
 
-        val userRole = user[Users.role]
+        val role = playerData.role ?: return@newTransaction false
 
-        return@newTransaction userRole >= minimumRole
+        return@newTransaction role >= minimumRole
     }
 }
 
