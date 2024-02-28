@@ -1,6 +1,5 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
-import arc.util.Strings
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
@@ -71,7 +70,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
             """.trimIndent()
         )
 
-        Call.sendMessage("Vote kick success. Kicked ${session.objective.target.name} for ${duration.toDisplayString()}.")
+        Call.sendMessage("Vote kick success. Kicked ${session.objective.target.plainName()} for ${duration.toDisplayString()}.")
 
         Database.newTransaction {
             val mindustryUser = session.initiator.getMindustryUser()!!
@@ -115,8 +114,8 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
                         Clock.System.now(),
                         PlayerPunishedGameEvent(
                             punishmentID.value,
-                            Strings.stripColors(session.initiator.name),
-                            Strings.stripColors(session.objective.target.name)
+                            session.initiator.plainName(),
+                            session.objective.target.plainName()
                         )
                     )
                 )
