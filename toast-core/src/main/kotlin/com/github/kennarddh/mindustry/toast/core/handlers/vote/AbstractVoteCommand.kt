@@ -8,14 +8,17 @@ import com.github.kennarddh.mindustry.toast.common.toDisplayString
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import mindustry.game.EventType.PlayerJoin
-import mindustry.game.EventType.PlayerLeave
+import mindustry.game.EventType.*
 import mindustry.gen.Call
 import mindustry.gen.Groups
 import mindustry.gen.Player
 import kotlin.time.Duration
 
-abstract class AbstractVoteCommand<T : Any>(val name: String, protected val timeout: Duration) : Handler() {
+abstract class AbstractVoteCommand<T : Any>(
+    val name: String,
+    protected val timeout: Duration,
+    val resetOnPlay: Boolean = true
+) : Handler() {
     private var session: VoteSession<T>? = null
 
     private val sessionMutex = Mutex()
@@ -155,5 +158,12 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
     @EventHandler
     suspend fun onPlayerJoin(event: PlayerJoin) {
         checkIsRequiredVoteReached()
+    }
+
+    @EventHandler
+    suspend fun onPlay(event: PlayEvent) {
+        sessionMutex.withLock {
+            cleanUp()
+        }
     }
 }
