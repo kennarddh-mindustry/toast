@@ -1,10 +1,9 @@
 package com.github.kennarddh.mindustry.toast.core.commands.paramaters.types
 
-import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.parameters.types.CommandParameter
 import com.github.kennarddh.mindustry.genesis.core.commands.parameters.types.CommandParameterParsingException
 import com.github.kennarddh.mindustry.toast.common.database.Database
-import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
+import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import mindustry.gen.Groups
 import mindustry.gen.Player
 import kotlin.reflect.KClass
@@ -34,7 +33,7 @@ class ToastPlayerParameter : CommandParameter<Player> {
 
         return Database.newTransaction {
             val player =
-                GenesisAPI.getHandler<UserAccountHandler>()!!.users.filter { it.value.userID == inputInt }.keys.firstOrNull()
+                Entities.players.filter { it.value.userID == inputInt }.keys.firstOrNull()
 
             if (player == null)
                 throw CommandParameterParsingException("Cannot convert $input into active player for parameter :parameterName:. Player with the id $inputInt is not here.")
