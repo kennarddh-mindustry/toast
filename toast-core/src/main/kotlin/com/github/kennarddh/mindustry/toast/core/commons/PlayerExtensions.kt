@@ -1,14 +1,13 @@
 package com.github.kennarddh.mindustry.toast.core.commons
 
 import arc.math.Mathf
-import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.selectOne
-import com.github.kennarddh.mindustry.toast.core.handlers.users.User
-import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
+import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
+import com.github.kennarddh.mindustry.toast.core.commons.entities.PlayerData
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.Op
@@ -21,31 +20,34 @@ val Player.mindustryServerUserDataWhereClause: Op<Boolean>
     get() = con.mindustryServerUserDataWhereClause
 
 /**
- * Depends on UserAccountHandler stored user id
- * Cannot be used before user is added to the users map
+ * Cannot be used before player is added to the "Entities.players" map
  */
 fun Player.getUser(): ResultRow? {
-    val userID = getStoredUser()?.userID ?: return null
+    val userID = safeGetPlayerData()?.userID ?: return null
 
-    return Users.selectOne {
-        Users.id eq userID
+    return Users.selectOne { Users.id eq userID }
+}
+
+fun Player.safeGetPlayerData(): PlayerData? {
+    val playerData = Entities.players[this]
+
+    if (playerData == null) {
+        sendMessage("There is an error. Please report this and explain what make this happen. Error code: NULL_PLAYER_ENTITY")
+
+        return null
     }
+
+    return playerData
 }
 
-fun Player.getStoredUser(): User? {
-    return GenesisAPI.getHandler<UserAccountHandler>()!!.users[this]
-}
-
-fun Player.applyName(role: UserRole?): Player {
-    val user = getStoredUser()!!
+fun Player.applyName(role: UserRole?) {
+    val user = safeGetPlayerData() ?: return
 
     name = if (role == null) {
         user.originalName
     } else {
         "[accent]<${role.displayName}> [#${color}]${user.originalName}"
     }
-
-    return this
 }
 
 fun Player.getMindustryUserAndUserServerData() =

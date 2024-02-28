@@ -1,7 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import arc.util.Strings
-import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commons.priority.PriorityEnum
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
@@ -13,6 +12,8 @@ import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.applyName
+import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
+import com.github.kennarddh.mindustry.toast.core.commons.entities.PlayerData
 import com.github.kennarddh.mindustry.toast.core.commons.getUserOptionalAndMindustryUserAndUserServerData
 import com.password4j.Argon2Function
 import com.password4j.Password
@@ -88,7 +89,7 @@ class UserJoinsHandler : Handler() {
 
         if (user == null) return true
 
-        if (GenesisAPI.getHandler<UserAccountHandler>()!!.users.count { it.value.userID == user[Users.id].value } >= 1) {
+        if (Entities.players.count { it.value.userID == user[Users.id].value } >= 1) {
             con.kickWithoutLogging("There is someone with the same user already on this server.")
 
             return false
@@ -296,8 +297,13 @@ class UserJoinsHandler : Handler() {
 
             val mindustryUserID = userAndMindustryUserAndUserServerData?.get(MindustryUser.id)!!.value
 
-            GenesisAPI.getHandler<UserAccountHandler>()!!.users[player] =
-                User(userID, mindustryUserID, player, player.name)
+            Entities.players[player] = PlayerData(
+                userID,
+                mindustryUserID,
+                player,
+                player.name,
+                if (userID != null) userAndMindustryUserAndUserServerData[Users.role] else null
+            )
 
             player.clearRoleEffect()
 

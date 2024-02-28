@@ -8,5 +8,5 @@ data class PlayerData(
     val mindustryUserID: Int,
     val player: Player,
     val originalName: String,
-    var role: UserRole
+    var role: UserRole?
 )
