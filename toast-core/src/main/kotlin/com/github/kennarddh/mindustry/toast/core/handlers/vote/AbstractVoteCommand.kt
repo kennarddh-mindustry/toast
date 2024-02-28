@@ -34,6 +34,7 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
         }
 
         val task = Timer.schedule({
+            println("TIMEOUT")
             CoroutineScopes.Main.launch {
                 timeout()
             }
@@ -99,21 +100,27 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
     protected open suspend fun cancel(player: Player) {
         Call.sendMessage("[#ff0000]The $name vote cancelled by ${player.plainName()}.")
 
-        cleanUp()
+        sessionMutex.withLock {
+            cleanUp()
+        }
     }
 
     protected open suspend fun timeout() {
         Call.sendMessage("[#ff0000]The $name vote timed out.")
 
-        cleanUp()
+        sessionMutex.withLock {
+            cleanUp()
+        }
     }
 
-    protected suspend fun cleanUp() {
-        sessionMutex.withLock {
-            session!!.task.cancel()
+    /**
+     * Must be called with locked sessionMutex
+     */
+    private suspend fun cleanUp() {
+        session!!.task.cancel()
+        println("CANCEL")
 
-            session = null
-        }
+        session = null
     }
 
     protected suspend fun checkIsRequiredVoteReached() {
