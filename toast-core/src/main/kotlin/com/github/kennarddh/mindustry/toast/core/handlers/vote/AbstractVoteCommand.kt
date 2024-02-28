@@ -41,9 +41,10 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
 
         session = VoteSession(initiator, objective, task)
 
-        vote(initiator, true)
-
         sessionMutex.withLock {
+            if (canPlayerVote(initiator, session!!))
+                session!!.voted[initiator] = true
+
             Call.sendMessage(
                 """
                 [#00ff00]${initiator.plainName()} started $name vote.
