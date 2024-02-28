@@ -2,10 +2,13 @@ package com.github.kennarddh.mindustry.toast.core.handlers.vote
 
 import arc.util.Timer
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
+import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import mindustry.game.EventType.PlayerJoin
+import mindustry.game.EventType.PlayerLeave
 import mindustry.gen.Call
 import mindustry.gen.Groups
 import mindustry.gen.Player
@@ -104,17 +107,19 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
         }
     }
 
-    suspend fun onPlayerLeave(player: Player) {
+    @EventHandler
+    suspend fun onPlayerLeave(event: PlayerLeave) {
         sessionMutex.withLock {
             if (session == null) return
 
-            session!!.voted.remove(player)
+            session!!.voted.remove(event.player)
         }
 
         checkIsRequiredVoteReached()
     }
 
-    suspend fun onPlayerJoin(player: Player) {
+    @EventHandler
+    suspend fun onPlayerJoin(event: PlayerJoin) {
         checkIsRequiredVoteReached()
     }
 }
