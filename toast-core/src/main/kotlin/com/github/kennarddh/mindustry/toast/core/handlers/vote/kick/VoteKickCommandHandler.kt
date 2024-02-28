@@ -39,7 +39,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
         GenesisAPI.commandRegistry.removeCommand("vote")
     }
 
-    @Command(["votekick", "voteKick"])
+    @Command(["votekick", "vote-kick"])
     @ClientSide
     suspend fun startVoteKick(player: Player, target: Player, reason: String) {
         start(player, VoteKickVoteObjective(target, reason))
