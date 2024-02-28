@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.core.handlers
+package com.github.kennarddh.mindustry.toast.core.handlers.vote.kick
 
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide

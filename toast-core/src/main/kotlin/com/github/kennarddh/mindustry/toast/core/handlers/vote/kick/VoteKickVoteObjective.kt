@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.core.handlers
+package com.github.kennarddh.mindustry.toast.core.handlers.vote.kick
 
 import mindustry.gen.Player
 

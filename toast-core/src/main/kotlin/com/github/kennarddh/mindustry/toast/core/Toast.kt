@@ -15,6 +15,7 @@ import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.handlers.*
 import com.github.kennarddh.mindustry.toast.core.handlers.users.*
+import com.github.kennarddh.mindustry.toast.core.handlers.vote.kick.VoteKickCommandHandler
 import kotlinx.datetime.Clock
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.transactions.TransactionManager
