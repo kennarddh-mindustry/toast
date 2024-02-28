@@ -105,12 +105,16 @@ abstract class AbstractVoteCommand<T : Any>(
         return true
     }
 
-    protected open suspend fun cancel(player: Player) {
-        Call.sendMessage("[#ff0000]The $name vote cancelled by ${player.plainName()}.")
-
+    protected suspend fun silentCancel() {
         sessionMutex.withLock {
             cleanUp()
         }
+    }
+
+    protected open suspend fun cancel(player: Player) {
+        Call.sendMessage("[#ff0000]The $name vote cancelled by ${player.plainName()}.")
+
+        silentCancel()
     }
 
     protected open suspend fun timeout() {
@@ -162,8 +166,6 @@ abstract class AbstractVoteCommand<T : Any>(
 
     @EventHandler
     suspend fun onPlay(event: PlayEvent) {
-        sessionMutex.withLock {
-            cleanUp()
-        }
+        silentCancel()
     }
 }
