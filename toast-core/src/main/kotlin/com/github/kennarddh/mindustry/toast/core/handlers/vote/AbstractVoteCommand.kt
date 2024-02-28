@@ -34,7 +34,6 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
         }
 
         val task = Timer.schedule({
-            println("TIMEOUT")
             CoroutineScopes.Main.launch {
                 timeout()
             }
@@ -118,7 +117,6 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
      */
     private fun cleanUp() {
         session!!.task.cancel()
-        println("CANCEL")
 
         session = null
     }
