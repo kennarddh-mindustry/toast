@@ -42,7 +42,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
 
     @Command(["votekick", "voteKick"])
     @ClientSide
-    fun startVoteKick(player: Player, target: Player, reason: String) {
+    suspend fun startVoteKick(player: Player, target: Player, reason: String) {
         start(player, VoteKickVoteObjective(target, reason))
     }
 
