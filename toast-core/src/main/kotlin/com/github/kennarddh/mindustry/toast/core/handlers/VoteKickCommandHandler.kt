@@ -4,11 +4,7 @@ import arc.util.Strings
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
-import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
-import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
-import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
-import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
 import com.github.kennarddh.mindustry.toast.common.PunishmentType
 import com.github.kennarddh.mindustry.toast.common.UserRole
@@ -21,29 +17,24 @@ import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerPunishedGameEvent
 import com.github.kennarddh.mindustry.toast.common.toDisplayString
+import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
-import com.github.kennarddh.mindustry.toast.core.commons.VoteSession
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUser
 import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
+import com.github.kennarddh.mindustry.toast.core.handlers.vote.AbstractVoteCommand
+import com.github.kennarddh.mindustry.toast.core.handlers.vote.VoteSession
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import mindustry.game.EventType
 import mindustry.gen.Call
-import mindustry.gen.Groups
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
-class VoteKickCommandHandler : Handler() {
-    private var voteSession: VoteSession? = null
-    private var target: Player? = null
-    private var starter: Player? = null
-    private var reason: String? = null
-
+class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote kick", 1.minutes) {
     override suspend fun onInit() {
         GenesisAPI.commandRegistry.removeCommand("votekick")
         GenesisAPI.commandRegistry.removeCommand("vote")
@@ -51,79 +42,46 @@ class VoteKickCommandHandler : Handler() {
 
     @Command(["votekick", "voteKick"])
     @ClientSide
-    suspend fun startVoteKick(player: Player, target: Player, reason: String): CommandResult? {
-        if (voteSession != null) return CommandResult("Vote kick is already in progress.", CommandResultStatus.Failed)
-        if (Groups.player.size() < 3) return CommandResult(
-            "There must be at least 3 players to start a vote kick.",
-            CommandResultStatus.Failed
-        )
-        if (player == target) return CommandResult("You cannot vote kick your self.", CommandResultStatus.Failed)
-
-        voteSession = VoteSession(1.minutes, player, ::getRequiredVotes, ::onSuccess, ::onTimeout, ::onCancel)
-        this.target = target
-        starter = player
-        this.reason = reason
-
-        Call.sendMessage("Vote kick started to kick ${target.name} with the reason \"$reason\".")
-
-        vote(player, true)
-
-        return null
+    fun startVoteKick(player: Player, target: Player, reason: String) {
+        start(player, VoteKickVoteObjective(target, reason))
     }
 
     @Command(["vote"])
     @ClientSide
-    suspend fun vote(player: Player, vote: Boolean): CommandResult? {
-        if (voteSession == null) return CommandResult("No one is currently vote kicked.", CommandResultStatus.Failed)
-
-        Call.sendMessage("${player.name} voted ${if (vote) "yes" else "no"} to kick ${target!!.name}. ${voteSession!!.votes}/${getRequiredVotes()} votes")
-
-        voteSession!!.vote(player, vote)
-
-        return null
+    suspend fun voteCommand(player: Player, vote: Boolean) {
+        vote(player, vote)
     }
 
     @Command(["vote-cancel", "vote-kick-cancel", "votekick-cancel"])
     @ClientSide
-    suspend fun cancel(player: Player): CommandResult? {
-        val user = player.getUserAndMindustryUserAndUserServerData()
-
-        if (player == starter || (user != null && user[Users.role] >= UserRole.Mod)) {
-            Call.sendMessage("${player.name} canceled vote kick session.")
-
-            voteSession!!.cancel()
-
-            return null
-        } else {
-            return CommandResult("Cannot cancel vote kick session as you are not the starter or mod.")
-        }
+    @MinimumRole(UserRole.Mod)
+    suspend fun cancelCommand(player: Player) {
+        cancel(player)
     }
 
-    private fun getRequiredVotes(): Int = Groups.player.size() / 2 + 1
-
-    private suspend fun onSuccess() {
+    override suspend fun onSuccess(session: VoteSession<VoteKickVoteObjective>) {
         val duration = 5.hours
 
-        target!!.kickWithoutLogging(
+        session.objective.target.kickWithoutLogging(
             """
             [#ff0000]You were vote kicked with the reason
-            []$reason
+            []${session.objective.reason}
             [#00ff00]You can join again in ${duration.toDisplayString()}.
             [#00ff00]Appeal in Discord.
             """.trimIndent()
         )
 
-        Call.sendMessage("Vote kick success. Kicked ${target!!.name} for ${duration.toDisplayString()}.")
+        Call.sendMessage("Vote kick success. Kicked ${session.objective.target.name} for ${duration.toDisplayString()}.")
 
         Database.newTransaction {
-            val mindustryUser = starter!!.getMindustryUser()!!
-            val targetMindustryUser = target!!.getMindustryUser()!!
-            val user = starter!!.getUserAndMindustryUserAndUserServerData()
-            val targetUser = target!!.getUserAndMindustryUserAndUserServerData()
+            val mindustryUser = session.initiator.getMindustryUser()!!
+            val targetMindustryUser = session.objective.target.getMindustryUser()!!
+            val user = session.initiator.getUserAndMindustryUserAndUserServerData()
+            val targetUser = session.objective.target.getUserAndMindustryUserAndUserServerData()
 
             val punishmentID = UserPunishments.insertAndGetId {
                 it[this.server] = ToastVars.server
-                it[this.reason] = reason
+                it[this.reason] = session.objective.reason
                 it[this.endAt] =
                     Clock.System.now().plus(duration).toLocalDateTime(TimeZone.UTC)
                 it[this.type] = PunishmentType.VoteKick
@@ -138,7 +96,7 @@ class VoteKickCommandHandler : Handler() {
                     it[this.targetUserID] = targetUser[Users.id]
             }
 
-            voteSession!!.voted.forEach { voter ->
+            session.voted.forEach { voter ->
                 val voterMindustryUser = voter.key.getMindustryUser()!!
                 val vote = voter.value
 
@@ -157,49 +115,12 @@ class VoteKickCommandHandler : Handler() {
                         Clock.System.now(),
                         PlayerPunishedGameEvent(
                             punishmentID.value,
-                            Strings.stripColors(starter!!.name),
-                            Strings.stripColors(target!!.name)
+                            Strings.stripColors(session.initiator.name),
+                            Strings.stripColors(session.objective.target.name)
                         )
                     )
                 )
             }
-
-            voteSession = null
-            target = null
-            starter = null
-            reason = null
-        }
-    }
-
-    private fun onTimeout() {
-        Call.sendMessage("Vote kick session timed out. Failed to kick ${target!!.name}.")
-
-        voteSession = null
-        target = null
-        starter = null
-        reason = null
-    }
-
-    private fun onCancel() {
-        Call.sendMessage("Vote kick session cancelled.")
-
-        voteSession = null
-        target = null
-        starter = null
-        reason = null
-    }
-
-    @EventHandler
-    private suspend fun onPlayerJoin(event: EventType.PlayerJoin) {
-        voteSession?.onPlayerJoin(event.player)
-    }
-
-    @EventHandler
-    private suspend fun onPlayerLeave(event: EventType.PlayerLeave) {
-        voteSession?.onPlayerLeave(event.player)
-
-        if (event.player == target) {
-            Call.sendMessage("Vote kick target left. Vote kick session will still continue.")
         }
     }
 }
