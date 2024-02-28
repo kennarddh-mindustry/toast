@@ -4,6 +4,7 @@ import arc.util.Timer
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
+import com.github.kennarddh.mindustry.toast.common.toDisplayString
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -46,7 +47,7 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
             Call.sendMessage(
                 """
                 [#00ff00]${initiator.plainName()} started $name vote.
-                ${session!!.votes}/${getRequiredVotes()} is required.
+                ${session!!.votes}/${getRequiredVotes()} votes are required.
                 ${getSessionDetails(session!!)}
                 """.trimIndent()
             )
@@ -80,6 +81,13 @@ abstract class AbstractVoteCommand<T : Any>(val name: String, protected val time
             }
 
             session!!.voted[player] = vote
+
+            Call.sendMessage(
+                """
+                [#00ff00]${player.plainName()} voted ${vote.toDisplayString()} for $name vote.
+                ${session!!.votes}/${getRequiredVotes()} votes are required.
+                """.trimIndent()
+            )
         }
 
         checkIsRequiredVoteReached()
