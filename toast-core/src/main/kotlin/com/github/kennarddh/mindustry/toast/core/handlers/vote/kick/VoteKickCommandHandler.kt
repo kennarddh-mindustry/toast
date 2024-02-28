@@ -70,7 +70,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
             """.trimIndent()
         )
 
-        Call.sendMessage("Vote kick success. Kicked ${session.objective.target.plainName()} for ${duration.toDisplayString()}.")
+        Call.sendMessage("[#00ff00]Vote kick success. Kicked ${session.objective.target.plainName()} for ${duration.toDisplayString()}.")
 
         Database.newTransaction {
             val mindustryUser = session.initiator.getMindustryUser()!!
