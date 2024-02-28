@@ -17,9 +17,13 @@ import kotlin.time.Duration.Companion.minutes
 class RTVCommandHandler : AbstractVoteCommand<Byte>("rtv", 2.minutes) {
     @Command(["rtv", "change-map"])
     @ClientSide
-    suspend fun rtv(player: Player) {
+    suspend fun rtv(player: Player, vote: Boolean? = null) {
         if (!getIsVoting()) {
-            start(player, 1)
+            if ((vote == null || vote == true)) {
+                start(player, 1)
+            } else {
+                player.sendMessage("[#ff0000]Cannot vote no for rtv because there is no rtv session in progress.")
+            }
 
             return
         }
