@@ -3,6 +3,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers.vote.kick
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
+import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
 import com.github.kennarddh.mindustry.toast.common.PunishmentType
@@ -27,6 +28,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import mindustry.gen.Call
+import mindustry.gen.Groups
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -41,8 +43,12 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
 
     @Command(["votekick", "vote-kick"])
     @ClientSide
-    suspend fun startVoteKick(player: Player, target: Player, reason: String) {
+    suspend fun startVoteKick(player: Player, target: Player, reason: String): CommandResult? {
+        if (Groups.player.size() < 3) CommandResult("There must be more than or equal to 3 players to start $name vote.")
+
         start(player, VoteKickVoteObjective(target, reason))
+
+        return null
     }
 
     @Command(["vote"])
