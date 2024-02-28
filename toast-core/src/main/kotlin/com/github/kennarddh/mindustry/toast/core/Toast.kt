@@ -15,6 +15,7 @@ import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.handlers.*
 import com.github.kennarddh.mindustry.toast.core.handlers.users.*
+import com.github.kennarddh.mindustry.toast.core.handlers.vote.kick.RTVCommandHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.kick.VoteKickCommandHandler
 import kotlinx.datetime.Clock
 import mindustry.gen.Player
@@ -55,6 +56,7 @@ class Toast : AbstractPlugin() {
         GenesisAPI.registerHandler(StartHandler())
 
         GenesisAPI.registerHandler(VoteKickCommandHandler())
+        GenesisAPI.registerHandler(RTVCommandHandler())
 
         GenesisAPI.registerHandler(ServerPresenceHandler())
         GenesisAPI.registerHandler(WelcomeHandler())
