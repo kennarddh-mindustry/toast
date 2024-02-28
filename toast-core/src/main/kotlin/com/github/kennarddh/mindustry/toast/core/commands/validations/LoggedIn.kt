@@ -1,9 +1,8 @@
 package com.github.kennarddh.mindustry.toast.core.commands.validations
 
-import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validations.CommandValidation
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validations.CommandValidationDescription
-import com.github.kennarddh.mindustry.toast.core.handlers.users.UserAccountHandler
+import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import mindustry.gen.Player
 
 
@@ -13,7 +12,7 @@ fun validateLoggedIn(annotation: Annotation, player: Player?): Boolean {
         return true
     }
 
-    return GenesisAPI.getHandler<UserAccountHandler>()!!.users[player]!!.userID != null
+    return Entities.players[player]?.userID != null
 }
 
 @Target(AnnotationTarget.FUNCTION)
