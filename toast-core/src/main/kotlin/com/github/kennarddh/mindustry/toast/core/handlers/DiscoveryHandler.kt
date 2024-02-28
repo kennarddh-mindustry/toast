@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
+import arc.util.Time
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryPayload
@@ -37,7 +38,7 @@ class DiscoveryHandler : Handler() {
         val payload = DiscoveryPayload(
             Clock.System.now(),
             Groups.player.map { it.name }.toTypedArray(),
-            if (Vars.state.serverTps == -1) 60 else Vars.state.serverTps,
+            (60 / Time.delta).toInt(),
             uptime,
             Vars.state.map.name(),
             Vars.state.isPaused,
