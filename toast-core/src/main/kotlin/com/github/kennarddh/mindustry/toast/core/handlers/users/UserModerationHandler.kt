@@ -14,9 +14,7 @@ import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLog
 import com.github.kennarddh.mindustry.toast.common.PunishmentType
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.Database
-import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
-import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerPunishedGameEvent
@@ -24,8 +22,8 @@ import com.github.kennarddh.mindustry.toast.common.toDisplayString
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
-import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUser
-import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
+import com.github.kennarddh.mindustry.toast.core.commons.entities.PlayerData
+import com.github.kennarddh.mindustry.toast.core.commons.safeGetPlayerData
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -49,36 +47,53 @@ class UserModerationHandler : Handler() {
     @ClientSide
     @ServerSide
     @Description("Kick player.")
-    suspend fun kick(player: Player? = null, target: Player, duration: Duration, reason: String): CommandResult {
-        return Database.newTransaction {
-            val mindustryUser = player?.getMindustryUser()
-            val targetMindustryUser = target.getMindustryUser()!!
-            val user = player?.getUserAndMindustryUserAndUserServerData()
-            val targetUser = target.getUserAndMindustryUserAndUserServerData()
+    suspend fun kick(player: Player? = null, target: Player, duration: Duration, reason: String): CommandResult? {
+        val targetPlayerData = target.safeGetPlayerData() ?: return null
 
-            if (targetUser != null && user != null && user[Users.role] > targetUser[Users.role])
-                return@newTransaction CommandResult(
+        var playerData: PlayerData? = null
+
+        if (player != null) {
+            val playerDataNonNull = player.safeGetPlayerData() ?: return null
+
+            val playerRole = playerDataNonNull.role
+            val targetRole = targetPlayerData.role
+
+            if (
+                targetPlayerData.userID != null &&
+                playerDataNonNull.userID != null &&
+                playerRole != null &&
+                targetRole != null &&
+                playerRole > targetRole
+            )
+                return CommandResult(
                     "Your role must be higher than target's role to kick.",
                     CommandResultStatus.Failed
                 )
 
+            playerData = playerDataNonNull
+        }
+
+        val playerMindustryUserID = playerData?.mindustryUserID
+        val playerUserID = playerData?.userID
+        val targetUserID = targetPlayerData.userID
+
+        return Database.newTransaction {
             val punishmentID = UserPunishments.insertAndGetId {
                 it[this.server] = ToastVars.server
                 it[this.reason] = reason
-                it[this.endAt] =
-                    Clock.System.now().plus(duration).toLocalDateTime(TimeZone.UTC)
+                it[this.endAt] = Clock.System.now().plus(duration).toLocalDateTime(TimeZone.UTC)
                 it[this.type] = PunishmentType.Kick
 
-                if (mindustryUser != null)
-                    it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
+                if (playerMindustryUserID != null)
+                    it[this.mindustryUserID] = playerMindustryUserID
 
-                it[this.targetMindustryUserID] = targetMindustryUser[MindustryUser.id]
+                it[this.targetMindustryUserID] = targetPlayerData.mindustryUserID
 
-                if (user != null)
-                    it[this.userID] = user[Users.id]
+                if (playerUserID != null)
+                    it[this.userID] = playerUserID
 
-                if (targetUser != null)
-                    it[this.targetUserID] = targetUser[Users.id]
+                if (targetUserID != null)
+                    it[this.targetUserID] = targetUserID
             }
 
             Logger.info("${if (player == null) "Server" else player.name} kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
@@ -116,34 +131,52 @@ class UserModerationHandler : Handler() {
     @ClientSide
     @ServerSide
     @Description("Ban player.")
-    suspend fun ban(player: Player? = null, target: Player, reason: String): CommandResult {
-        return Database.newTransaction {
-            val mindustryUser = player?.getMindustryUser()
-            val targetMindustryUser = target.getMindustryUser()!!
-            val user = player?.getUserAndMindustryUserAndUserServerData()
-            val targetUser = target.getUserAndMindustryUserAndUserServerData()
+    suspend fun ban(player: Player? = null, target: Player, reason: String): CommandResult? {
+        val targetPlayerData = target.safeGetPlayerData() ?: return null
 
-            if (targetUser != null && user != null && user[Users.role] > targetUser[Users.role])
-                return@newTransaction CommandResult(
-                    "Your role must be higher than target's role to kick.",
+        var playerData: PlayerData? = null
+
+        if (player != null) {
+            val playerDataNonNull = player.safeGetPlayerData() ?: return null
+
+            val playerRole = playerDataNonNull.role
+            val targetRole = targetPlayerData.role
+
+            if (
+                targetPlayerData.userID != null &&
+                playerDataNonNull.userID != null &&
+                playerRole != null &&
+                targetRole != null &&
+                playerRole > targetRole
+            )
+                return CommandResult(
+                    "Your role must be higher than target's role to ban.",
                     CommandResultStatus.Failed
                 )
 
+            playerData = playerDataNonNull
+        }
+
+        val playerMindustryUserID = playerData?.mindustryUserID
+        val playerUserID = playerData?.userID
+        val targetUserID = targetPlayerData.userID
+
+        return Database.newTransaction {
             val punishmentID = UserPunishments.insertAndGetId {
                 it[this.server] = ToastVars.server
                 it[this.reason] = reason
                 it[this.type] = PunishmentType.Ban
 
-                if (mindustryUser != null)
-                    it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
+                if (playerMindustryUserID != null)
+                    it[this.mindustryUserID] = playerMindustryUserID
 
-                it[this.targetMindustryUserID] = targetMindustryUser[MindustryUser.id]
+                it[this.targetMindustryUserID] = targetPlayerData.mindustryUserID
 
-                if (user != null)
-                    it[this.userID] = user[Users.id]
+                if (playerUserID != null)
+                    it[this.userID] = playerUserID
 
-                if (targetUser != null)
-                    it[this.targetUserID] = targetUser[Users.id]
+                if (targetUserID != null)
+                    it[this.targetUserID] = targetUserID
             }
 
             Logger.info("${if (player == null) "Server" else player.name} banned ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
