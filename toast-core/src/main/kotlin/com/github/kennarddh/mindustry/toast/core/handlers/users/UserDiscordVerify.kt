@@ -24,10 +24,11 @@ class UserDiscordVerify : Handler() {
     suspend fun verify(player: Player): CommandResult {
         val user = Database.newTransaction { player.getUser()!! }
 
-        if (user[Users.discordID] != null) return CommandResult(
-            "You have already verified your discord account",
-            CommandResultStatus.Failed
-        )
+        if (user[Users.discordID] != null)
+            return CommandResult(
+                "You have already verified your discord account",
+                CommandResultStatus.Failed
+            )
 
         // 6 digits pin
         val pin = pinSecureRandom.nextInt(100000, 999999)
@@ -38,9 +39,9 @@ class UserDiscordVerify : Handler() {
             """
             Your pin is $pin.
             Do not share your pin to anyone.
-            Do /verify in Toast Mindustry discord and enter your pin to be verified.
+            Do /verify in Toast Mindustry Discord and enter your pin to be verified.
             Your pin will expire in 5 minutes.
-            Do /discord to join Toast Mindustry discord.
+            Do /discord to join Toast Mindustry Discord.
             """.trimIndent()
         )
     }
