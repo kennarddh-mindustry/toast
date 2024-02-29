@@ -137,7 +137,7 @@ class UserStatsHandler : Handler() {
     @MinimumRole(UserRole.Admin)
     @ClientSide
     @ServerSide
-    @Description("Get and update player's xp .This will always return saved data.")
+    @Description("Get and update player's xp. This will always return saved data.")
     suspend fun xp(
         player: Player? = null,
         target: Player,
