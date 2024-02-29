@@ -1,6 +1,5 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
-import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
 import com.github.kennarddh.mindustry.toast.common.PunishmentType
@@ -12,6 +11,7 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerPuni
 import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.common.toDisplayString
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import org.jetbrains.exposed.sql.JoinType
@@ -19,10 +19,10 @@ import org.jetbrains.exposed.sql.alias
 
 class UserModerationSyncHandler : Handler() {
     override suspend fun onInit() {
-        Messenger.listenGameEvent("${ToastVars.server.name}ServerPunishmentSync", "*.punishment.*") {
-            val data = it.data
+        Messenger.listenGameEvent("${ToastVars.server.name}ServerPunishmentSync", "*.punishment.*") { gameEvent ->
+            val data = gameEvent.data
 
-            if (it.server == ToastVars.server) return@listenGameEvent
+            if (gameEvent.server == ToastVars.server) return@listenGameEvent
             if (data !is PlayerPunishedGameEvent) return@listenGameEvent
 
             val targetUserAlias = Users.alias("targetUser")
@@ -46,61 +46,61 @@ class UserModerationSyncHandler : Handler() {
                 }!!
 
 
-            for ((player, user) in GenesisAPI.getHandler<UserAccountHandler>()!!.users) {
-                if (
-                    (userPunishment[UserPunishments.targetMindustryUserID] != null && player.uuid() == userPunishment[targetMindustryUserAlias[MindustryUser.mindustryUUID]]) ||
-                    (userPunishment[UserPunishments.targetUserID] != null && user.userID != null && user.userID == userPunishment[UserPunishments.targetUserID]!!.value)
-                ) {
-                    val reason = userPunishment[UserPunishments.reason]
-                    val type = userPunishment[UserPunishments.type]
+            val punishedPlayers = Entities.players.values.filter {
+                (userPunishment[UserPunishments.targetMindustryUserID] != null && it.player.uuid() == userPunishment[targetMindustryUserAlias[MindustryUser.mindustryUUID]]) ||
+                        (userPunishment[UserPunishments.targetUserID] != null && it.userID != null && it.userID == userPunishment[UserPunishments.targetUserID]!!.value)
+            }
 
-                    when (type) {
-                        PunishmentType.Kick -> {
-                            val duration = userPunishment[UserPunishments.endAt]!!
-                                .toInstant(TimeZone.UTC)
-                                .minus(
-                                    userPunishment[UserPunishments.punishedAt].toInstant(TimeZone.UTC)
-                                )
+            for (playerData in punishedPlayers) {
+                val reason = userPunishment[UserPunishments.reason]
+                val type = userPunishment[UserPunishments.type]
 
-                            player.kickWithoutLogging(
-                                """
+                when (type) {
+                    PunishmentType.Kick -> {
+                        val duration = userPunishment[UserPunishments.endAt]!!
+                            .toInstant(TimeZone.UTC)
+                            .minus(
+                                userPunishment[UserPunishments.punishedAt].toInstant(TimeZone.UTC)
+                            )
+
+                        playerData.player.kickWithoutLogging(
+                            """
                                 [#ff0000]You were kicked in other server for the reason
                                 []$reason
                                 [#00ff00]You can join again in ${duration.toDisplayString()}.
                                 [#00ff00]Appeal in Discord.
                                 """.trimIndent()
+                        )
+                    }
+
+                    PunishmentType.VoteKick -> {
+                        val duration = userPunishment[UserPunishments.endAt]!!
+                            .toInstant(TimeZone.UTC)
+                            .minus(
+                                userPunishment[UserPunishments.punishedAt].toInstant(TimeZone.UTC)
                             )
-                        }
 
-                        PunishmentType.VoteKick -> {
-                            val duration = userPunishment[UserPunishments.endAt]!!
-                                .toInstant(TimeZone.UTC)
-                                .minus(
-                                    userPunishment[UserPunishments.punishedAt].toInstant(TimeZone.UTC)
-                                )
-
-                            player.kickWithoutLogging(
-                                """
+                        playerData.player.kickWithoutLogging(
+                            """
                                 [#ff0000]You were vote kicked in other server for the reason
                                 []$reason
                                 [#00ff00]You can join again in ${duration.toDisplayString()}.
                                 [#00ff00]Appeal in Discord.
                                 """.trimIndent()
-                            )
-                        }
+                        )
+                    }
 
-                        PunishmentType.Ban -> {
-                            player.kickWithoutLogging(
-                                """
+                    PunishmentType.Ban -> {
+                        playerData.player.kickWithoutLogging(
+                            """
                                 [#ff0000]You were banned in other server for the reason
                                 []$reason
                                 [#00ff00]Appeal in Discord.
                                 """.trimIndent()
-                            )
-                        }
-
-                        PunishmentType.Mute -> TODO("Mute")
+                        )
                     }
+
+                    PunishmentType.Mute -> TODO("Mute")
                 }
             }
         }
