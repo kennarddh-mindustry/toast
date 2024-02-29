@@ -1,9 +1,10 @@
-version: '3'
+version: '3.8'
 
 # Development
 services:
   discovery-redis:
     image: redis:7.2.4-alpine
+    init: true
     volumes:
       - ./dev/discovery-redis/redis.conf:/usr/local/etc/redis/redis.conf
       - ./dev/verify-discord-redis/users.acl:/usr/local/etc/redis/users.acl
@@ -17,6 +18,7 @@ services:
 
   verify-discord-redis:
     image: redis:7.2.4-alpine
+    init: true
     volumes:
       - ./dev/verify-discord-redis/redis.conf:/usr/local/etc/redis/redis.conf
       - ./dev/verify-discord-redis/users.acl:/usr/local/etc/redis/users.acl
@@ -31,6 +33,7 @@ services:
 
   database:
     image: mariadb:lts
+    init: true
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: toast
@@ -54,6 +57,7 @@ services:
 
   rabbitMQ:
     image: rabbitmq:3.12-management
+    init: true
     hostname: rabbitmq
     ports:
       - "5672:5672"

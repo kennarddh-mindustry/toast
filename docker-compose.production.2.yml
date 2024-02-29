@@ -3,6 +3,7 @@ version: '3.8'
 services:
   portainer-agent:
     image: portainer/agent:2.19.4-alpine
+    init: true
     ports:
       - "9001:9001"
     volumes:

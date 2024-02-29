@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
+    init: true
     ports:
       - "6567:6567/tcp"
       - "6567:6567/udp"
@@ -41,6 +42,7 @@ services:
     build:
       context: .
       dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
+    init: true
     ports:
       - "6568:6568/tcp"
       - "6568:6568/udp"
@@ -79,6 +81,7 @@ services:
     build:
       context: .
       dockerfile: ./prod/Dockerfiles/discord.Dockerfile
+    init: true
     networks:
       - toast
     env_file:
@@ -103,6 +106,7 @@ services:
   discovery-redis:
     image: redis:7.2.4-alpine
     command: redis-server /usr/local/etc/redis/redis.conf
+    init: true
     ports:
       - "6379:6379"
     volumes:
@@ -122,6 +126,7 @@ services:
   verify-discord-redis:
     image: redis:7.2.4-alpine
     command: redis-server /usr/local/etc/redis/redis.conf
+    init: true
     ports:
       - "6380:6379"
     volumes:
@@ -140,6 +145,7 @@ services:
 
   database:
     image: mariadb:lts
+    init: true
     env_file:
       - ./prod/.env.database
     volumes:
@@ -168,6 +174,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.12-management
+    init: true
     hostname: rabbitmq
     ports:
       - "5672:5672"
@@ -190,6 +197,7 @@ services:
 
   portainer:
     image: portainer/portainer-ce:2.19.4-alpine
+    init: true
     ports:
       - "8000:8000"
       - "9443:9443"
