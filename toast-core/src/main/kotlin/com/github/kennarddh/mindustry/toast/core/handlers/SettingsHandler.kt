@@ -10,8 +10,10 @@ import mindustry.game.EventType
 class SettingsHandler : Handler() {
     override suspend fun onInit() {
         Logger.info("Applying configs.")
+
         ToastVars.server.gameMode.applyConfigs()
         ToastVars.server.applyConfigs()
+
         Logger.info("Configs applied.")
     }
 
