@@ -247,10 +247,10 @@ class UserJoinsHandler : Handler() {
                 if (userPunishment[UserPunishments.type] == PunishmentType.Ban) {
                     con.kickWithoutLogging(
                         """
-                            [#ff0000]You were banned for the reason
-                            []${userPunishment[UserPunishments.reason]}
-                            [#00ff00]Appeal in Discord.
-                            """.trimIndent()
+                        [#ff0000]You were banned for the reason
+                        []${userPunishment[UserPunishments.reason]}
+                        [#00ff00]Appeal in Discord.
+                        """.trimIndent()
                     )
 
                     return@newTransaction false
@@ -260,11 +260,11 @@ class UserJoinsHandler : Handler() {
 
                     con.kickWithoutLogging(
                         """
-                            [#ff0000]You were kicked for the reason
-                            []${userPunishment[UserPunishments.reason]}
-                            [#00ff00]You can join again in ${kickTimeLeft.toDisplayString()}.
-                            [#00ff00]Appeal in Discord.
-                            """.trimIndent()
+                        [#ff0000]You were kicked for the reason
+                        []${userPunishment[UserPunishments.reason]}
+                        [#00ff00]You can join again in ${kickTimeLeft.toDisplayString()}.
+                        [#00ff00]Appeal in Discord.
+                        """.trimIndent()
                     )
 
                     return@newTransaction false
@@ -274,11 +274,11 @@ class UserJoinsHandler : Handler() {
 
                     con.kickWithoutLogging(
                         """
-                            [#ff0000]You were vote kicked for the reason
-                            []${userPunishment[UserPunishments.reason]}
-                            [#00ff00]You can join again in ${kickTimeLeft.toDisplayString()}.
-                            [#00ff00]Appeal in Discord.
-                            """.trimIndent()
+                        [#ff0000]You were vote kicked for the reason
+                        []${userPunishment[UserPunishments.reason]}
+                        [#00ff00]You can join again in ${kickTimeLeft.toDisplayString()}.
+                        [#00ff00]Appeal in Discord.
+                        """.trimIndent()
                     )
 
                     return@newTransaction false

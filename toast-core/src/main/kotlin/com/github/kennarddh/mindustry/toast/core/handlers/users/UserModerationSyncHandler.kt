@@ -65,11 +65,11 @@ class UserModerationSyncHandler : Handler() {
 
                         playerData.player.kickWithoutLogging(
                             """
-                                [#ff0000]You were kicked in other server for the reason
-                                []$reason
-                                [#00ff00]You can join again in ${duration.toDisplayString()}.
-                                [#00ff00]Appeal in Discord.
-                                """.trimIndent()
+                            [#ff0000]You were kicked in other server for the reason
+                            []$reason
+                            [#00ff00]You can join again in ${duration.toDisplayString()}.
+                            [#00ff00]Appeal in Discord.
+                            """.trimIndent()
                         )
                     }
 
@@ -82,21 +82,21 @@ class UserModerationSyncHandler : Handler() {
 
                         playerData.player.kickWithoutLogging(
                             """
-                                [#ff0000]You were vote kicked in other server for the reason
-                                []$reason
-                                [#00ff00]You can join again in ${duration.toDisplayString()}.
-                                [#00ff00]Appeal in Discord.
-                                """.trimIndent()
+                            [#ff0000]You were vote kicked in other server for the reason
+                            []$reason
+                            [#00ff00]You can join again in ${duration.toDisplayString()}.
+                            [#00ff00]Appeal in Discord.
+                            """.trimIndent()
                         )
                     }
 
                     PunishmentType.Ban -> {
                         playerData.player.kickWithoutLogging(
                             """
-                                [#ff0000]You were banned in other server for the reason
-                                []$reason
-                                [#00ff00]Appeal in Discord.
-                                """.trimIndent()
+                            [#ff0000]You were banned in other server for the reason
+                            []$reason
+                            [#00ff00]Appeal in Discord.
+                            """.trimIndent()
                         )
                     }
 
