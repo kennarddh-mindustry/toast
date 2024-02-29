@@ -2,6 +2,7 @@ import fr.xpdustry.toxopid.dsl.mindustryDependencies
 import fr.xpdustry.toxopid.spec.ModMetadata
 import fr.xpdustry.toxopid.spec.ModPlatform
 import fr.xpdustry.toxopid.task.GithubArtifactDownload
+import fr.xpdustry.toxopid.task.MindustryExec
 
 plugins {
     kotlin("jvm") version "1.9.22"
@@ -141,4 +142,12 @@ publishing {
 
 tasks.register("getArtifactPath") {
     doLast { println(tasks.jar.get().archiveFile.get().toString()) }
+}
+
+tasks.register<MindustryExec>("runMindustryClient2") {
+    group = fr.xpdustry.toxopid.Toxopid.TASK_GROUP_NAME
+    classpath(tasks.downloadMindustryClient)
+    mainClass.convention("mindustry.desktop.DesktopLauncher")
+    modsPath.convention("./mods")
+    standardInput = System.`in`
 }
