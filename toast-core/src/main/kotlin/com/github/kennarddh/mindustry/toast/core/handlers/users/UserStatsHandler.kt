@@ -52,7 +52,6 @@ class UserStatsHandler : Handler() {
             val isPlayerActive = xpDelta > 0
 
             Database.newTransaction {
-                // TODO: Only update once even if the player is in multiple servers. Use redis with set ttl to lock which server will generate xp for each player
                 MindustryUserServerData.join(
                     MindustryUser,
                     JoinType.INNER,
