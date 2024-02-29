@@ -24,7 +24,7 @@ class GameEventsHandler : Handler() {
             GameEvent(
                 ToastVars.server,
                 Clock.System.now(),
-                PlayerJoinGameEvent(Strings.stripColors(player.name), player.uuid())
+                PlayerJoinGameEvent(player.plainName(), player.uuid())
             )
         )
     }
@@ -38,7 +38,7 @@ class GameEventsHandler : Handler() {
             GameEvent(
                 ToastVars.server,
                 Clock.System.now(),
-                PlayerLeaveGameEvent(Strings.stripColors(player.name), player.uuid())
+                PlayerLeaveGameEvent(player.plainName(), player.uuid())
             )
         )
     }
