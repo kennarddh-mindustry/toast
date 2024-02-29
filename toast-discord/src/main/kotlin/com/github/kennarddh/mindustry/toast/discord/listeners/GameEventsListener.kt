@@ -185,6 +185,8 @@ object GameEventsListener : ListenerAdapter() {
 
                     null
                 }
+
+                is PlayerRoleChangedGameEvent -> null
             }
 
             if (message != null)
