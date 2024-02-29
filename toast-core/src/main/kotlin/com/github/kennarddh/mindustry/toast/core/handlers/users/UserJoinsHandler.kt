@@ -49,18 +49,21 @@ class UserJoinsHandler : Handler() {
             return false
         }
 
+        // Prevent discord formatting error
         if (packet.name.contains('`')) {
             con.kickWithoutLogging("Name cannot contains the letter \"`\" (backtick).")
 
             return false
         }
 
+        // For mindustry id ToastPlayerParameter
         if (packet.name.startsWith('#')) {
             con.kickWithoutLogging("Name cannot starts with #.")
 
             return false
         }
 
+        // For user id ToastPlayerParameter
         if (packet.name.matches(numberOnlyNameRegex)) {
             con.kickWithoutLogging("Name cannot only contains numbers.")
 
