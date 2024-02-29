@@ -6,16 +6,16 @@ import com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryPayload
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import mindustry.Vars
-import mindustry.gen.Groups
 import java.io.IOException
 import java.net.URL
 
 class DiscoveryHandler : Handler() {
-    lateinit var serverStart: Instant
-    var publicIP: String? = null
+    private lateinit var serverStart: Instant
+    private var publicIP: String? = null
 
     override suspend fun onInit() {
         serverStart = Clock.System.now()
@@ -37,7 +37,7 @@ class DiscoveryHandler : Handler() {
 
         val payload = DiscoveryPayload(
             Clock.System.now(),
-            Groups.player.map { it.name }.toTypedArray(),
+            Entities.players.keys.map { it.name }.toTypedArray(),
             (60 / Time.delta).toInt(),
             uptime,
             Vars.state.map.name(),
