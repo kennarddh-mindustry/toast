@@ -55,7 +55,7 @@ class GameEventsHandler : Handler() {
             GameEvent(
                 ToastVars.server, Clock.System.now(),
                 PlayerChatGameEvent(
-                    Strings.stripColors(player.name), player.uuid(),
+                    player.plainName(), player.uuid(),
                     Strings.stripColors(event.message.stripFooMessageInvisibleCharacters())
                 )
             )
