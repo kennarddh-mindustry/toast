@@ -15,16 +15,14 @@ import mindustry.gen.Player
 import java.security.SecureRandom
 
 class UserDiscordVerify : Handler() {
-    val pinSecureRandom = SecureRandom()
+    private val pinSecureRandom = SecureRandom()
 
     @Command(["verify"])
     @ClientSide
     @LoggedIn
     @Description("Verify account with discord account.")
     suspend fun verify(player: Player): CommandResult {
-        val user = Database.newTransaction {
-            player.getUser()!!
-        }
+        val user = Database.newTransaction { player.getUser()!! }
 
         if (user[Users.discordID] != null) return CommandResult(
             "You have already verified your discord account",
