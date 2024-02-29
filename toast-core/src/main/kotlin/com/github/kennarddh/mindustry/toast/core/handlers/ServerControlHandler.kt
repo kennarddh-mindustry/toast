@@ -22,8 +22,8 @@ class ServerControlHandler : Handler() {
             if (data is ServerCommandServerControl) {
                 try {
                     GenesisAPI.commandRegistry.invokeServerCommand(data.command)
-                } catch (_: IllegalArgumentException) {
-                    Logger.warn("Command from ServerCommandServerControl should not be empty")
+                } catch (error: Exception) {
+                    Logger.error("Unknown invokeServerCommand error occurred", error)
                 }
             } else if (data is ChatServerControl) {
                 Call.sendMessage("[gold]<Discord> [accent][${data.sender}][white]: ${data.message}")
