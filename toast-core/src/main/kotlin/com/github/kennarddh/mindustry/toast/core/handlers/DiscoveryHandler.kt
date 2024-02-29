@@ -15,7 +15,7 @@ import java.net.URL
 
 class DiscoveryHandler : Handler() {
     private lateinit var serverStart: Instant
-    private var publicIP: String? = null
+    private lateinit var publicIP: String
 
     override suspend fun onInit() {
         serverStart = Clock.System.now()
@@ -25,11 +25,11 @@ class DiscoveryHandler : Handler() {
     suspend fun onUpdateDiscovery() {
         val uptime = Clock.System.now() - serverStart
 
-        if (publicIP == null) {
-            publicIP = try {
-                URL("http://checkip.amazonaws.com").readText().trim('\n')
+        if (!::publicIP.isInitialized) {
+            try {
+                publicIP = URL("http://checkip.amazonaws.com").readText().trim('\n')
             } catch (err: IOException) {
-                null
+                // Ignore and try again later if publicIP can't be initialized
             }
         }
 
@@ -42,7 +42,7 @@ class DiscoveryHandler : Handler() {
             uptime,
             Vars.state.map.name(),
             Vars.state.isPaused,
-            if (publicIP == null) null else host
+            if (::publicIP.isInitialized) host else null
         )
 
         DiscoveryRedis.post(ToastVars.server, payload)
