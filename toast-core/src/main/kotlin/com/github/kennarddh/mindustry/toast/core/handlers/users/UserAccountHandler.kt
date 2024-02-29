@@ -161,7 +161,7 @@ class UserAccountHandler : Handler() {
                     "User not found.", CommandResultStatus.Failed
                 )
 
-            if (Entities.players.count { it.value.userID == user[Users.id].value } >= 1) {
+            if (Entities.players.values.find { it.userID == user[Users.id].value } != null) {
                 return@newTransaction CommandResult(
                     "There is someone with the same user already on this server.",
                     CommandResultStatus.Failed

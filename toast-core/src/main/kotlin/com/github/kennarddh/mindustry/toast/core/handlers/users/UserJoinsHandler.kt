@@ -89,7 +89,7 @@ class UserJoinsHandler : Handler() {
 
         if (user == null) return true
 
-        if (Entities.players.count { it.value.userID == user[Users.id].value } >= 1) {
+        if (Entities.players.values.find { it.userID == user[Users.id].value } != null) {
             con.kickWithoutLogging("There is someone with the same user already on this server.")
 
             return false
