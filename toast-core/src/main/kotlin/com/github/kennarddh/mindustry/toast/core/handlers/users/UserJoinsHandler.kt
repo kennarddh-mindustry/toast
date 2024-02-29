@@ -316,6 +316,8 @@ class UserJoinsHandler : Handler() {
                 role.applyRoleEffect(player)
 
                 player.applyName(role)
+            } else {
+                player.applyName(null)
             }
         }
     }

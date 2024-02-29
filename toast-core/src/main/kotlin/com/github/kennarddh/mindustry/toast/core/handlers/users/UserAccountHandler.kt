@@ -194,6 +194,7 @@ class UserAccountHandler : Handler() {
             playerData.userID = user[Users.id].value
 
             user[Users.role].applyRoleEffect(player)
+            
             player.applyName(user[Users.role])
 
             CommandResult(

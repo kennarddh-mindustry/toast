@@ -43,11 +43,9 @@ fun Player.safeGetPlayerData(): PlayerData? {
 fun Player.applyName(role: UserRole?) {
     val user = safeGetPlayerData() ?: return
 
-    name = if (role == null) {
-        user.originalName
-    } else {
-        "[accent]<${role.displayName}> [#${color}]${user.originalName}"
-    }
+    val roleDisplayName = role?.displayName ?: "Public"
+
+    name = "[accent]<$roleDisplayName> [#${color}]${user.originalName}"
 }
 
 fun Player.getMindustryUserAndUserServerData() =
