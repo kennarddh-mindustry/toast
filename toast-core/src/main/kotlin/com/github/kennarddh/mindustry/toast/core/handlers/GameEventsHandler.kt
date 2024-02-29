@@ -1,6 +1,5 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
-import arc.util.Strings
 import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
@@ -10,6 +9,9 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerChatGameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerJoinGameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerLeaveGameEvent
+import com.github.kennarddh.mindustry.toast.common.preventDiscordPings
+import com.github.kennarddh.mindustry.toast.common.stripColors
+import com.github.kennarddh.mindustry.toast.common.stripGlyphs
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kotlinx.datetime.Clock
 import mindustry.game.EventType
@@ -56,7 +58,11 @@ class GameEventsHandler : Handler() {
                 ToastVars.server, Clock.System.now(),
                 PlayerChatGameEvent(
                     player.plainName(), player.uuid(),
-                    Strings.stripColors(event.message.stripFooMessageInvisibleCharacters())
+                    event.message
+                        .stripFooMessageInvisibleCharacters()
+                        .stripGlyphs()
+                        .stripColors()
+                        .preventDiscordPings()
                 )
             )
         )
