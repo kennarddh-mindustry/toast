@@ -1,9 +1,9 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import arc.util.Align
-import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
@@ -17,8 +17,10 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
 import com.github.kennarddh.mindustry.toast.core.commons.mindustryServerUserDataWhereClause
+import com.github.kennarddh.mindustry.toast.core.commons.safeGetPlayerData
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import mindustry.game.EventType
@@ -27,39 +29,26 @@ import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.update
+import kotlin.time.Duration
 
+private const val MAX_XP_PER_WINDOW_TIME: Int = 10
 
 class UserStatsHandler : Handler() {
-    // Constants
-    private val minActionsPerWindowTimeToGetXP: Int = 30
-    private val xpPerWindowTime: Int = 10
-
-    private val playersActionsCounter: MutableMap<Player, Int> = mutableMapOf()
-
-    // Unsaved xp
-    private val playersXPDelta: MutableMap<Player, Int> = mutableMapOf()
+    private val playersUnsavedXp: MutableMap<Player, Int> = mutableMapOf()
 
     private val playersLastPlayTimeSave: MutableMap<Player, Instant> = mutableMapOf()
 
     @TimerTask(0f, 10f)
-    private suspend fun savePlayerDelta() {
-        GenesisAPI.getHandler<UserAccountHandler>()!!.users.forEach {
+    private suspend fun savePlayerStats() {
+        Entities.players.forEach {
             val player = it.key
 
-            if (!playersActionsCounter.containsKey(player)) return
-            if (!playersLastPlayTimeSave.containsKey(player)) return
-
-            val playerActionsCount = playersActionsCounter[player]!!
-            val lastPlayTimeSave = playersLastPlayTimeSave[player]!!
-
             val now = Clock.System.now()
+
+            val lastPlayTimeSave = playersLastPlayTimeSave.getOrDefault(player, now)
             val playTimeChanges = now - lastPlayTimeSave
 
-            // It's like this for easier change if later xp can be incremented in other places
-            if (playerActionsCount >= minActionsPerWindowTimeToGetXP)
-                playersXPDelta[player] = playersXPDelta[player]!! + xpPerWindowTime
-
-            val xpDelta = playersXPDelta[player]!!
+            val xpDelta = playersUnsavedXp.getOrDefault(player, 0)
             val isPlayerActive = xpDelta > 0
 
             Database.newTransaction {
@@ -80,50 +69,49 @@ class UserStatsHandler : Handler() {
                     }
                 }
 
-                updateStatsPopup(player)
+                val updatedMindustryUserAndUserServerData = player.getMindustryUserAndUserServerData()
 
-                playersActionsCounter[player] = 0
-                playersXPDelta[player] = 0
+                Entities.players[player]?.xp =
+                    updatedMindustryUserAndUserServerData?.get(MindustryUserServerData.xp) ?: 0
+                Entities.players[player]?.playTime =
+                    updatedMindustryUserAndUserServerData?.get(MindustryUserServerData.playTime) ?: Duration.ZERO
+
                 playersLastPlayTimeSave[player] = now
             }
         }
     }
 
-    private suspend fun updateStatsPopup(player: Player) {
-        Database.newTransaction {
-            val mindustryUserServerData = player.getMindustryUserAndUserServerData()!!
+    @TimerTask(1f, 1f)
+    private fun updateStatsPopup(player: Player) {
+        val playerData = player.safeGetPlayerData() ?: return
 
-            val xp = mindustryUserServerData[MindustryUserServerData.xp]
-            val playTime = mindustryUserServerData[MindustryUserServerData.playTime]
+        val now = Clock.System.now()
+        val lastPlayTimeSave = playersLastPlayTimeSave.getOrDefault(player, now)
+        val computedPlayTime = playerData.playTime + (now - lastPlayTimeSave)
 
-            player.infoPopup(
-                """
-                XP: $xp
-                Rank: ${UserRank.getRank(xp)}
-                Play Time: ${playTime.toDisplayString()}
-                """.trimIndent(),
-                10.5f, Align.topRight, 200, 0, 0, 10
-            )
-        }
+        player.infoPopup(
+            """
+            XP: ${playerData.xp}
+            Rank: ${UserRank.getRank(playerData.xp)}
+            Play Time: ${computedPlayTime.toDisplayString()}
+            """.trimIndent(),
+            10f, Align.topRight, 200, 0, 0, 10
+        )
     }
 
-    private fun incrementActionsCounter(player: Player, value: Int) {
-        playersActionsCounter[player] = playersActionsCounter[player]!! + value
-    }
+    private fun tryIncrementPlayerXP(player: Player, value: Int = 1) {
+        val unsavedXp = playersUnsavedXp.getOrDefault(player, 0)
 
-    @EventHandler
-    private fun onPlayerJoin(event: EventType.PlayerJoin) {
-        playersActionsCounter[event.player] = 0
-        playersXPDelta[event.player] = 0
+        // Limit xp per window time
+        val coercedValue = (unsavedXp + value).coerceIn(0, MAX_XP_PER_WINDOW_TIME)
 
-        playersLastPlayTimeSave[event.player] = Clock.System.now()
+        playersUnsavedXp[player] = coercedValue
+
+        Entities.players[player]?.xp = coercedValue
     }
 
     @EventHandler
     private fun onPlayerLeave(event: EventType.PlayerLeave) {
-        playersActionsCounter.remove(event.player)
-        playersXPDelta.remove(event.player)
-
         playersLastPlayTimeSave.remove(event.player)
     }
 
@@ -132,13 +120,14 @@ class UserStatsHandler : Handler() {
      */
     @EventHandler
     private fun onBlockBuildEndEvent(event: EventType.BlockBuildEndEvent) {
-        if (event.unit.player != null)
-            incrementActionsCounter(event.unit.player, 1)
+        if (event.unit.player == null) return
+
+        tryIncrementPlayerXP(event.unit.player)
     }
 
     @EventHandler
     private fun onPlayerChatEvent(event: EventType.PlayerChatEvent) {
-        incrementActionsCounter(event.player, 1)
+        tryIncrementPlayerXP(event.player)
     }
 
     enum class XPCommandType {
@@ -149,6 +138,7 @@ class UserStatsHandler : Handler() {
     @MinimumRole(UserRole.Admin)
     @ClientSide
     @ServerSide
+    @Description("Get and update player's xp .This will always return saved data.")
     suspend fun xp(
         player: Player? = null,
         target: Player,
