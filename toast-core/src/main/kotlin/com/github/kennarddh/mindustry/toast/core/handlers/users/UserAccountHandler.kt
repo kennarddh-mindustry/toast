@@ -7,6 +7,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Descript
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
+import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.menus.Menu
@@ -18,6 +19,9 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.exists
+import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerRoleChangedGameEvent
 import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
@@ -29,6 +33,8 @@ import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
 import com.password4j.types.Argon2
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
@@ -260,6 +266,16 @@ class UserAccountHandler : Handler() {
             target.clearRoleEffect()
             newRole.applyRoleEffect(target)
             target.applyName(newRole)
+
+            CoroutineScopes.Main.launch {
+                Messenger.publishGameEvent(
+                    "${ToastVars.server.name}.player.role.changed",
+                    GameEvent(
+                        ToastVars.server, Clock.System.now(),
+                        PlayerRoleChangedGameEvent(targetUser[Users.id].value)
+                    )
+                )
+            }
 
             return@newTransaction CommandResult("Successfully changed ${targetUser[Users.username]} to $newRole.")
         }

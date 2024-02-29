@@ -40,6 +40,12 @@ data class PlayerPunishedGameEvent(
 ) : GameEventBase()
 
 @Serializable
+@SerialName("PlayerRoleChanged")
+data class PlayerRoleChangedGameEvent(
+    val userID: Int,
+) : GameEventBase()
+
+@Serializable
 @SerialName("PlayerReported")
 data class PlayerReportedGameEvent(
     val playerMindustryName: String,
