@@ -9,7 +9,7 @@ import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 
-class UserRoleSyncHandler : Handler() {
+class UserRoleSyncHandler : Handler {
     override suspend fun onInit() {
         Messenger.listenGameEvent("${ToastVars.server.name}ServerRoleSync", "*.player.role.changed") { gameEvent ->
             val data = gameEvent.data

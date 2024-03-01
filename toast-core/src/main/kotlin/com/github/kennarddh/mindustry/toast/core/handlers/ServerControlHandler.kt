@@ -1,6 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
-import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
+import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
@@ -14,14 +14,14 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import mindustry.gen.Call
 
-class ServerControlHandler : Handler() {
+class ServerControlHandler : Handler {
     override suspend fun onInit() {
         Messenger.listenServerControl("${ToastVars.server.name}ServerServerControl", "${ToastVars.server.name}.#") {
             val data = it.data
 
             if (data is ServerCommandServerControl) {
                 try {
-                    GenesisAPI.commandRegistry.invokeServerCommand(data.command)
+                    Genesis.commandRegistry.invokeServerCommand(data.command)
                 } catch (error: Exception) {
                     Logger.error("Unknown invokeServerCommand error occurred", error)
                 }

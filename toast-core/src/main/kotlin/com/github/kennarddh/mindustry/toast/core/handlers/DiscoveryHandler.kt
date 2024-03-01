@@ -13,7 +13,7 @@ import mindustry.Vars
 import java.io.IOException
 import java.net.URL
 
-class DiscoveryHandler : Handler() {
+class DiscoveryHandler : Handler {
     private lateinit var serverStart: Instant
     private lateinit var publicIP: String
 

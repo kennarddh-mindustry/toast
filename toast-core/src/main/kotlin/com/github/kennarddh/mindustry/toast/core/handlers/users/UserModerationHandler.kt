@@ -1,6 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
-import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
+import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
@@ -31,14 +31,14 @@ import mindustry.gen.Player
 import org.jetbrains.exposed.sql.insertAndGetId
 import kotlin.time.Duration
 
-class UserModerationHandler : Handler() {
+class UserModerationHandler : Handler {
     override suspend fun onInit() {
-        GenesisAPI.commandRegistry.removeCommand("kick")
-        GenesisAPI.commandRegistry.removeCommand("ban")
-        GenesisAPI.commandRegistry.removeCommand("bans")
-        GenesisAPI.commandRegistry.removeCommand("unban")
-        GenesisAPI.commandRegistry.removeCommand("pardon")
-        GenesisAPI.commandRegistry.removeCommand("subnet-ban")
+        Genesis.commandRegistry.removeCommand("kick")
+        Genesis.commandRegistry.removeCommand("ban")
+        Genesis.commandRegistry.removeCommand("bans")
+        Genesis.commandRegistry.removeCommand("unban")
+        Genesis.commandRegistry.removeCommand("pardon")
+        Genesis.commandRegistry.removeCommand("subnet-ban")
     }
 
     @Command(["kick"])

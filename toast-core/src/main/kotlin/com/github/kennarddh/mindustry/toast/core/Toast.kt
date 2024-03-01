@@ -1,6 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core
 
-import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
+import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.commons.AbstractPlugin
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.common.database.Database
@@ -33,38 +33,38 @@ class Toast : AbstractPlugin() {
 
         Logger.info("Registering command and parameter")
 
-        GenesisAPI.commandRegistry.registerCommandValidationAnnotation(MinimumRole::class, ::validateMinimumRole)
-        GenesisAPI.commandRegistry.registerCommandValidationAnnotation(LoggedIn::class, ::validateLoggedIn)
-        GenesisAPI.commandRegistry.registerCommandValidationAnnotation(MinimumRank::class, ::validateMinimumRank)
-        GenesisAPI.commandRegistry.replaceParameterType(Player::class, ToastPlayerParameter())
+        Genesis.commandRegistry.registerCommandValidationAnnotation(MinimumRole::class, ::validateMinimumRole)
+        Genesis.commandRegistry.registerCommandValidationAnnotation(LoggedIn::class, ::validateLoggedIn)
+        Genesis.commandRegistry.registerCommandValidationAnnotation(MinimumRank::class, ::validateMinimumRank)
+        Genesis.commandRegistry.replaceParameterType(Player::class, ToastPlayerParameter())
 
         Logger.info("Registering handlers")
 
-        GenesisAPI.registerHandler(UserAccountHandler())
-        GenesisAPI.registerHandler(UserJoinsHandler())
-        GenesisAPI.registerHandler(UserStatsHandler())
-        GenesisAPI.registerHandler(UserModerationHandler())
-        GenesisAPI.registerHandler(UserModerationSyncHandler())
-        GenesisAPI.registerHandler(UserRoleSyncHandler())
-        GenesisAPI.registerHandler(UserReportHandler())
-        GenesisAPI.registerHandler(UserDiscordVerify())
+        Genesis.registerHandler(UserAccountHandler())
+        Genesis.registerHandler(UserJoinsHandler())
+        Genesis.registerHandler(UserStatsHandler())
+        Genesis.registerHandler(UserModerationHandler())
+        Genesis.registerHandler(UserModerationSyncHandler())
+        Genesis.registerHandler(UserRoleSyncHandler())
+        Genesis.registerHandler(UserReportHandler())
+        Genesis.registerHandler(UserDiscordVerify())
 
-        GenesisAPI.registerHandler(GameEventsHandler())
-        GenesisAPI.registerHandler(DiscoveryHandler())
+        Genesis.registerHandler(GameEventsHandler())
+        Genesis.registerHandler(DiscoveryHandler())
 
-        GenesisAPI.registerHandler(SettingsHandler())
-        GenesisAPI.registerHandler(DiscordHandler())
-        GenesisAPI.registerHandler(StartHandler())
+        Genesis.registerHandler(SettingsHandler())
+        Genesis.registerHandler(DiscordHandler())
+        Genesis.registerHandler(StartHandler())
 
-        GenesisAPI.registerHandler(VoteKickCommandHandler())
-        GenesisAPI.registerHandler(RTVCommandHandler())
+        Genesis.registerHandler(VoteKickCommandHandler())
+        Genesis.registerHandler(RTVCommandHandler())
 
-        GenesisAPI.registerHandler(ServerPresenceHandler())
-        GenesisAPI.registerHandler(WelcomeHandler())
+        Genesis.registerHandler(ServerPresenceHandler())
+        Genesis.registerHandler(WelcomeHandler())
 
-        GenesisAPI.registerHandler(ServerControlHandler())
+        Genesis.registerHandler(ServerControlHandler())
 
-        GenesisAPI.registerHandler(MessageHandler())
+        Genesis.registerHandler(MessageHandler())
 
         Logger.info("Loaded")
     }

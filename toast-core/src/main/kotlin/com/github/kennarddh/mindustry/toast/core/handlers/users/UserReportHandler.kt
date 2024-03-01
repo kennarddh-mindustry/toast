@@ -13,7 +13,7 @@ import com.github.kennarddh.mindustry.toast.core.commons.safeGetPlayerData
 import kotlinx.datetime.Clock
 import mindustry.gen.Player
 
-class UserReportHandler : Handler() {
+class UserReportHandler : Handler {
     @Command(["report"])
     @ClientSide
     @Description("Report a player.")

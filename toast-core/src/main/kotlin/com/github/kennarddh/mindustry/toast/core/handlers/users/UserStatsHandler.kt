@@ -33,7 +33,7 @@ import kotlin.time.Duration
 
 private const val MAX_XP_PER_WINDOW_TIME: Int = 10
 
-class UserStatsHandler : Handler() {
+class UserStatsHandler : Handler {
     private val playersUnsavedXp: MutableMap<Player, Int> = mutableMapOf()
 
     private val playersLastPlayTimeSave: MutableMap<Player, Instant> = mutableMapOf()

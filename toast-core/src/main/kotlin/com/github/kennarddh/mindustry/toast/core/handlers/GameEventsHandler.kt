@@ -1,6 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
-import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
+import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.extensions.stripFooMessageInvisibleCharacters
@@ -16,7 +16,7 @@ import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kotlinx.datetime.Clock
 import mindustry.game.EventType
 
-class GameEventsHandler : Handler() {
+class GameEventsHandler : Handler {
     @EventHandler
     suspend fun onPlayerJoin(event: EventType.PlayerJoin) {
         val player = event.player
@@ -50,7 +50,7 @@ class GameEventsHandler : Handler() {
         val player = event.player
 
         // Ignore client command
-        if (event.message.startsWith(GenesisAPI.commandRegistry.clientPrefix)) return
+        if (event.message.startsWith(Genesis.commandRegistry.clientPrefix)) return
 
         Messenger.publishGameEvent(
             "${ToastVars.server.name}.player.chat",

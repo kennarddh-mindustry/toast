@@ -14,7 +14,7 @@ import com.github.kennarddh.mindustry.toast.core.commons.getUser
 import mindustry.gen.Player
 import java.security.SecureRandom
 
-class UserDiscordVerify : Handler() {
+class UserDiscordVerify : Handler {
     private val pinSecureRandom = SecureRandom()
 
     @Command(["verify"])

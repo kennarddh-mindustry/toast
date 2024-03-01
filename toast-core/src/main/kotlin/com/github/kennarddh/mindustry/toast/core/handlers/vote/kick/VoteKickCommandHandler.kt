@@ -1,6 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.vote.kick
 
-import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
+import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
@@ -37,8 +37,8 @@ import kotlin.time.Duration.Companion.minutes
 
 class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote kick", 1.minutes) {
     override suspend fun onInit() {
-        GenesisAPI.commandRegistry.removeCommand("votekick")
-        GenesisAPI.commandRegistry.removeCommand("vote")
+        Genesis.commandRegistry.removeCommand("votekick")
+        Genesis.commandRegistry.removeCommand("vote")
     }
 
     @Command(["votekick", "vote-kick"])

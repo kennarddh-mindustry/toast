@@ -1,6 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
-import com.github.kennarddh.mindustry.genesis.core.GenesisAPI
+import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
@@ -41,7 +41,7 @@ import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.update
 
-class UserAccountHandler : Handler() {
+class UserAccountHandler : Handler {
     private val passwordHashFunctionInstance = Argon2Function.getInstance(
         4096, 10, 2, 64, Argon2.ID
     )
@@ -65,8 +65,8 @@ class UserAccountHandler : Handler() {
     )
 
     override suspend fun onInit() {
-        GenesisAPI.commandRegistry.removeCommand("admin")
-        GenesisAPI.commandRegistry.removeCommand("admins")
+        Genesis.commandRegistry.removeCommand("admin")
+        Genesis.commandRegistry.removeCommand("admins")
     }
 
     @EventHandler
@@ -194,7 +194,7 @@ class UserAccountHandler : Handler() {
             playerData.userID = user[Users.id].value
 
             user[Users.role].applyRoleEffect(player)
-            
+
             player.applyName(user[Users.role])
 
             CommandResult(

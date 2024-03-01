@@ -7,7 +7,7 @@ import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.extensions.openURI
 import mindustry.gen.Player
 
-class DiscordHandler : Handler() {
+class DiscordHandler : Handler {
     @Command(["discord"])
     @ClientSide
     @Description("Open Toast Mindustry Server Discord.")

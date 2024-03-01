@@ -21,7 +21,7 @@ import mindustry.net.Administration.Config
 import mindustry.server.ServerControl
 import kotlin.time.Duration.Companion.seconds
 
-class StartHandler : Handler() {
+class StartHandler : Handler {
     @EventHandler
     suspend fun onLoad(event: EventType.ServerLoadEvent) {
         Logger.info("Server load... Will host in 1 second.")

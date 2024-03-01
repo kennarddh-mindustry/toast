@@ -17,7 +17,7 @@ import kotlinx.datetime.toInstant
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.alias
 
-class UserModerationSyncHandler : Handler() {
+class UserModerationSyncHandler : Handler {
     override suspend fun onInit() {
         Messenger.listenGameEvent("${ToastVars.server.name}ServerPunishmentSync", "*.punishment.*") { gameEvent ->
             val data = gameEvent.data

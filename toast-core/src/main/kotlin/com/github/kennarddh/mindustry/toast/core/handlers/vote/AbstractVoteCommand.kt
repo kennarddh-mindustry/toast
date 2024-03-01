@@ -18,7 +18,7 @@ abstract class AbstractVoteCommand<T : Any>(
     val name: String,
     protected val timeout: Duration,
     val resetOnPlay: Boolean = true
-) : Handler() {
+) : Handler {
     private var session: VoteSession<T>? = null
 
     private val sessionMutex = Mutex()

@@ -5,7 +5,7 @@ import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import mindustry.net.Administration.Config
 
-class ServerPresenceHandler : Handler() {
+class ServerPresenceHandler : Handler {
     override suspend fun onInit() {
         Config.serverName.set("Toast | ${ToastVars.server.displayName}")
         Config.desc.set(ToastVars.server.description)

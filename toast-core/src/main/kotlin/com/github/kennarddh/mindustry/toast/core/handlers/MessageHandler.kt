@@ -13,7 +13,7 @@ import mindustry.Vars
 import mindustry.gen.Groups
 import mindustry.gen.Player
 
-class MessageHandler : Handler() {
+class MessageHandler : Handler {
     @Command(["whisper", "w"])
     @ClientSide
     @Description("Send a message to a player. Won't be logged in Discord.")

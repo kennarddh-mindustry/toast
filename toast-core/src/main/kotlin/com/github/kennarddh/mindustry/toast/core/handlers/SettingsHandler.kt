@@ -7,7 +7,7 @@ import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import mindustry.Vars
 import mindustry.game.EventType
 
-class SettingsHandler : Handler() {
+class SettingsHandler : Handler {
     override suspend fun onInit() {
         Logger.info("Applying configs.")
 

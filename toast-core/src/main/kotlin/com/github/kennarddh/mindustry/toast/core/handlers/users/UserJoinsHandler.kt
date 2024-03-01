@@ -1,7 +1,7 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import arc.util.Strings
-import com.github.kennarddh.mindustry.genesis.core.commons.priority.PriorityEnum
+import com.github.kennarddh.mindustry.genesis.core.commons.priority.Priority
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.server.packets.annotations.ServerPacketHandler
@@ -28,14 +28,14 @@ import mindustry.net.Packets
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.kotlin.datetime.CurrentDateTime
 
-class UserJoinsHandler : Handler() {
+class UserJoinsHandler : Handler {
     private val usidHashFunctionInstance = Argon2Function.getInstance(
         4096, 10, 2, 64, Argon2.ID
     )
 
     private val numberOnlyNameRegex = """^\d+$""".toRegex()
 
-    @ServerPacketHandler(PriorityEnum.Important)
+    @ServerPacketHandler(Priority.Important)
     fun checkPlayerName(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
         if (packet.name.length > 50) {
             con.kickWithoutLogging("Name cannot be longer than 50 characters long.")
@@ -73,7 +73,7 @@ class UserJoinsHandler : Handler() {
         return true
     }
 
-    @ServerPacketHandler(PriorityEnum.Important)
+    @ServerPacketHandler(Priority.Important)
     suspend fun checkIsSameUserAlreadyJoined(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
         val user = Database.newTransaction {
             Users.join(
@@ -102,7 +102,7 @@ class UserJoinsHandler : Handler() {
     }
 
 
-    @ServerPacketHandler(PriorityEnum.High)
+    @ServerPacketHandler(Priority.High)
     suspend fun onConnectPacket(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
         val ip = con.address.packIP()
 
