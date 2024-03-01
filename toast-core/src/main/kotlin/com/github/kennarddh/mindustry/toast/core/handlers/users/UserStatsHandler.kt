@@ -81,6 +81,12 @@ class UserStatsHandler : Handler {
     }
 
     @TimerTask(1f, 1f)
+    private fun updatePlayersStatsPopup() {
+        Entities.players.keys.forEach {
+            updateStatsPopup(it)
+        }
+    }
+
     private fun updateStatsPopup(player: Player) {
         val playerData = player.safeGetPlayerData() ?: return
 
