@@ -31,13 +31,13 @@ abstract class AbstractVoteCommand<T : Any>(
 
     protected suspend fun start(initiator: Player, objective: T): Boolean {
         if (session != null) {
-            initiator.sendMessage("[#ff0000]There is $name vote in progress.")
+            initiator.sendMessage("[#ff0000]There is '$name' vote in progress.")
 
             return false
         }
 
         if (!canPlayerStart(initiator, objective)) {
-            initiator.sendMessage("[#ff0000]You cannot start $name vote.")
+            initiator.sendMessage("[#ff0000]You cannot start '$name' vote.")
 
             return false
         }
@@ -56,7 +56,7 @@ abstract class AbstractVoteCommand<T : Any>(
 
             Call.sendMessage(
                 """
-                [#00ff00]${initiator.plainName()} started $name vote.
+                [#00ff00]${initiator.plainName()} started '$name' vote.
                 ${session!!.votes}/${getRequiredVotes()} votes are required.
                 ${getSessionDetails(session!!)}
                 """.trimIndent()
@@ -79,13 +79,13 @@ abstract class AbstractVoteCommand<T : Any>(
     protected suspend fun vote(player: Player, vote: Boolean): Boolean {
         sessionMutex.withLock {
             if (session == null) {
-                player.sendMessage("[#ff0000]No $name vote is in progress.")
+                player.sendMessage("[#ff0000]No '$name' vote is in progress.")
 
                 return false
             }
 
             if (!canPlayerVote(player, session!!)) {
-                player.sendMessage("[#ff0000]You cannot vote in $name vote.")
+                player.sendMessage("[#ff0000]You cannot vote in '$name' vote.")
 
                 return false
             }
@@ -94,7 +94,7 @@ abstract class AbstractVoteCommand<T : Any>(
 
             Call.sendMessage(
                 """
-                [#00ff00]${player.plainName()} voted ${vote.toDisplayString()} for $name vote.
+                [#00ff00]${player.plainName()} voted ${vote.toDisplayString()} for '$name' vote.
                 ${session!!.votes}/${getRequiredVotes()} votes are required.
                 """.trimIndent()
             )
@@ -112,13 +112,13 @@ abstract class AbstractVoteCommand<T : Any>(
     }
 
     protected open suspend fun cancel(player: Player) {
-        Call.sendMessage("[#ff0000]The $name vote cancelled by ${player.plainName()}.")
+        Call.sendMessage("[#ff0000]The '$name' vote cancelled by ${player.plainName()}.")
 
         silentCancel()
     }
 
     protected open suspend fun timeout() {
-        Call.sendMessage("[#ff0000]The $name vote timed out.")
+        Call.sendMessage("[#ff0000]The '$name' vote timed out.")
 
         sessionMutex.withLock {
             cleanUp()
@@ -139,7 +139,7 @@ abstract class AbstractVoteCommand<T : Any>(
             if (session == null) throw IllegalStateException("Cannot check votes when session is null")
 
             if (session!!.votes >= getRequiredVotes()) {
-                Call.sendMessage("[#00ff00]The $name vote succeeded.")
+                Call.sendMessage("[#00ff00]The '$name' vote succeeded.")
 
                 onSuccess(session!!)
 

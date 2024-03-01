@@ -45,7 +45,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
     @Command(["votekick", "vote-kick"])
     @ClientSide
     suspend fun startVoteKick(player: Player, target: Player, reason: String): CommandResult? {
-        if (Groups.player.size() < 3) CommandResult("There must be more than or equal to 3 players to start $name vote.")
+        if (Groups.player.size() < 3) CommandResult("There must be more than or equal to 3 players to start '$name' vote.")
 
         start(player, VoteKickVoteObjective(target, reason))
 

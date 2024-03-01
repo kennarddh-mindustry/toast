@@ -21,7 +21,7 @@ class SkipWaveCommandHandler : AbstractVoteCommand<Byte>("skip wave", 1.minutes)
             if (vote) {
                 start(player, 1)
             } else {
-                player.sendMessage("[#ff0000]Cannot vote no for $name because there is no $name session in progress.")
+                player.sendMessage("[#ff0000]Cannot vote no for '$name' because there is no '$name' vote session in progress.")
             }
 
             return
@@ -38,7 +38,7 @@ class SkipWaveCommandHandler : AbstractVoteCommand<Byte>("skip wave", 1.minutes)
     }
 
     override suspend fun onSuccess(session: VoteSession<Byte>) {
-        Call.sendMessage("[#00ff00]$name vote success. Skipping wave.")
+        Call.sendMessage("[#00ff00]'$name' vote success. Skipping wave.")
 
         Vars.logic.runWave()
     }
