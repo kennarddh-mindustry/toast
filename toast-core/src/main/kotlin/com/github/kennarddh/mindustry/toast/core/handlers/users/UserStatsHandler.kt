@@ -19,7 +19,6 @@ import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRol
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
-import com.github.kennarddh.mindustry.toast.core.commons.mindustryServerUserDataWhereClause
 import com.github.kennarddh.mindustry.toast.core.commons.safeGetPlayerData
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -57,7 +56,9 @@ class UserStatsHandler : Handler {
                     JoinType.INNER,
                     onColumn = MindustryUserServerData.mindustryUserID,
                     otherColumn = MindustryUser.id
-                ).update({ player.mindustryServerUserDataWhereClause }) {
+                ).update({
+                    (MindustryUser.mindustryUUID eq player.uuid()) and (MindustryUserServerData.server eq ToastVars.server)
+                }) {
                     with(SqlExpressionBuilder) {
                         it[MindustryUserServerData.xp] = MindustryUserServerData.xp + xpDelta
                         it[MindustryUserServerData.playTime] = MindustryUserServerData.playTime + playTimeChanges

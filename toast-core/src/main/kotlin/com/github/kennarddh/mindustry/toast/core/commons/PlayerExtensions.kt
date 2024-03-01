@@ -10,14 +10,11 @@ import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import com.github.kennarddh.mindustry.toast.core.commons.entities.PlayerData
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
-import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.and
 
 fun Player.distanceFrom(other: Player): Float =
     Mathf.sqrt(Mathf.pow(x - other.x, 2f) + Mathf.pow(y - other.y, 2f))
-
-val Player.mindustryServerUserDataWhereClause: Op<Boolean>
-    get() = con.mindustryServerUserDataWhereClause
 
 /**
  * Cannot be used before player is added to the "Entities.players" map
@@ -56,7 +53,10 @@ fun Player.getMindustryUserAndUserServerData() =
             onColumn = MindustryUserServerData.mindustryUserID,
             otherColumn = MindustryUser.id
         )
-        .selectOne { mindustryServerUserDataWhereClause }
+        .selectOne {
+            (MindustryUser.mindustryUUID eq uuid()) and (MindustryUserServerData.server eq ToastVars.server)
+        }
+
 
 fun Player.getUserAndMindustryUserAndUserServerData() =
     Users.join(
@@ -69,7 +69,9 @@ fun Player.getUserAndMindustryUserAndUserServerData() =
         JoinType.INNER,
         onColumn = MindustryUserServerData.mindustryUserID,
         otherColumn = MindustryUser.id
-    ).selectOne { mindustryServerUserDataWhereClause }
+    ).selectOne {
+        (MindustryUser.mindustryUUID eq uuid()) and (MindustryUserServerData.server eq ToastVars.server)
+    }
 
 fun Player.getUserOptionalAndMindustryUserAndUserServerData() =
     MindustryUser.join(
@@ -82,7 +84,9 @@ fun Player.getUserOptionalAndMindustryUserAndUserServerData() =
         JoinType.LEFT,
         onColumn = MindustryUserServerData.userID,
         otherColumn = Users.id
-    ).selectOne { mindustryServerUserDataWhereClause }
+    ).selectOne {
+        (MindustryUser.mindustryUUID eq uuid()) and (MindustryUserServerData.server eq ToastVars.server)
+    }
 
 fun Player.getMindustryUser() =
     MindustryUser.selectOne { MindustryUser.mindustryUUID eq uuid() }

@@ -28,7 +28,6 @@ import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.applyName
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
-import com.github.kennarddh.mindustry.toast.core.commons.mindustryServerUserDataWhereClause
 import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
@@ -38,6 +37,7 @@ import kotlinx.datetime.Clock
 import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.JoinType
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.update
 
@@ -186,7 +186,9 @@ class UserAccountHandler : Handler {
                     onColumn = MindustryUserServerData.mindustryUserID,
                     otherColumn = MindustryUser.id
                 )
-                .update({ player.mindustryServerUserDataWhereClause }) {
+                .update({
+                    (MindustryUser.mindustryUUID eq player.uuid()) and (MindustryUserServerData.server eq ToastVars.server)
+                }) {
                     it[MindustryUserServerData.userID] = user[Users.id]
                 }
 
