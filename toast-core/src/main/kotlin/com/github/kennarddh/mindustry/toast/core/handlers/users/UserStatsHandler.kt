@@ -100,7 +100,7 @@ class UserStatsHandler : Handler {
             Rank: ${UserRank.getRank(playerData.xp)}
             Play Time: ${computedPlayTime.toDisplayString()}
             """.trimIndent(),
-            10f, Align.topRight, 200, 0, 0, 10
+            1f, Align.topRight, 200, 0, 0, 10
         )
     }
 
