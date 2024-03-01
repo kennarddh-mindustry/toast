@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.core.handlers.vote.kick
+package com.github.kennarddh.mindustry.toast.core.handlers.vote.rtv
 
 import arc.Events
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
