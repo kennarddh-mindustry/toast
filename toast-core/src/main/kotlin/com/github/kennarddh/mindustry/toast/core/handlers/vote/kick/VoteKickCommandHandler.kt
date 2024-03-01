@@ -155,6 +155,9 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
     }
 
     override suspend fun getSessionDetails(session: VoteSession<VoteKickVoteObjective>): String {
-        return "Type [accent]/vote y[] or [accent]/vote n[] to vote."
+        return """
+            Voting to kick '${session.objective.target.plainName()}' with the reason '${session.objective.reason}'
+            Type [accent]/vote y[] or [accent]/vote n[] to vote.
+        """.trimIndent()
     }
 }
