@@ -129,7 +129,7 @@ abstract class AbstractVoteCommand<T : Any>(
      * Must be called with locked sessionMutex
      */
     private fun cleanUp() {
-        session!!.task.cancel()
+        session?.task?.cancel()
 
         session = null
     }
