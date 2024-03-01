@@ -54,12 +54,13 @@ abstract class AbstractVoteCommand<T : Any>(
             if (canPlayerVote(initiator, session!!))
                 session!!.voted[initiator] = true
 
+            val sessionDetail = getSessionDetails(session!!)
+
             Call.sendMessage(
                 """
                 [#00ff00]'${initiator.plainName()}' started '$name' vote.
                 ${session!!.votes}/${getRequiredVotes()} votes are required.
-                ${getSessionDetails(session!!)}
-                """.trimIndent()
+                """.trimIndent() + if (sessionDetail != "") "\n${sessionDetail}" else ""
             )
         }
 
