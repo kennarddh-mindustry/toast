@@ -9,8 +9,8 @@ import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.commands.parameters.validations.numbers.GTE
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.distanceFrom
+import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import mindustry.Vars
-import mindustry.gen.Groups
 import mindustry.gen.Player
 
 class MessageHandler : Handler {
@@ -41,7 +41,7 @@ class MessageHandler : Handler {
 
         Logger.info("${player.name} broadcast(${tileRange}): $filteredMessage")
 
-        Groups.player.each {
+        Entities.players.keys.forEach {
             if (it.distanceFrom(player) <= tileRange) {
                 it.sendMessage(computedMessage)
             }

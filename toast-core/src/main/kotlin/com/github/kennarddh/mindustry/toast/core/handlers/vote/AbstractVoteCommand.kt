@@ -5,12 +5,12 @@ import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.toDisplayString
+import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mindustry.game.EventType.*
 import mindustry.gen.Call
-import mindustry.gen.Groups
 import mindustry.gen.Player
 import kotlin.time.Duration
 
@@ -67,7 +67,7 @@ abstract class AbstractVoteCommand<T : Any>(
         return true
     }
 
-    protected open fun getRequiredVotes(): Int = Groups.player.size() / 2 + 1
+    protected open fun getRequiredVotes(): Int = Entities.players.size / 2 + 1
 
     protected open fun canPlayerVote(player: Player, session: VoteSession<T>): Boolean = true
 

@@ -4,7 +4,6 @@ import com.github.kennarddh.mindustry.genesis.core.commands.parameters.types.Com
 import com.github.kennarddh.mindustry.genesis.core.commands.parameters.types.CommandParameterParsingException
 import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
-import mindustry.gen.Groups
 import mindustry.gen.Player
 import kotlin.reflect.KClass
 
@@ -14,7 +13,7 @@ class ToastPlayerParameter : CommandParameter<Player> {
             try {
                 val inputInt = input.drop(1).toInt()
 
-                return Groups.player.find { it.id == inputInt }
+                return Entities.players.keys.find { it.id == inputInt }
                     ?: throw CommandParameterParsingException("Cannot convert $input into player for parameter :parameterName:. Cannot find player with the mindustry id $inputInt.")
             } catch (error: NumberFormatException) {
                 throw CommandParameterParsingException("Cannot convert $input into player for parameter :parameterName: because it's not a valid mindustry id, mindustry id must starts with '#' and followed with numbers.")
@@ -28,7 +27,7 @@ class ToastPlayerParameter : CommandParameter<Player> {
         }
 
         if (inputInt == null)
-            return Groups.player.find { it.plainName() == input }
+            return Entities.players.keys.find { it.plainName() == input }
                 ?: throw CommandParameterParsingException("Cannot convert $input into player for parameter :parameterName:. Cannot find player with the name $input.")
 
         return Database.newTransaction {
