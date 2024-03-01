@@ -28,6 +28,8 @@ class StartHandler : Handler {
 
         Config.port.set(ToastVars.port)
 
+        Logger.info("Port set to ${ToastVars.port}")
+
         delay(1.seconds)
 
         Logger.info("Hosting")
