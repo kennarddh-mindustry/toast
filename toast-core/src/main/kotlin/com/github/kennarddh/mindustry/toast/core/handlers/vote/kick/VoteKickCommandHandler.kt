@@ -21,6 +21,7 @@ import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRol
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUser
 import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
+import com.github.kennarddh.mindustry.toast.core.commons.safeGetPlayerData
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.AbstractVoteCommand
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.VoteSession
 import kotlinx.coroutines.launch
@@ -62,6 +63,23 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
     @MinimumRole(UserRole.Mod)
     suspend fun cancelCommand(player: Player) {
         cancel(player)
+    }
+
+    override fun canPlayerStart(player: Player, session: VoteKickVoteObjective): Boolean {
+        val playerData = player.safeGetPlayerData() ?: return false
+        val targetPlayerData = session.target.safeGetPlayerData() ?: return false
+
+        // If the player is public it's equivalent to UserRole.Player role
+        val playerComputedRole = playerData.role ?: UserRole.Player
+        val targetComputedRole = targetPlayerData.role ?: UserRole.Player
+
+        if (playerComputedRole < targetComputedRole) {
+            player.sendMessage("[#ff0000]Your role must be higher than target's role to vote kick them.")
+
+            return false
+        }
+
+        return true
     }
 
     override suspend fun onSuccess(session: VoteSession<VoteKickVoteObjective>) {
