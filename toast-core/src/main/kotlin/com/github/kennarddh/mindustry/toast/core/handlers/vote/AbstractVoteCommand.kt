@@ -56,7 +56,7 @@ abstract class AbstractVoteCommand<T : Any>(
 
             Call.sendMessage(
                 """
-                [#00ff00]${initiator.plainName()} started '$name' vote.
+                [#00ff00]'${initiator.plainName()}' started '$name' vote.
                 ${session!!.votes}/${getRequiredVotes()} votes are required.
                 ${getSessionDetails(session!!)}
                 """.trimIndent()
@@ -94,7 +94,7 @@ abstract class AbstractVoteCommand<T : Any>(
 
             Call.sendMessage(
                 """
-                [#00ff00]${player.plainName()} voted ${vote.toDisplayString()} for '$name' vote.
+                [#00ff00]'${player.plainName()}' voted ${vote.toDisplayString()} for '$name' vote.
                 ${session!!.votes}/${getRequiredVotes()} votes are required.
                 """.trimIndent()
             )
@@ -112,7 +112,7 @@ abstract class AbstractVoteCommand<T : Any>(
     }
 
     protected open suspend fun cancel(player: Player) {
-        Call.sendMessage("[#ff0000]The '$name' vote cancelled by ${player.plainName()}.")
+        Call.sendMessage("[#ff0000]The '$name' vote cancelled by '${player.plainName()}'.")
 
         silentCancel()
     }
