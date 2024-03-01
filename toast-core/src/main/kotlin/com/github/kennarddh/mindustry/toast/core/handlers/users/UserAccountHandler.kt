@@ -268,6 +268,8 @@ class UserAccountHandler : Handler {
             newRole.applyRoleEffect(target)
             target.applyName(newRole)
 
+            Entities.players[target]?.role = newRole
+
             CoroutineScopes.Main.launch {
                 Messenger.publishGameEvent(
                     "${ToastVars.server.name}.player.role.changed",
