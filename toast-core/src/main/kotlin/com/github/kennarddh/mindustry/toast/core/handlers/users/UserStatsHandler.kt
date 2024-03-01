@@ -76,6 +76,7 @@ class UserStatsHandler : Handler {
                     updatedMindustryUserAndUserServerData?.get(MindustryUserServerData.playTime) ?: Duration.ZERO
 
                 playersLastPlayTimeSave[player] = now
+                playersUnsavedXp[player] = 0
             }
         }
     }
@@ -112,7 +113,9 @@ class UserStatsHandler : Handler {
 
         playersUnsavedXp[player] = coercedValue
 
-        Entities.players[player]?.xp = coercedValue
+        val playerData = player.safeGetPlayerData() ?: return
+
+        playerData.xp = playerData.xp - unsavedXp + coercedValue
     }
 
     @EventHandler
