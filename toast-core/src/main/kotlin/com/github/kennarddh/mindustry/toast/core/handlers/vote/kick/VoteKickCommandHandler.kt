@@ -19,6 +19,7 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerPuni
 import com.github.kennarddh.mindustry.toast.common.toDisplayString
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUser
 import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
 import com.github.kennarddh.mindustry.toast.core.commons.safeGetPlayerData
@@ -66,6 +67,12 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
     }
 
     override fun canPlayerStart(player: Player, session: VoteKickVoteObjective): Boolean {
+        if (Entities.players.size < 3) {
+            player.sendMessage("[#ff0000]Minimum of 3 players to start a '$name' vote.")
+
+            return false
+        }
+
         val playerData = player.safeGetPlayerData() ?: return false
         val targetPlayerData = session.target.safeGetPlayerData() ?: return false
 
