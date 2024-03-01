@@ -30,6 +30,16 @@ class SkipWaveCommandHandler : AbstractVoteCommand<Byte>("skip wave", 1.minutes)
         vote(player, vote)
     }
 
+    override fun canPlayerStart(player: Player, session: Byte): Boolean {
+        if (!Vars.state.rules.waves) {
+            player.sendMessage("[#ff0000]Cannot start '$name' vote because waves is disabled")
+
+            return false
+        }
+
+        return true
+    }
+
     @Command(["skip-wave-cancel"])
     @ClientSide
     @MinimumRole(UserRole.Mod)
