@@ -60,6 +60,8 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
         cancel(player)
     }
 
+    override fun getRequiredVotes(): Int = 3
+
     override fun canPlayerStart(player: Player, objective: VoteKickVoteObjective): Boolean {
         if (Entities.players.size < 3) {
             player.sendMessage("[#ff0000]Minimum of 3 players to start a '$name' vote.")

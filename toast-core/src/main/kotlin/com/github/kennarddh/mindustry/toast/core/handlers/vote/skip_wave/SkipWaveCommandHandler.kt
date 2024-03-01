@@ -37,6 +37,8 @@ class SkipWaveCommandHandler : AbstractVoteCommand<Byte>("skip wave", 1.minutes)
         cancel(player)
     }
 
+    override fun getRequiredVotes(): Int = 3
+
     override suspend fun onSuccess(session: VoteSession<Byte>) {
         Call.sendMessage("[#00ff00]'$name' vote success. Skipping wave.")
 
