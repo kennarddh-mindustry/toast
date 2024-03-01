@@ -22,7 +22,7 @@ class RTVCommandHandler : AbstractVoteCommand<Byte>("rtv", 2.minutes) {
             if ((vote == null || vote == true)) {
                 start(player, 1)
             } else {
-                player.sendMessage("[#ff0000]Cannot vote no for rtv because there is no rtv session in progress.")
+                player.sendMessage("[#ff0000]Cannot vote no for '$name' because there is no '$name' vote session in progress.")
             }
 
             return
