@@ -6,7 +6,7 @@
   "minGameVersion": "146",
   "java": true,
   "main": "com.github.kennarddh.mindustry.toast.core.Toast",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "repo": "kennarddh-mindustry/toast",
   "dependencies": [
     "kotlin-runtime",
