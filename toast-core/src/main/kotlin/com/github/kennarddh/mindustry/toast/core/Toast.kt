@@ -17,6 +17,7 @@ import com.github.kennarddh.mindustry.toast.core.handlers.*
 import com.github.kennarddh.mindustry.toast.core.handlers.users.*
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.kick.VoteKickCommandHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.rtv.RTVCommandHandler
+import com.github.kennarddh.mindustry.toast.core.handlers.vote.skip_wave.SkipWaveCommandHandler
 import kotlinx.datetime.Clock
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.transactions.TransactionManager
@@ -58,6 +59,7 @@ class Toast : AbstractPlugin() {
 
         Genesis.registerHandler(VoteKickCommandHandler())
         Genesis.registerHandler(RTVCommandHandler())
+        Genesis.registerHandler(SkipWaveCommandHandler())
 
         Genesis.registerHandler(ServerPresenceHandler())
         Genesis.registerHandler(WelcomeHandler())
