@@ -15,9 +15,9 @@ import mindustry.gen.Player
 import kotlin.time.Duration
 
 abstract class AbstractVoteCommand<T : Any>(
-    val name: String,
+    protected val name: String,
     protected val timeout: Duration,
-    val resetOnPlay: Boolean = true
+    protected val resetOnPlay: Boolean = true
 ) : Handler {
     private var session: VoteSession<T>? = null
 
