@@ -13,8 +13,10 @@ import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.and
 
-fun Player.distanceFrom(other: Player): Float =
-    Mathf.sqrt(Mathf.pow(x - other.x, 2f) + Mathf.pow(y - other.y, 2f))
+fun Player.distanceFrom(other: Player): Float = distanceFrom(other.x, other.y)
+
+fun Player.distanceFrom(otherX: Float, otherY: Float): Float =
+    Mathf.sqrt(Mathf.pow(x - otherX, 2f) + Mathf.pow(y - otherY, 2f))
 
 /**
  * Cannot be used before player is added to the "Entities.players" map
