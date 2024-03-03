@@ -1,6 +1,9 @@
 package com.github.kennarddh.mindustry.toast.common
 
 enum class UserRank(val displayName: String, val minXP: Int) {
+    /**
+     * Rank for anyone that has less than 0 xp
+     */
     BeyondBad("Beyond Bad", -1),
     Duo1("Duo 1", 0),
     Duo2("Duo 2", 1000),
