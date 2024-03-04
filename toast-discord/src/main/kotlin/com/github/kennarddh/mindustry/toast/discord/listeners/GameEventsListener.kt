@@ -189,33 +189,37 @@ object GameEventsListener : ListenerAdapter() {
                 is PlayerRoleChangedGameEvent -> {
                     val data = it.data as PlayerRoleChangedGameEvent
 
-                    val user = Users.selectOne { Users.id eq data.userID }!!
+                    CoroutineScopes.Main.launch {
+                        val user = Database.newTransaction {
+                            Users.selectOne { Users.id eq data.userID }!!
+                        }
 
-                    val embed = EmbedBuilder().run {
-                        setTitle("User Role Changed")
+                        val embed = EmbedBuilder().run {
+                            setTitle("User Role Changed")
 
-                        setColor(DiscordConstant.ROLE_CHANGES_EMBED_COLOR)
+                            setColor(DiscordConstant.ROLE_CHANGES_EMBED_COLOR)
 
-                        addField(
-                            MessageEmbed.Field(
-                                "User",
-                                user[Users.username],
-                                true
+                            addField(
+                                MessageEmbed.Field(
+                                    "User",
+                                    user[Users.username],
+                                    true
+                                )
                             )
-                        )
 
-                        addField(
-                            MessageEmbed.Field(
-                                "Role",
-                                user[Users.username],
-                                true
+                            addField(
+                                MessageEmbed.Field(
+                                    "Role",
+                                    user[Users.username],
+                                    true
+                                )
                             )
-                        )
 
-                        build()
+                            build()
+                        }
+
+                        roleChangesChannel.sendMessageEmbeds(embed).queue()
                     }
-
-                    roleChangesChannel.sendMessageEmbeds(embed).queue()
 
                     null
                 }
