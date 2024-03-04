@@ -293,7 +293,7 @@ class UserAccountHandler : Handler {
         }
 
         val targetUser = target.getUser()
-            ?: return CommandResult("Target is not registered.", CommandResultStatus.Failed)
+            ?: return CommandResult("Target is not logged in.", CommandResultStatus.Failed)
 
         val targetPlayerData = target.safeGetPlayerData() ?: return null
 
