@@ -19,7 +19,7 @@ lateinit var toastMindustryGuild: Guild
 lateinit var notificationChannel: TextChannel
 lateinit var reportsChannel: TextChannel
 lateinit var serverListChannel: TextChannel
-
+lateinit var roleChangesChannel: TextChannel
 
 suspend fun main() {
     Logger.info("Loaded")

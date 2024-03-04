@@ -186,7 +186,39 @@ object GameEventsListener : ListenerAdapter() {
                     null
                 }
 
-                is PlayerRoleChangedGameEvent -> null
+                is PlayerRoleChangedGameEvent -> {
+                    val data = it.data as PlayerRoleChangedGameEvent
+
+                    val user = Users.selectOne { Users.id eq data.userID }!!
+
+                    val embed = EmbedBuilder().run {
+                        setTitle("User Role Changed")
+
+                        setColor(DiscordConstant.ROLE_CHANGES_EMBED_COLOR)
+
+                        addField(
+                            MessageEmbed.Field(
+                                "User",
+                                user[Users.username],
+                                true
+                            )
+                        )
+
+                        addField(
+                            MessageEmbed.Field(
+                                "Role",
+                                user[Users.username],
+                                true
+                            )
+                        )
+
+                        build()
+                    }
+
+                    roleChangesChannel.sendMessageEmbeds(embed).queue()
+
+                    null
+                }
             }
 
             if (message != null)
