@@ -39,14 +39,8 @@ enum class UserRole(
 
     val fullPermissions: Set<Permission>
         get() {
-            val allAffectingRoles = entries.filter { it <= this }
+            val affectingRoles = entries.filter { it <= this }
 
-            val computedPermissions: Set<Permission> = setOf()
-
-            allAffectingRoles.forEach {
-                computedPermissions + it.permissions
-            }
-
-            return computedPermissions
+            return affectingRoles.flatMap { it.permissions }.toSet()
         }
 }
