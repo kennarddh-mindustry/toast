@@ -1,6 +1,10 @@
 package com.github.kennarddh.mindustry.toast.common
 
-enum class UserRank(val displayName: String, val minXP: Int) {
+enum class UserRank(
+    val displayName: String,
+    val minXP: Int,
+    val permissions: Set<Permission> = setOf()
+) {
     /**
      * Rank for anyone that has less than 0 xp
      */
@@ -26,8 +30,21 @@ enum class UserRank(val displayName: String, val minXP: Int) {
 
     override fun toString(): String = this.displayName
 
+    val fullPermissions: Set<Permission>
+        get() {
+            val allAffectingRanks = entries.filter { it <= this }
+
+            val computedPermissions: Set<Permission> = setOf()
+
+            allAffectingRanks.forEach {
+                computedPermissions + it.permissions
+            }
+
+            return computedPermissions
+        }
+
     companion object {
-        val sortedDescending: List<UserRank> = entries.sortedByDescending { it.minXP }
+        private val sortedDescending: List<UserRank> = entries.sortedByDescending { it.minXP }
 
         fun getRank(xp: Int): UserRank {
             for (userRank in sortedDescending) {
