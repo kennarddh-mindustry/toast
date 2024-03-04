@@ -12,22 +12,15 @@ import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandl
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.menus.Menu
 import com.github.kennarddh.mindustry.genesis.core.menus.Menus
-import com.github.kennarddh.mindustry.toast.common.UserRole
-import com.github.kennarddh.mindustry.toast.common.clearRoleEffect
+import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.Database
-import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
-import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
-import com.github.kennarddh.mindustry.toast.common.database.tables.Users
-import com.github.kennarddh.mindustry.toast.common.exists
+import com.github.kennarddh.mindustry.toast.common.database.tables.*
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerRoleChangedGameEvent
-import com.github.kennarddh.mindustry.toast.common.selectOne
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
-import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
-import com.github.kennarddh.mindustry.toast.core.commons.applyName
+import com.github.kennarddh.mindustry.toast.core.commons.*
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
-import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
 import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
@@ -36,10 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import mindustry.game.EventType
 import mindustry.gen.Player
-import org.jetbrains.exposed.sql.JoinType
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.update
+import org.jetbrains.exposed.sql.*
 
 class UserAccountHandler : Handler {
     private val passwordHashFunctionInstance = Argon2Function.getInstance(
@@ -284,4 +274,126 @@ class UserAccountHandler : Handler {
 
             return@newTransaction CommandResult("Successfully changed ${targetUser[Users.username]} to $newRole.")
         }
+
+    @Command(["user"])
+    @ClientSide
+    @ServerSide
+    @Description("Get data about a user.")
+    fun getUserData(player: Player? = null, target: Player? = player): CommandResult? {
+        if (player == null && target == null) return CommandResult(
+            "Target must not be null on server",
+            CommandResultStatus.Failed
+        )
+
+        if (target == null) {
+            return CommandResult(
+                "There is an error. Please report this and explain what make this happen. Error code: NULL_TARGET_COMMAND",
+                CommandResultStatus.Failed
+            )
+        }
+
+        val targetUser = target.getUser()
+            ?: return CommandResult("Target is not registered.", CommandResultStatus.Failed)
+
+        val targetPlayerData = target.safeGetPlayerData() ?: return null
+
+        val permissions =
+            if (player == null) Permission.all else player.safeGetPlayerData()?.fullPermissions ?: return null
+
+        val targetUUIDs: Set<String> =
+            if (permissions.contains(Permission.ViewUUID)) {
+                val uuids = MindustryUser
+                    .join(
+                        MindustryUserServerData,
+                        JoinType.INNER,
+                        onColumn = MindustryUser.id,
+                        otherColumn = MindustryUserServerData.mindustryUserID
+                    )
+                    .select(MindustryUser.mindustryUUID)
+                    .where { MindustryUserServerData.userID eq targetPlayerData.userID }
+
+                uuids.map { it[MindustryUser.mindustryUUID] }.toSet()
+            } else {
+                setOf()
+            }
+
+        val targetIPs: Set<String> =
+            if (permissions.contains(Permission.ViewIP)) {
+                val ips = MindustryUser
+                    .join(
+                        MindustryUserServerData,
+                        JoinType.INNER,
+                        onColumn = MindustryUser.id,
+                        otherColumn = MindustryUserServerData.mindustryUserID
+                    )
+                    .join(
+                        MindustryUserIPAddresses,
+                        JoinType.INNER,
+                        onColumn = MindustryUser.id,
+                        otherColumn = MindustryUserIPAddresses.mindustryUserID
+                    )
+                    .select(MindustryUserIPAddresses.ipAddress)
+                    .where { MindustryUserServerData.userID eq targetPlayerData.userID }
+
+                ips.map { it[MindustryUserIPAddresses.ipAddress].unpackIP() }.toSet()
+            } else {
+                setOf()
+            }
+
+        val targetMindustryNames: Set<String> =
+            if (permissions.contains(Permission.ViewMindustryNamesHistory)) {
+                val ips = MindustryUser
+                    .join(
+                        MindustryUserServerData,
+                        JoinType.INNER,
+                        onColumn = MindustryUser.id,
+                        otherColumn = MindustryUserServerData.mindustryUserID
+                    )
+                    .join(
+                        MindustryUserMindustryNames,
+                        JoinType.INNER,
+                        onColumn = MindustryUser.id,
+                        otherColumn = MindustryUserMindustryNames.mindustryUserID
+                    )
+                    .select(MindustryUserMindustryNames.strippedName)
+                    .where { MindustryUserServerData.userID eq targetPlayerData.userID }
+
+                ips.map { it[MindustryUserMindustryNames.strippedName] }.toSet()
+            } else {
+                setOf()
+            }
+
+        val targetTotalXP = MindustryUser
+            .join(
+                MindustryUserServerData,
+                JoinType.INNER,
+                onColumn = MindustryUser.id,
+                otherColumn = MindustryUserServerData.mindustryUserID
+            )
+            .join(
+                MindustryUserMindustryNames,
+                JoinType.INNER,
+                onColumn = MindustryUser.id,
+                otherColumn = MindustryUserMindustryNames.mindustryUserID
+            )
+            .select(MindustryUserServerData.xp.sum())
+            .where { MindustryUserServerData.userID eq targetPlayerData.userID }
+            .firstOrNull()
+            ?.get(MindustryUserServerData.xp.sum())
+
+
+        return CommandResult(
+            """
+            Info for ${targetUser[Users.username]}.
+            Total XP: $targetTotalXP
+            UUIDs: ${if (permissions.contains(Permission.ViewUUID)) targetUUIDs.joinToString(", ") else "No Permission"}
+            IPs: ${if (permissions.contains(Permission.ViewIP)) targetIPs.joinToString(", ") else "No Permission"}
+            Mindustry names: ${
+                if (permissions.contains(Permission.ViewMindustryNamesHistory)) targetMindustryNames.joinToString(
+                    ", "
+                ) else "No Permission"
+            }
+            """.trimIndent()
+        )
+    }
 }

@@ -18,7 +18,7 @@ enum class UserRole(
     Player("Player", { }, setOf(Permission.Join, Permission.Chat)),
 
     @SerialName("Mod")
-    Mod("Mod", { }, setOf(Permission.ViewUUID)),
+    Mod("Mod", { }, setOf(Permission.ViewUUID, Permission.ViewMindustryNamesHistory)),
 
     @SerialName("Admin")
     Admin("Admin", {
