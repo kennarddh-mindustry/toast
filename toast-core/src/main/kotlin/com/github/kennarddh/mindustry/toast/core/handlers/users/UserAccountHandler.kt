@@ -299,8 +299,10 @@ class UserAccountHandler : Handler {
             val targetPlayerData = target.safeGetPlayerData() ?: return@newTransaction null
 
             val permissions =
-                if (player == null) Permission.all else player.safeGetPlayerData()?.fullPermissions
-                    ?: return@newTransaction null
+                if (player == null)
+                    Permission.all
+                else
+                    player.safeGetPlayerData()?.fullPermissions ?: return@newTransaction null
 
             val targetUUIDs: Set<String> =
                 if (permissions.contains(Permission.ViewUUID)) {
