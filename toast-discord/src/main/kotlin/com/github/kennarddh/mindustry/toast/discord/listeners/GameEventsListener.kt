@@ -210,7 +210,7 @@ object GameEventsListener : ListenerAdapter() {
                             addField(
                                 MessageEmbed.Field(
                                     "Role",
-                                    user[Users.username],
+                                    user[Users.role].displayName,
                                     true
                                 )
                             )
