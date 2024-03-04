@@ -195,7 +195,7 @@ object GameEventsListener : ListenerAdapter() {
                         }
 
                         val embed = EmbedBuilder().run {
-                            setTitle("User Role Changed")
+                            setTitle("User's Role Changed")
 
                             setColor(DiscordConstant.ROLE_CHANGES_EMBED_COLOR)
 
