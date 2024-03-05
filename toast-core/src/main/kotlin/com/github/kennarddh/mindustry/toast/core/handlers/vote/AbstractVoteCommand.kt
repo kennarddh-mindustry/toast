@@ -30,10 +30,12 @@ abstract class AbstractVoteCommand<T : Any>(
     }
 
     protected suspend fun start(initiator: Player, objective: T): Boolean {
-        if (session != null) {
-            initiator.sendMessage("[#ff0000]There is '$name' vote in progress.")
+        sessionMutex.withLock {
+            if (session != null) {
+                initiator.sendMessage("[#ff0000]There is '$name' vote in progress.")
 
-            return false
+                return false
+            }
         }
 
         if (!canPlayerStart(initiator, objective)) {
@@ -63,6 +65,8 @@ abstract class AbstractVoteCommand<T : Any>(
                 """.trimIndent() + if (sessionDetail != "") "\n${sessionDetail}" else ""
             )
         }
+
+        checkIsRequiredVoteReached()
 
         return true
     }
