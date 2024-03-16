@@ -1,6 +1,8 @@
 package com.github.kennarddh.mindustry.toast.core.commons
 
 import com.github.kennarddh.mindustry.toast.common.Server
+import mindustry.game.Rules
+import mindustry.net.Administration.Config
 
 object ToastVars {
     val server: Server
@@ -14,4 +16,10 @@ object ToastVars {
 
     val port: Int
         get() = System.getenv("PORT")?.toInt() ?: 6567
+
+    val applyRules: Rules.() -> Unit = {}
+
+    val applyConfigs: () -> Unit = {
+        Config.messageRateLimit.set(0.5f)
+    }
 }

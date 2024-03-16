@@ -11,6 +11,7 @@ class SettingsHandler : Handler {
     override suspend fun onInit() {
         Logger.info("Applying configs.")
 
+        ToastVars.applyConfigs()
         ToastVars.server.gameMode.applyConfigs()
         ToastVars.server.applyConfigs()
 
@@ -21,6 +22,7 @@ class SettingsHandler : Handler {
     fun onPlay(event: EventType.PlayEvent) {
         Logger.info("New map. Applying rules.")
 
+        ToastVars.applyRules(Vars.state.rules)
         ToastVars.server.gameMode.applyRules(Vars.state.rules)
         ToastVars.server.applyRules(Vars.state.rules)
 
