@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
     init: true
+    tty: true
+    stdin_open: true
     ports:
       - "6567:6567/tcp"
       - "6567:6567/udp"
@@ -43,6 +45,8 @@ services:
       context: .
       dockerfile: ./prod/Dockerfiles/mindustry.Dockerfile
     init: true
+    tty: true
+    stdin_open: true
     ports:
       - "6568:6568/tcp"
       - "6568:6568/udp"
