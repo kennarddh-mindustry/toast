@@ -24,7 +24,7 @@ object Database {
         config.minimumIdle = 2
         config.maximumPoolSize = 8
         config.driverClassName = "org.mariadb.jdbc.Driver"
-        config.jdbcUrl = System.getenv("DB_HOST")
+        config.jdbcUrl = "${System.getenv(" DB_HOST ")}?characterEncoding=utf8&useUnicode=true"
         config.username = System.getenv("DB_USERNAME")
         config.password = System.getenv("DB_PASSWORD")
         config.connectionTimeout = 20000
