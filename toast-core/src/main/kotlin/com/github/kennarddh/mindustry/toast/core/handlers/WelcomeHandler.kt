@@ -6,6 +6,6 @@ import mindustry.net.Administration.Config
 
 class WelcomeHandler : Handler {
     override suspend fun onInit() {
-        Config.motd.set("Welcome to [red] | Toast |[orange]| Survival |[yellow]Owner:Bread|[white]please join our discord by using [red]/discord [white]we are looking for new members and staff ${ToastVars.server.displayName} server.")
+        Config.motd.set("Welcome to [red] | Toast ||[yellow]Owner:Bread|[white]please join our discord by using [red]/discord [white]we are looking for new members and staff[orange] ${ToastVars.server.displayName} server.")
     }
 }
