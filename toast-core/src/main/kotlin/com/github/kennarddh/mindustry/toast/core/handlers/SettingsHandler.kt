@@ -6,6 +6,7 @@ import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import mindustry.Vars
 import mindustry.game.EventType
+import mindustry.gen.Call
 
 class SettingsHandler : Handler {
     override suspend fun onInit() {
@@ -25,6 +26,8 @@ class SettingsHandler : Handler {
         ToastVars.applyRules(Vars.state.rules)
         ToastVars.server.gameMode.applyRules(Vars.state.rules)
         ToastVars.server.applyRules(Vars.state.rules)
+
+        Call.setRules(Vars.state.rules)
 
         Logger.info("New map. Rules applied.")
     }
