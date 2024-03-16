@@ -151,7 +151,7 @@ services:
     volumes:
       - ./prod/mysql/my.cnf:/etc/mysql/my.cnf
       - data:/var/lib/mysql
-    command: bash -c "chmod 644 /etc/mysql/*.cnf && /usr/local/bin/docker-entrypoint.sh mysqld"
+    command: bash -c "chmod 644 /etc/mysql/*.cnf && /usr/local/bin/docker-entrypoint.sh mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
     ports:
       - "3306:3306"
     healthcheck:
