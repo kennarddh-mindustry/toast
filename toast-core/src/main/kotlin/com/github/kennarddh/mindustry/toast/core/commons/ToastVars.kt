@@ -20,6 +20,6 @@ object ToastVars {
     val applyRules: Rules.() -> Unit = {}
 
     val applyConfigs: () -> Unit = {
-        Config.messageRateLimit.set(0.5f)
+        Config.messageRateLimit.set(1)
     }
 }
