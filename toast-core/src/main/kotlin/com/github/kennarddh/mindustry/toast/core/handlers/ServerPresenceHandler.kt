@@ -7,7 +7,7 @@ import mindustry.net.Administration.Config
 
 class ServerPresenceHandler : Handler {
     override suspend fun onInit() {
-        Config.serverName.set("[red]Toast | ${ToastVars.server.displayName}")
+        Config.serverName.set("[red]Toast |[white] ${ToastVars.server.displayName}")
         Config.desc.set(ToastVars.server.description)
 
         Logger.info("Server presence done")
