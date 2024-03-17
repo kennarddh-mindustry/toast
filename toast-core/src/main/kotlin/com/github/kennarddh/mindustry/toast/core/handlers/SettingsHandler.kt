@@ -17,8 +17,10 @@ class SettingsHandler : Handler {
         ToastVars.server.gameMode.applyRules(Vars.state.rules)
         ToastVars.server.applyRules(Vars.state.rules)
 
+        Logger.info("New map. Rules applied. Sending rules.")
+
         Call.setRules(Vars.state.rules)
 
-        Logger.info("New map. Rules applied.")
+        Logger.info("New map. Rules applied. Rules sent.")
     }
 }
