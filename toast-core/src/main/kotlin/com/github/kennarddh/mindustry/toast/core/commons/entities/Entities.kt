@@ -5,5 +5,5 @@ import java.util.*
 
 
 object Entities {
-    val players: MutableMap<Player, PlayerData> = Collections.synchronizedMap(mutableMapOf())
+    val players = Collections.synchronizedMap(mutableMapOf<Player, PlayerData>())
 }
