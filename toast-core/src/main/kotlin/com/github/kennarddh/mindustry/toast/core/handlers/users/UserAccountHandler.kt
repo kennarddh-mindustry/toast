@@ -62,6 +62,8 @@ class UserAccountHandler : Handler {
     @EventHandler
     fun onPlayerLeave(event: EventType.PlayerLeave) {
         Entities.players.remove(event.player)
+
+        Logger.info("Player ${event.player.name}/${event.player.uuid()} removed from Entities.players")
     }
 
     @Command(["register"])

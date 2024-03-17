@@ -10,6 +10,7 @@ import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLog
 import com.github.kennarddh.mindustry.toast.common.*
 import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
+import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.applyName
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
@@ -307,6 +308,8 @@ class UserJoinsHandler : Handler {
                 player.name,
                 if (userID != null) userAndMindustryUserAndUserServerData[Users.role] else null
             )
+
+            Logger.info("Player ${event.player.name}/${event.player.uuid()} added to Entities.players")
 
             player.clearRoleEffect()
 
