@@ -10,7 +10,7 @@ import mindustry.net.Packets
 
 class UserLeavesHandler : Handler {
     @ServerPacketHandler(Priority.Important, true)
-    fun onPlayerDisconnect(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
+    fun onPlayerDisconnect(con: NetConnection, packet: Packets.Disconnect): Boolean {
         Entities.players.remove(con.player)
 
         Logger.info("Player ${con.player.name}/${con.player.uuid()} removed from Entities.players")
