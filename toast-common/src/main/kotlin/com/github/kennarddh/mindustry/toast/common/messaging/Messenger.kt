@@ -65,7 +65,14 @@ object Messenger {
 
         val deliverCallback = DeliverCallback { _, delivery ->
             val message = delivery.body.toString(Charsets.UTF_8)
-            val data = Json.decodeFromString<GameEvent>(message)
+
+            val data = try {
+                Json.decodeFromString<GameEvent>(message)
+            } catch (error: Exception) {
+                logger.error("Unknown GameEvent listener for queue $queueName parsing error.", error)
+
+                return@DeliverCallback
+            }
 
             try {
                 callback(data)
@@ -84,7 +91,14 @@ object Messenger {
 
         val deliverCallback = DeliverCallback { _, delivery ->
             val message = delivery.body.toString(Charsets.UTF_8)
-            val data = Json.decodeFromString<ServerControl>(message)
+
+            val data = try {
+                Json.decodeFromString<ServerControl>(message)
+            } catch (error: Exception) {
+                logger.error("Unknown ServerControl listener for queue $queueName parsing error.", error)
+
+                return@DeliverCallback
+            }
 
             try {
                 callback(data)
