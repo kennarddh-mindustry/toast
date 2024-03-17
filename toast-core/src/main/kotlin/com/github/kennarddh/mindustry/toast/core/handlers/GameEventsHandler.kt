@@ -67,35 +67,4 @@ class GameEventsHandler : Handler {
             )
         )
     }
-
-//    @EventHandler
-//    @EventHandlerTrigger(Trigger.update)
-//    fun onUpdate() {
-//        runOnMindustryThread {
-//            Groups.build.each { building ->
-//                if (building is GenericCrafterBuild) {
-//                    val items = mutableListOf<ItemStack>()
-//                    val liquids = mutableListOf<LiquidStack>()
-//
-//                    building.block.consumers.forEach {
-//                        if (it is ConsumeItems) {
-//                            items.addAll(it.items)
-//                        } else if (it is ConsumeLiquid) {
-//                            liquids.add(LiquidStack(it.liquid, it.amount))
-//                        } else if (it is ConsumeLiquids) {
-//                            liquids.addAll(it.liquids)
-//                        }
-//                    }
-//
-//                    items.forEach {
-//                        building.items.set(it.item, building.block.itemCapacity * 10)
-//                    }
-//
-//                    liquids.forEach {
-//                        building.liquids.set(it.liquid, building.block.liquidCapacity * 10)
-//                    }
-//                }
-//            }
-//        }
-//    }
 }
