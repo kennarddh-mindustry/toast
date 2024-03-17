@@ -14,6 +14,7 @@ import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import mindustry.Vars
 import mindustry.game.EventType
@@ -24,30 +25,40 @@ import kotlin.time.Duration.Companion.seconds
 class StartHandler : Handler {
     @EventHandler
     suspend fun onLoad(event: EventType.ServerLoadEvent) {
-        Logger.info("Server load... Will host in 1 second.")
-
         Config.port.set(ToastVars.port)
 
         Logger.info("Port set to ${ToastVars.port}")
 
-        delay(1.seconds)
+        Logger.info("Server load... Will host in 1 second.")
 
-        Logger.info("Hosting")
+        runBlocking {
+            delay(1.seconds)
 
-        host()
+            Logger.info("Applying configs.")
 
-        CoroutineScopes.Main.launch {
-            Logger.info("ServerStartGameEvent publishing")
+            ToastVars.applyConfigs()
+            ToastVars.server.gameMode.applyConfigs()
+            ToastVars.server.applyConfigs()
 
-            Messenger.publishGameEvent(
-                "${ToastVars.server.name}.start",
-                GameEvent(
-                    ToastVars.server, Clock.System.now(),
-                    ServerStartGameEvent()
+            Logger.info("Configs applied.")
+
+            Logger.info("Hosting")
+
+            host()
+
+            CoroutineScopes.Main.launch {
+                Logger.info("ServerStartGameEvent publishing")
+
+                Messenger.publishGameEvent(
+                    "${ToastVars.server.name}.start",
+                    GameEvent(
+                        ToastVars.server, Clock.System.now(),
+                        ServerStartGameEvent()
+                    )
                 )
-            )
 
-            Logger.info("ServerStartGameEvent published")
+                Logger.info("ServerStartGameEvent published")
+            }
         }
     }
 
@@ -64,7 +75,13 @@ class StartHandler : Handler {
 
             Core.settings.put("lastServerMode", ServerControl.instance.lastMode.name)
             Vars.world.loadMap(map, map.applyRules(ServerControl.instance.lastMode))
+
             Vars.state.rules = map.applyRules(ToastVars.server.gameMode.mindustryGameMode)
+
+            ToastVars.applyRules(Vars.state.rules)
+            ToastVars.server.gameMode.applyRules(Vars.state.rules)
+            ToastVars.server.applyRules(Vars.state.rules)
+
             Vars.logic.play()
 
             Vars.netServer.openServer()
