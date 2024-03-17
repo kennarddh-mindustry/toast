@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
+import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThread
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
@@ -19,8 +20,10 @@ class SettingsHandler : Handler {
 
         Logger.info("New map. Rules applied. Sending rules.")
 
-        Call.setRules(Vars.state.rules)
+        runOnMindustryThread {
+            Call.setRules(Vars.state.rules)
 
-        Logger.info("New map. Rules applied. Rules sent.")
+            Logger.info("New map. Rules applied. Rules sent.")
+        }
     }
 }
