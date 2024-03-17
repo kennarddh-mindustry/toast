@@ -121,7 +121,7 @@ class UserModerationHandler : Handler {
                 )
             }
 
-            CommandResult("Successfully kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
+            CommandResult("Successfully kicked ${target.plainName()}/${target.uuid()} for $duration with the reason \"$reason\"")
         }
     }
 
@@ -203,7 +203,7 @@ class UserModerationHandler : Handler {
                 )
             }
 
-            CommandResult("Successfully banned ${target.name}/${target.uuid()} with the reason \"$reason\"")
+            CommandResult("Successfully banned ${target.plainName()}/${target.uuid()} with the reason \"$reason\"")
         }
     }
 }
