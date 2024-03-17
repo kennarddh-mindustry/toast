@@ -28,6 +28,10 @@ object Messenger {
 
         connectionFactory.setUri(uri)
         connectionFactory.connectionTimeout = 20000
+        connectionFactory.networkRecoveryInterval = 20000
+        connectionFactory.requestedHeartbeat = 5
+        connectionFactory.isAutomaticRecoveryEnabled = true
+        connectionFactory.isTopologyRecoveryEnabled = true
 
         connection = connectionFactory.newConnection()
 
