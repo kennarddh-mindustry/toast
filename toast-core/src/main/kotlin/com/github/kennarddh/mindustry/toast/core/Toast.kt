@@ -43,6 +43,7 @@ class Toast : AbstractPlugin() {
 
         Genesis.registerHandler(UserAccountHandler())
         Genesis.registerHandler(UserJoinsHandler())
+        Genesis.registerHandler(UserLeavesHandler())
         Genesis.registerHandler(UserStatsHandler())
         Genesis.registerHandler(UserModerationHandler())
         Genesis.registerHandler(UserModerationSyncHandler())

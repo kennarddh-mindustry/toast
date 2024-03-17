@@ -8,7 +8,6 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSi
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
-import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.menus.Menu
 import com.github.kennarddh.mindustry.genesis.core.menus.Menus
@@ -27,7 +26,6 @@ import com.password4j.SecureString
 import com.password4j.types.Argon2
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import mindustry.game.EventType
 import mindustry.gen.Player
 import org.jetbrains.exposed.sql.*
 
@@ -57,13 +55,6 @@ class UserAccountHandler : Handler {
     override suspend fun onInit() {
         Genesis.commandRegistry.removeCommand("admin")
         Genesis.commandRegistry.removeCommand("admins")
-    }
-
-    @EventHandler
-    fun onPlayerLeave(event: EventType.PlayerLeave) {
-        Entities.players.remove(event.player)
-
-        Logger.info("Player ${event.player.name}/${event.player.uuid()} removed from Entities.players")
     }
 
     @Command(["register"])
