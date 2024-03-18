@@ -60,7 +60,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
         cancel(player)
     }
 
-    override fun getRequiredVotes(): Int = 3
+    override fun getRequiredVotes(): Int = if (Entities.players.size <= 3) 2 else 3
 
     override fun canPlayerStart(player: Player, objective: VoteKickVoteObjective): Boolean {
         if (Entities.players.size < 3) {
