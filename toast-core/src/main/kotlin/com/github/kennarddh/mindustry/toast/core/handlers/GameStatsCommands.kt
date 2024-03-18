@@ -3,6 +3,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers
 import arc.struct.Seq
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
@@ -19,6 +20,7 @@ class GameStatsCommands : Handler {
     @Command(["count"])
     @ClientSide
     @ServerSide
+    @Description("Shows unit count.")
     fun count(player: Player? = null, unit: UnitType, team: Team? = null): CommandResult {
         val computedTeam = team ?: player?.team() ?: Team.sharded
 
@@ -74,6 +76,7 @@ class GameStatsCommands : Handler {
     @Command(["mapinfo", "map_info"])
     @ClientSide
     @ServerSide
+    @Description("Shows map info.")
     fun mapInfo(player: Player? = null, team: Team? = null): CommandResult {
         val computedTeam = team ?: player?.team() ?: Team.sharded
 
