@@ -105,6 +105,8 @@ class UserJoinsHandler : Handler {
 
     @ServerPacketHandler(Priority.High)
     suspend fun onConnectPacket(con: NetConnection, packet: Packets.ConnectPacket): Boolean {
+        if (con.hasDisconnected) return false
+
         val ip = con.address.packIP()
 
         return Database.newTransaction {
@@ -293,6 +295,8 @@ class UserJoinsHandler : Handler {
     @EventHandler
     suspend fun onPlayerConnect(event: EventType.PlayerConnect) {
         val player = event.player
+
+        if (player.con.hasDisconnected) return
 
         Database.newTransaction {
             val userAndMindustryUserAndUserServerData = player.getUserOptionalAndMindustryUserAndUserServerData()
