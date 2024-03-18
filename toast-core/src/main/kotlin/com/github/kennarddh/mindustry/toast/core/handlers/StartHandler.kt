@@ -76,7 +76,7 @@ class StartHandler : Handler {
                 SaveIO.load(AutoSaveHandler.file)
             } else {
                 Logger.info("No auto save found. Using random maps.")
-
+                
                 val map = Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
 
                 ServerControl.instance.lastMode = ToastVars.server.gameMode.mindustryGameMode
