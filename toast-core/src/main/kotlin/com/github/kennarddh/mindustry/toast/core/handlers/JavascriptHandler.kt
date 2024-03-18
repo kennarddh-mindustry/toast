@@ -9,6 +9,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
+import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import mindustry.Vars
 import mindustry.gen.Player
 
@@ -24,6 +25,8 @@ class JavascriptHandler : Handler {
     @MinimumRole(UserRole.Admin)
     @Description("Run arbitrary Javascript on the server.")
     fun javascript(player: Player? = null, script: String): CommandResult {
+        Logger.info("${player?.name ?: "Server"} ran \"${script}\"")
+
         return CommandResult(Vars.mods.scripts.runConsole(script))
     }
 }
