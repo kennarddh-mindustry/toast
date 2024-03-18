@@ -16,6 +16,7 @@ import mindustry.Vars
 import mindustry.gen.Call
 import mindustry.gen.KickCallPacket2
 import mindustry.gen.Player
+import mindustry.io.SaveIO
 import mindustry.net.Packets.KickReason
 import kotlin.time.Duration.Companion.seconds
 
@@ -43,6 +44,16 @@ class MiscCommandsHandler : Handler {
             val packet = KickCallPacket2()
             packet.reason = KickReason.serverRestarting
             Vars.net.send(packet, true)
+
+            Logger.info("Kicked all players")
+
+            val file = Vars.saveDirectory.child("autoSave.msav")
+
+            try {
+                SaveIO.save(file)
+            } catch (error: Exception) {
+                Logger.error("Failed to save auto save msav file.", error)
+            }
 
             Logger.info("Gracefully exiting.")
 
