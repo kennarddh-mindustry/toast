@@ -28,14 +28,15 @@ import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.update
+import java.util.*
 import kotlin.time.Duration
 
 private const val MAX_XP_PER_WINDOW_TIME: Int = 10
 
 class UserStatsHandler : Handler {
-    private val playersUnsavedXp: MutableMap<Player, Int> = mutableMapOf()
+    private val playersUnsavedXp = Collections.synchronizedMap(mutableMapOf<Player, Int>())
 
-    private val playersLastPlayTimeSave: MutableMap<Player, Instant> = mutableMapOf()
+    private val playersLastPlayTimeSave = Collections.synchronizedMap(mutableMapOf<Player, Instant>())
 
     @TimerTask(0f, 10f)
     private suspend fun savePlayerStats() {
@@ -120,8 +121,9 @@ class UserStatsHandler : Handler {
     }
 
     @EventHandler
-    private fun onPlayerLeave(event: EventType.PlayerLeave) {
+    private fun onPlayerDisconnected(event: PlayerDisconnected) {
         playersLastPlayTimeSave.remove(event.player)
+        playersUnsavedXp.remove(event.player)
     }
 
     /**
