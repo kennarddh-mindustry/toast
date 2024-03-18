@@ -28,15 +28,15 @@ import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.update
-import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration
 
 private const val MAX_XP_PER_WINDOW_TIME: Int = 10
 
 class UserStatsHandler : Handler {
-    private val playersUnsavedXp = Collections.synchronizedMap(mutableMapOf<Player, Int>())
+    private val playersUnsavedXp = ConcurrentHashMap<Player, Int>()
 
-    private val playersLastPlayTimeSave = Collections.synchronizedMap(mutableMapOf<Player, Instant>())
+    private val playersLastPlayTimeSave = ConcurrentHashMap<Player, Instant>()
 
     @TimerTask(0f, 10f)
     private suspend fun savePlayerStats() {
