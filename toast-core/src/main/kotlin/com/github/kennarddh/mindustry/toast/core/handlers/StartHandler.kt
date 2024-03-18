@@ -18,6 +18,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import mindustry.Vars
 import mindustry.game.EventType
+import mindustry.io.SaveIO
 import mindustry.net.Administration.Config
 import mindustry.server.ServerControl
 import kotlin.time.Duration.Companion.seconds
@@ -67,16 +68,24 @@ class StartHandler : Handler {
             // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
             Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
 
-            val map = Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
-
             Vars.logic.reset()
 
-            ServerControl.instance.lastMode = ToastVars.server.gameMode.mindustryGameMode
+            if (AutoSaveHandler.file.exists()) {
+                Logger.info("Found auto save. Using it.")
 
-            Core.settings.put("lastServerMode", ServerControl.instance.lastMode.name)
-            Vars.world.loadMap(map, map.applyRules(ServerControl.instance.lastMode))
+                SaveIO.load(AutoSaveHandler.file)
+            } else {
+                Logger.info("No auto save found. Using random maps.")
 
-            Vars.state.rules = map.applyRules(ToastVars.server.gameMode.mindustryGameMode)
+                val map = Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
+
+                ServerControl.instance.lastMode = ToastVars.server.gameMode.mindustryGameMode
+
+                Core.settings.put("lastServerMode", ServerControl.instance.lastMode.name)
+                Vars.world.loadMap(map, map.applyRules(ServerControl.instance.lastMode))
+
+                Vars.state.rules = map.applyRules(ToastVars.server.gameMode.mindustryGameMode)
+            }
 
             ToastVars.applyRules(Vars.state.rules)
             ToastVars.server.gameMode.applyRules(Vars.state.rules)
