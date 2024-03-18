@@ -3,6 +3,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers.vote.kick
 import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
 import com.github.kennarddh.mindustry.toast.common.PunishmentType
@@ -43,12 +44,14 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
 
     @Command(["votekick", "vote-kick"])
     @ClientSide
+    @Description("Start a vote kick vote.")
     suspend fun startVoteKick(player: Player, target: Player, reason: String) {
         start(player, VoteKickVoteObjective(target, reason))
     }
 
     @Command(["vote"])
     @ClientSide
+    @Description("Vote for vote kick vote.")
     suspend fun voteCommand(player: Player, vote: Boolean) {
         vote(player, vote)
     }
@@ -56,6 +59,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
     @Command(["vote-cancel", "vote-kick-cancel", "votekick-cancel"])
     @ClientSide
     @MinimumRole(UserRole.Mod)
+    @Description("Cancel a vote kick vote.")
     suspend fun cancelCommand(player: Player) {
         cancel(player)
     }

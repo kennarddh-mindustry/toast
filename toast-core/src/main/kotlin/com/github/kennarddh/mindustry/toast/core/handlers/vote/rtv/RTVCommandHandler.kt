@@ -3,6 +3,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers.vote.rtv
 import arc.Events
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
 import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThread
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
@@ -19,6 +20,7 @@ import kotlin.time.Duration.Companion.minutes
 class RTVCommandHandler : AbstractVoteCommand<Byte>("rtv", 2.minutes) {
     @Command(["rtv", "change-map"])
     @ClientSide
+    @Description("Start a rtv/change map vote.")
     suspend fun rtv(player: Player, vote: Boolean = true) {
         if (!getIsVoting()) {
             if (vote) {
@@ -36,6 +38,7 @@ class RTVCommandHandler : AbstractVoteCommand<Byte>("rtv", 2.minutes) {
     @Command(["rtv-cancel"])
     @ClientSide
     @MinimumRole(UserRole.Mod)
+    @Description("Cancel a rtv/change map vote.")
     suspend fun cancelCommand(player: Player) {
         cancel(player)
     }

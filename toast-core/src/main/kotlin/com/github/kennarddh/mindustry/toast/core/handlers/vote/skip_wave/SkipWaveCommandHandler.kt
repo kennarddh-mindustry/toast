@@ -2,6 +2,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers.vote.skip_wave
 
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
@@ -16,6 +17,7 @@ import kotlin.time.Duration.Companion.minutes
 class SkipWaveCommandHandler : AbstractVoteCommand<Byte>("skip wave", 1.minutes) {
     @Command(["skip-wave", "skipwave", "next-wave", "nextwave"])
     @ClientSide
+    @Description("Start a skip wave vote.")
     suspend fun skipWave(player: Player, vote: Boolean = true) {
         if (!getIsVoting()) {
             if (vote) {
@@ -30,6 +32,14 @@ class SkipWaveCommandHandler : AbstractVoteCommand<Byte>("skip wave", 1.minutes)
         vote(player, vote)
     }
 
+    @Command(["skip-wave-cancel"])
+    @ClientSide
+    @MinimumRole(UserRole.Mod)
+    @Description("Cancel a skip wave vote.")
+    suspend fun cancelCommand(player: Player) {
+        cancel(player)
+    }
+
     override fun canPlayerStart(player: Player, session: Byte): Boolean {
         if (!Vars.state.rules.waves) {
             player.sendMessage("[#ff0000]Cannot start '$name' vote because waves is disabled")
@@ -38,13 +48,6 @@ class SkipWaveCommandHandler : AbstractVoteCommand<Byte>("skip wave", 1.minutes)
         }
 
         return true
-    }
-
-    @Command(["skip-wave-cancel"])
-    @ClientSide
-    @MinimumRole(UserRole.Mod)
-    suspend fun cancelCommand(player: Player) {
-        cancel(player)
     }
 
     override fun getRequiredVotes(): Int = 3
