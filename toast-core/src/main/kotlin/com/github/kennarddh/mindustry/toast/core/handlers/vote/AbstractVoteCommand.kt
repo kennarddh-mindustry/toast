@@ -6,10 +6,12 @@ import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandl
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.toDisplayString
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
+import com.github.kennarddh.mindustry.toast.core.handlers.users.PlayerDisconnected
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import mindustry.game.EventType.*
+import mindustry.game.EventType.PlayEvent
+import mindustry.game.EventType.PlayerJoin
 import mindustry.gen.Call
 import mindustry.gen.Player
 import kotlin.time.Duration
@@ -154,7 +156,7 @@ abstract class AbstractVoteCommand<T : Any>(
     }
 
     @EventHandler
-    suspend fun onPlayerLeave(event: PlayerLeave) {
+    suspend fun onPlayerDisconnected(event: PlayerDisconnected) {
         sessionMutex.withLock {
             if (session == null) return
 
