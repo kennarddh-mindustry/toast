@@ -39,7 +39,7 @@ class MiscCommandsHandler : Handler {
         gracefulStopJob = CoroutineScopes.Main.launch {
             if (countdown > 0) {
                 for (i in countdown downTo 1) {
-                    Call.sendMessage("[scarlet]Server stopping in: ${i}s.")
+                    Call.sendMessage("[scarlet]Server stopping in: ${i}s. Same map will continue after restart.")
 
                     delay(1.seconds)
                 }
