@@ -9,7 +9,9 @@ import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStopGameEvent
 import com.github.kennarddh.mindustry.toast.common.verify.discord.VerifyDiscordRedis
+import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.TeamParameter
 import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.ToastPlayerParameter
+import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.UnitTypeParameter
 import com.github.kennarddh.mindustry.toast.core.commands.validations.*
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
@@ -19,7 +21,9 @@ import com.github.kennarddh.mindustry.toast.core.handlers.vote.kick.VoteKickComm
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.rtv.RTVCommandHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.skip_wave.SkipWaveCommandHandler
 import kotlinx.datetime.Clock
+import mindustry.game.Team
 import mindustry.gen.Player
+import mindustry.type.UnitType
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 
 @Suppress("unused")
@@ -38,6 +42,8 @@ class Toast : AbstractPlugin() {
         Genesis.commandRegistry.registerCommandValidationAnnotation(LoggedIn::class, ::validateLoggedIn)
         Genesis.commandRegistry.registerCommandValidationAnnotation(MinimumRank::class, ::validateMinimumRank)
         Genesis.commandRegistry.replaceParameterType(Player::class, ToastPlayerParameter())
+        Genesis.commandRegistry.registerParameterType(UnitType::class, UnitTypeParameter())
+        Genesis.commandRegistry.registerParameterType(Team::class, TeamParameter())
 
         Logger.info("Registering handlers")
 
@@ -68,6 +74,8 @@ class Toast : AbstractPlugin() {
         Genesis.registerHandler(ServerControlHandler())
 
         Genesis.registerHandler(MessageHandler())
+
+        Genesis.registerHandler(GameStatsCommands())
 
         Logger.info("Loaded")
     }
