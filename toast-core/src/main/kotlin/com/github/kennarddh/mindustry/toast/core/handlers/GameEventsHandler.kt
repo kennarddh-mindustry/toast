@@ -13,6 +13,7 @@ import com.github.kennarddh.mindustry.toast.common.preventDiscordPings
 import com.github.kennarddh.mindustry.toast.common.stripColors
 import com.github.kennarddh.mindustry.toast.common.stripGlyphs
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.handlers.users.PlayerDisconnected
 import kotlinx.datetime.Clock
 import mindustry.game.EventType
 
@@ -32,7 +33,9 @@ class GameEventsHandler : Handler {
     }
 
     @EventHandler
-    suspend fun onPlayerLeave(event: EventType.PlayerLeave) {
+    suspend fun onPlayerDisconnected(event: PlayerDisconnected) {
+        if (!event.player.con.hasConnected) return
+
         val player = event.player
 
         Messenger.publishGameEvent(
