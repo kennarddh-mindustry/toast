@@ -75,6 +75,7 @@ class Toast : AbstractPlugin() {
         Genesis.registerHandler(MessageHandler())
         Genesis.registerHandler(GameStatsCommands())
         Genesis.registerHandler(JavascriptHandler())
+        Genesis.registerHandler(MiscCommandsHandler())
 
         Logger.info("Loaded")
     }
