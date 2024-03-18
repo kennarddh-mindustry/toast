@@ -37,7 +37,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 400M
+          memory: 600M
           cpus: '1'
 
   attack-server:
@@ -78,7 +78,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 400M
+          memory: 600M
           cpus: '1'
 
   discord-bot:
@@ -104,7 +104,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 400M
+          memory: 300M
           cpus: '1'
 
   discovery-redis:
