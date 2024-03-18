@@ -6,6 +6,8 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
+import mindustry.Vars
+import mindustry.core.UI
 import mindustry.entities.Units
 import mindustry.game.Team
 import mindustry.gen.Player
@@ -67,5 +69,28 @@ class GameStatsCommands : Handler {
             Logic(Logic Flagged): $logic($logicFlagged)
             """.trimIndent()
         )
+    }
+
+    @Command(["mapinfo", "map_info"])
+    @ClientSide
+    @ServerSide
+    fun mapInfo(player: Player? = null, team: Team? = null): CommandResult {
+        val computedTeam = team ?: player?.team() ?: Team.sharded
+
+        return CommandResult(with(Vars.state) {
+            """
+            [accent]Name: ${map.name()}[accent] (by: ${map.author()}[accent])
+            Team: ${computedTeam.name}
+            Map Time: ${UI.formatTime(tick.toFloat())}
+            Build Speed (Unit Factories): ${rules.buildSpeed(computedTeam)}x (${rules.unitBuildSpeed(computedTeam)}x)
+            Build Cost (Refund): ${rules.buildCostMultiplier}x (${rules.deconstructRefundMultiplier}x)
+            Block Health (Damage): ${rules.blockHealth(computedTeam)}x (${rules.blockDamage(computedTeam)}x)
+            Unit Damage: ${rules.unitDamage(computedTeam)}x
+            Core Capture: ${rules.coreCapture}
+            Core Incinerates: ${rules.coreIncinerates}
+            Core Modifies Unit Cap: ${rules.unitCapVariable}
+            Only Deposit Core: ${rules.onlyDepositCore}
+            """.trimIndent()
+        })
     }
 }
