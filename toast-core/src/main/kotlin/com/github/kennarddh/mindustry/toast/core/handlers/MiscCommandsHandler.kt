@@ -45,26 +45,30 @@ class MiscCommandsHandler : Handler {
                 }
             }
 
-            runOnMindustryThread {
-                Call.sendMessage("[scarlet]Stopping server.")
+            stop()
+        }
+    }
 
-                Genesis.getHandler<AutoSaveHandler>()?.autoSave()
+    fun stop() {
+        runOnMindustryThread {
+            Call.sendMessage("[scarlet]Stopping server.")
 
-                // Kick every player
-                val packet = KickCallPacket2()
-                packet.reason = KickReason.serverRestarting
-                Vars.net.send(packet, true)
+            Genesis.getHandler<AutoSaveHandler>()?.autoSave()
 
-                Logger.info("Kicked all players")
+            // Kick every player
+            val packet = KickCallPacket2()
+            packet.reason = KickReason.serverRestarting
+            Vars.net.send(packet, true)
 
-                Logger.info("Gracefully exiting.")
+            Logger.info("Kicked all players")
 
-                // Exit
-                Vars.net.dispose()
-                Core.app.exit()
+            Logger.info("Gracefully exiting.")
 
-                Logger.info("Gracefully exited.")
-            }
+            // Exit
+            Vars.net.dispose()
+            Core.app.exit()
+
+            Logger.info("Gracefully exited.")
         }
     }
 }

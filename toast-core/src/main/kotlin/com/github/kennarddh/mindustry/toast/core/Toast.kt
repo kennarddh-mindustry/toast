@@ -20,6 +20,7 @@ import com.github.kennarddh.mindustry.toast.core.handlers.users.*
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.kick.VoteKickCommandHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.rtv.RTVCommandHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.skip_wave.SkipWaveCommandHandler
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import mindustry.game.Team
 import mindustry.gen.Player
@@ -78,6 +79,16 @@ class Toast : AbstractPlugin() {
         Genesis.registerHandler(MiscCommandsHandler())
         Genesis.registerHandler(AutoSaveHandler())
 
+        Logger.info("Registering shutdown hook")
+
+        Runtime.getRuntime().addShutdownHook(object : Thread() {
+            override fun run(): Unit = runBlocking {
+                Logger.info("Gracefully shutting down via shutdown hook.")
+
+                onDispose()
+            }
+        })
+
         Logger.info("Loaded")
     }
 
@@ -96,5 +107,7 @@ class Toast : AbstractPlugin() {
         Messenger.close()
 
         TransactionManager.closeAndUnregister(Database.database)
+
+        Genesis.getHandler<MiscCommandsHandler>()?.stop()
     }
 }
