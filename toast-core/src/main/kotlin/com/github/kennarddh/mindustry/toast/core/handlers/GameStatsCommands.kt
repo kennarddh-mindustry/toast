@@ -79,7 +79,7 @@ class GameStatsCommands : Handler {
 
         return CommandResult(with(Vars.state) {
             """
-            [accent]Name: ${map.name()}[accent] (by: ${map.author()}[accent])
+            ${if (player == null) "" else "[accent]"}Name: ${map.name()}${if (player == null) "" else "[accent]"} (by: ${map.author()}${if (player == null) "" else "[accent]"})
             Team: ${computedTeam.name}
             Map Time: ${UI.formatTime(tick.toFloat())}
             Build Speed (Unit Factories): ${rules.buildSpeed(computedTeam)}x (${rules.unitBuildSpeed(computedTeam)}x)
