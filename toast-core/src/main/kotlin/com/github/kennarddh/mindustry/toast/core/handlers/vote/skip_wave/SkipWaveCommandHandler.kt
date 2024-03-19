@@ -6,6 +6,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Descript
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
+import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.AbstractVoteCommand
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.VoteSession
 import mindustry.Vars
@@ -50,13 +51,13 @@ class SkipWaveCommandHandler : AbstractVoteCommand<Byte>("skip wave", 1.minutes)
         return true
     }
 
-    override fun getRequiredVotes(): Int = 3
-
     override suspend fun onSuccess(session: VoteSession<Byte>) {
         Call.sendMessage("[#00ff00]'$name' vote success. Skipping wave.")
 
         Vars.logic.runWave()
     }
+
+    override fun getRequiredVotes(): Int = Entities.players.size.coerceIn(1..3)
 
     override suspend fun getSessionDetails(session: VoteSession<Byte>): String {
         return "Type [accent]/skip-wave y[] or [accent]/skip-wave n[] to vote."
