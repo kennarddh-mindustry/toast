@@ -26,49 +26,49 @@ import kotlin.time.Duration.Companion.seconds
 class ShutdownHandler : Handler {
     var gracefulStopJob: Job? = null
 
-    @Command(["graceful-stop"])
+    @Command(["graceful-shutdown"])
     @ServerSide
     @ClientSide
     @MinimumRole(UserRole.Admin)
-    @Description("Stop server with countdown then reconnect players.")
-    suspend fun gracefulStop(player: Player? = null, @GTE(0) countdown: Int) {
-        Logger.info("${player?.name ?: "Server"} ran graceful-stop command")
+    @Description("Shutdown server with countdown then reconnect players.")
+    fun gracefulShutdown(player: Player? = null, @GTE(0) countdown: Int = 5) {
+        Logger.info("${player?.name ?: "Server"} ran graceful-shutdown command")
 
+        shutdown(countdown)
+    }
+
+    fun shutdown(countdown: Int = 5) {
         gracefulStopJob?.cancel()
 
         gracefulStopJob = CoroutineScopes.Main.launch {
             if (countdown > 0) {
                 for (i in countdown downTo 1) {
-                    Call.sendMessage("[scarlet]Server stopping in: ${i}s. Same map will continue after restart.")
+                    Call.sendMessage("[scarlet]Server stopping in: ${i}s. Same map state will continue after restart.")
 
                     delay(1.seconds)
                 }
             }
 
-            stop()
-        }
-    }
+            runOnMindustryThread {
+                Call.sendMessage("[scarlet]Stopping server.")
 
-    fun stop() {
-        runOnMindustryThread {
-            Call.sendMessage("[scarlet]Stopping server.")
+                Genesis.getHandler<AutoSaveHandler>()?.autoSave()
 
-            Genesis.getHandler<AutoSaveHandler>()?.autoSave()
+                // Kick every player
+                val packet = KickCallPacket2()
+                packet.reason = KickReason.serverRestarting
+                Vars.net.send(packet, true)
 
-            // Kick every player
-            val packet = KickCallPacket2()
-            packet.reason = KickReason.serverRestarting
-            Vars.net.send(packet, true)
+                Logger.info("Kicked all players")
 
-            Logger.info("Kicked all players")
+                Logger.info("Gracefully exiting.")
 
-            Logger.info("Gracefully exiting.")
+                // Exit
+                Vars.net.dispose()
+                Core.app.exit()
 
-            // Exit
-            Vars.net.dispose()
-            Core.app.exit()
-
-            Logger.info("Gracefully exited.")
+                Logger.info("Gracefully exited.")
+            }
         }
     }
 }

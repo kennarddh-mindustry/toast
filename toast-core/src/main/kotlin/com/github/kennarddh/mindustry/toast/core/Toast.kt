@@ -93,7 +93,7 @@ class Toast : AbstractPlugin() {
     }
 
     override suspend fun onDispose() {
-        Genesis.getHandler<ShutdownHandler>()?.stop()
+        Genesis.getHandler<ShutdownHandler>()?.shutdown()
 
         Messenger.publishGameEvent(
             "${ToastVars.server.name}.stop",
