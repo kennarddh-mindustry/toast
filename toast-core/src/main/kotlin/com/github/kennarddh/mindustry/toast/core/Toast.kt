@@ -96,6 +96,8 @@ class Toast : AbstractPlugin() {
                 } catch (_: CancellationException) {
                     // Ignore if shutdown job got canceled
                 }
+
+                Logger.info("Gracefully shutting down via shutdown hook done.")
             }
         })
 
