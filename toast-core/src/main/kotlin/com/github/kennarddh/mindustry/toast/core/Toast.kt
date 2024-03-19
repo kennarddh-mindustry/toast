@@ -86,7 +86,7 @@ class Toast : AbstractPlugin() {
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run(): Unit = runBlocking {
                 if (ToastVars.state == ToastState.Disposed) return@runBlocking
-                
+
                 Logger.info("Gracefully shutting down via shutdown hook.")
 
                 try {
@@ -103,6 +103,8 @@ class Toast : AbstractPlugin() {
     }
 
     override suspend fun onDispose() {
+        if (ToastVars.state == ToastState.Disposed) return
+        
         Logger.info("Disposing")
 
         Messenger.publishGameEvent(
