@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
-    <list size="4">
+    <list size="5">
       <item index="0" class="java.lang.String" itemvalue="com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command" />
       <item index="1" class="java.lang.String" itemvalue="com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler" />
-      <item index="2" class="java.lang.String" itemvalue="com.github.kennarddh.mindustry.genesis.core.server.packets.annotations.ServerPacketHandler" />
-      <item index="3" class="java.lang.String" itemvalue="com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask" />
+      <item index="2" class="java.lang.String" itemvalue="com.github.kennarddh.mindustry.genesis.core.filters.annotations.Filter" />
+      <item index="3" class="java.lang.String" itemvalue="com.github.kennarddh.mindustry.genesis.core.server.packets.annotations.ServerPacketHandler" />
+      <item index="4" class="java.lang.String" itemvalue="com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask" />
     </list>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
