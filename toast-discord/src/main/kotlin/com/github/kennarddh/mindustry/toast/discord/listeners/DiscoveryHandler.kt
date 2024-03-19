@@ -24,7 +24,7 @@ object DiscoveryHandler : ListenerAdapter() {
         CoroutineScopes.Main.launch {
             while (true) {
                 val message = buildString {
-                    appendLine("Last update: <t:${Clock.System.now().toEpochMilliseconds() / 1000}:R>")
+                    appendLine("Last update <t:${Clock.System.now().toEpochMilliseconds() / 1000}:R>")
                     appendLine("Should update every 10 seconds.")
 
                     appendLine()
