@@ -33,7 +33,7 @@ class StartHandler : Handler {
     override suspend fun onInit() {
         Genesis.commandRegistry.removeCommand("host")
     }
-    
+
     @EventHandler
     suspend fun onLoad(event: EventType.ServerLoadEvent) {
         Config.port.set(ToastVars.port)
@@ -89,7 +89,11 @@ class StartHandler : Handler {
             if (AutoSaveHandler.file.exists()) {
                 Logger.info("Found auto save. Using it.")
 
-                SaveIO.load(AutoSaveHandler.file)
+                try {
+                    SaveIO.load(AutoSaveHandler.file)
+                } catch (error: Exception) {
+                    Logger.error("Failed to load auto save msav file.", error)
+                }
             } else {
                 Logger.info("No auto save found. Using random maps.")
 
