@@ -13,4 +13,5 @@ ADD https://github.com/kennarddh-mindustry/toast/releases/download/v0.0.40/toast
 # For ss command. ss command is used for healthcheck
 RUN apt-get update && apt-get install -y iproute2
 
-ENTRYPOINT java -XX:+ExitOnOutOfMemoryError -jar server-release.jar
+# https://dzone.com/articles/gracefully-shutting-down-java-in-containers
+ENTRYPOINT exec java -XX:+ExitOnOutOfMemoryError -jar server-release.jar
