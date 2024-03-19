@@ -8,8 +8,12 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSi
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
+import com.github.kennarddh.mindustry.genesis.core.commons.priority.Priority
+import com.github.kennarddh.mindustry.genesis.core.filters.FilterType
+import com.github.kennarddh.mindustry.genesis.core.filters.annotations.Filter
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
+import com.github.kennarddh.mindustry.toast.common.Permission
 import com.github.kennarddh.mindustry.toast.common.PunishmentType
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.Database
@@ -39,6 +43,17 @@ class UserModerationHandler : Handler {
         Genesis.commandRegistry.removeCommand("unban")
         Genesis.commandRegistry.removeCommand("pardon")
         Genesis.commandRegistry.removeCommand("subnet-ban")
+    }
+
+    @Filter(FilterType.Chat, Priority.Important)
+    fun chatFilter(player: Player, message: String): String? {
+        val playerData = player.safeGetPlayerData() ?: return null
+
+        if (playerData.fullPermissions.contains(Permission.Chat)) return message
+
+        player.sendMessage("[scarlet]You are not allowed to chat.")
+
+        return null
     }
 
     @Command(["kick"])
