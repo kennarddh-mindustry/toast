@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
+import arc.Core
 import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
@@ -75,6 +76,7 @@ class ShutdownHandler : Handler {
                 Logger.info("Gracefully exiting.")
 
                 Vars.net.dispose()
+                Core.app.exit()
 
                 Logger.info("Gracefully exited.")
             }
