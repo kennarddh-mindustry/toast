@@ -91,8 +91,6 @@ class Toast : AbstractPlugin() {
 
                 try {
                     Genesis.getHandler<ShutdownHandler>()?.shutdown()
-
-                    onDispose()
                 } catch (_: CancellationException) {
                     Logger.warn("Shutdown hook cancelled.")
                 }
