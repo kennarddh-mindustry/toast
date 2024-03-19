@@ -76,7 +76,7 @@ class Toast : AbstractPlugin() {
         Genesis.registerHandler(MessageHandler())
         Genesis.registerHandler(GameStatsCommands())
         Genesis.registerHandler(JavascriptHandler())
-        Genesis.registerHandler(MiscCommandsHandler())
+        Genesis.registerHandler(ShutdownHandler())
         Genesis.registerHandler(AutoSaveHandler())
 
         Logger.info("Registering shutdown hook")
@@ -93,7 +93,7 @@ class Toast : AbstractPlugin() {
     }
 
     override suspend fun onDispose() {
-        Genesis.getHandler<MiscCommandsHandler>()?.stop()
+        Genesis.getHandler<ShutdownHandler>()?.stop()
 
         Messenger.publishGameEvent(
             "${ToastVars.server.name}.stop",

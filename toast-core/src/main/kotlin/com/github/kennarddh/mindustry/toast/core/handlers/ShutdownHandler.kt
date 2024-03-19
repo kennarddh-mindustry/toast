@@ -23,7 +23,7 @@ import mindustry.gen.Player
 import mindustry.net.Packets.KickReason
 import kotlin.time.Duration.Companion.seconds
 
-class MiscCommandsHandler : Handler {
+class ShutdownHandler : Handler {
     var gracefulStopJob: Job? = null
 
     @Command(["graceful-stop"])
