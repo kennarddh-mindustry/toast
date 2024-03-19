@@ -13,6 +13,7 @@ import com.github.kennarddh.mindustry.genesis.standard.commands.parameters.valid
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,7 +40,11 @@ class ShutdownHandler : Handler {
     suspend fun gracefulShutdown(player: Player? = null, @GTE(0) countdown: Int = 5) {
         Logger.info("${player?.name ?: "Server"} ran graceful-shutdown command")
 
-        shutdown(countdown)
+        try {
+            shutdown(countdown)
+        } catch (_: CancellationException) {
+            // Ignore if shutdown job got canceled
+        }
     }
 
     suspend fun shutdown(countdown: Int = 5) {
