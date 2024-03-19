@@ -3,6 +3,12 @@ package com.github.kennarddh.mindustry.toast.core.handlers
 import arc.Core
 import arc.util.Reflect
 import arc.util.Timer
+import com.github.kennarddh.mindustry.genesis.core.Genesis
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
+import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
+import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThread
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
@@ -24,6 +30,10 @@ import mindustry.server.ServerControl
 import kotlin.time.Duration.Companion.seconds
 
 class StartHandler : Handler {
+    override suspend fun onInit() {
+        Genesis.commandRegistry.removeCommand("host")
+    }
+    
     @EventHandler
     suspend fun onLoad(event: EventType.ServerLoadEvent) {
         Config.port.set(ToastVars.port)
@@ -63,7 +73,13 @@ class StartHandler : Handler {
         }
     }
 
-    private fun host() {
+    @Command(["host"])
+    @ServerSide
+    @Description("Start hosting.")
+    private fun host(): CommandResult? {
+        if (Vars.state.isGame)
+            return CommandResult("Already hosting. Type 'stop' to stop hosting first.", CommandResultStatus.Failed)
+
         runOnMindustryThread {
             // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
             Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
@@ -76,7 +92,7 @@ class StartHandler : Handler {
                 SaveIO.load(AutoSaveHandler.file)
             } else {
                 Logger.info("No auto save found. Using random maps.")
-                
+
                 val map = Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
 
                 ServerControl.instance.lastMode = ToastVars.server.gameMode.mindustryGameMode
@@ -97,5 +113,7 @@ class StartHandler : Handler {
 
             Logger.info("Hosted")
         }
+
+        return null
     }
 }
