@@ -1,6 +1,7 @@
 package com.github.kennarddh.mindustry.toast.core.commons
 
 import com.github.kennarddh.mindustry.toast.common.Server
+import kotlinx.coroutines.sync.Mutex
 import mindustry.game.Rules
 import mindustry.net.Administration.Config
 
@@ -31,4 +32,6 @@ object ToastVars {
     }
 
     var state: ToastState = ToastState.Idle
+
+    val stateLock = Mutex()
 }

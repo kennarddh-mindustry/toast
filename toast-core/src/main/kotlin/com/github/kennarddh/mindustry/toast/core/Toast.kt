@@ -23,6 +23,7 @@ import com.github.kennarddh.mindustry.toast.core.handlers.vote.rtv.RTVCommandHan
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.skip_wave.SkipWaveCommandHandler
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 import mindustry.game.Team
 import mindustry.gen.Player
@@ -85,7 +86,9 @@ class Toast : AbstractPlugin() {
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run(): Unit = runBlocking {
-                if (ToastVars.state == ToastState.Disposing) return@runBlocking
+                ToastVars.stateLock.withLock {
+                    if (ToastVars.state == ToastState.Disposing) return@runBlocking
+                }
 
                 Logger.info("Gracefully shutting down via shutdown hook.")
 
@@ -103,9 +106,13 @@ class Toast : AbstractPlugin() {
     }
 
     override suspend fun onDispose() {
-        if (ToastVars.state == ToastState.Disposing) return
+        Logger.info("Trying to dispose")
 
-        ToastVars.state = ToastState.Disposing
+        ToastVars.stateLock.withLock {
+            if (ToastVars.state == ToastState.Disposing) return
+
+            ToastVars.state = ToastState.Disposing
+        }
 
         Logger.info("Disposing")
 

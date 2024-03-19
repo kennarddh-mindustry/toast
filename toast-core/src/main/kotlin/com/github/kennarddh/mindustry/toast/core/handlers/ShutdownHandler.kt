@@ -19,6 +19,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
 import mindustry.Vars
 import mindustry.gen.Call
 import mindustry.gen.KickCallPacket2
@@ -50,8 +51,10 @@ class ShutdownHandler : Handler {
     }
 
     suspend fun shutdown(countdown: Int = 5) {
-        ToastVars.state = ToastState.ShuttingDown
-        
+        ToastVars.stateLock.withLock {
+            ToastVars.state = ToastState.ShuttingDown
+        }
+
         gracefulStopJob?.cancel()
 
         gracefulStopJob = CoroutineScopes.Main.launch {

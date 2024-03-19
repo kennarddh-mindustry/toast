@@ -22,6 +22,7 @@ import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 import mindustry.Vars
 import mindustry.game.EventType
@@ -116,7 +117,11 @@ class StartHandler : Handler {
 
             Vars.netServer.openServer()
 
-            ToastVars.state = ToastState.Hosting
+            runBlocking {
+                ToastVars.stateLock.withLock {
+                    ToastVars.state = ToastState.Hosting
+                }
+            }
 
             Logger.info("Hosted")
         }
