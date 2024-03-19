@@ -27,6 +27,7 @@ import mindustry.game.Team
 import mindustry.gen.Player
 import mindustry.type.UnitType
 import org.jetbrains.exposed.sql.transactions.TransactionManager
+import kotlin.system.exitProcess
 
 @Suppress("unused")
 class Toast : AbstractPlugin() {
@@ -98,6 +99,8 @@ class Toast : AbstractPlugin() {
     }
 
     override suspend fun onDispose() {
+        Logger.info("On dispose")
+
         Messenger.publishGameEvent(
             "${ToastVars.server.name}.stop",
             GameEvent(
@@ -114,5 +117,9 @@ class Toast : AbstractPlugin() {
         Messenger.close()
 
         TransactionManager.closeAndUnregister(Database.database)
+
+        Logger.info("On dispose done. Exiting.")
+
+        exitProcess(0)
     }
 }
