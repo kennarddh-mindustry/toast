@@ -1,6 +1,5 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
-import arc.Core
 import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
@@ -13,7 +12,10 @@ import com.github.kennarddh.mindustry.genesis.standard.commands.parameters.valid
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import mindustry.Vars
 import mindustry.gen.Call
 import mindustry.gen.KickCallPacket2
@@ -57,26 +59,24 @@ class ShutdownHandler : Handler {
             }
 
             runOnMindustryThreadSuspended {
-                runBlocking {
-                    Call.sendMessage("[scarlet]Stopping server.")
+                Call.sendMessage("[scarlet]Stopping server.")
 
-                    Genesis.getHandler<AutoSaveHandler>()?.autoSave()
+                Genesis.getHandler<AutoSaveHandler>()?.save()
 
-                    // Kick every player
-                    val packet = KickCallPacket2()
-                    packet.reason = KickReason.serverRestarting
-                    Vars.net.send(packet, true)
+                Logger.info("Kicking all players")
 
-                    Logger.info("Kicked all players")
+                // Kick every player
+                val packet = KickCallPacket2()
+                packet.reason = KickReason.serverRestarting
+                Vars.net.send(packet, true)
 
-                    Logger.info("Gracefully exiting.")
+                Logger.info("Kicked all players")
 
-                    // Exit
-                    Vars.net.dispose()
-                    Core.app.exit()
+                Logger.info("Gracefully exiting.")
 
-                    Logger.info("Gracefully exited.")
-                }
+                Vars.net.dispose()
+
+                Logger.info("Gracefully exited.")
             }
         }
 
