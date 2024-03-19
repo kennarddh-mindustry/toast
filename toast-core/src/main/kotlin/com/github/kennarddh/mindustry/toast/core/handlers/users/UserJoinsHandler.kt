@@ -288,6 +288,33 @@ class UserJoinsHandler : Handler {
                 }
             }
 
+            if (userID != null) {
+                val user = Users.selectOne { Users.id eq userID.value }
+
+                if (user == null) {
+                    if (!publicPermission.contains(Permission.Join)) {
+                        con.kickWithoutLogging("[#ff0000]You are not allowed to join")
+
+                        return@newTransaction false
+                    }
+
+                    return@newTransaction true
+                }
+
+
+                if (!user[Users.role].fullPermissions.contains(Permission.Join)) {
+                    con.kickWithoutLogging("[#ff0000]You are not allowed to join")
+
+                    return@newTransaction false
+                }
+            } else {
+                if (!publicPermission.contains(Permission.Join)) {
+                    con.kickWithoutLogging("[#ff0000]You are not allowed to join")
+
+                    return@newTransaction false
+                }
+            }
+
             return@newTransaction true
         }
     }

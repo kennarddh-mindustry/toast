@@ -3,7 +3,7 @@ package com.github.kennarddh.mindustry.toast.common
 enum class UserRank(
     val displayName: String,
     val minXP: Int,
-    val permissions: Set<Permission> = setOf()
+    private val permissions: Set<Permission> = setOf()
 ) {
     /**
      * Rank for anyone that has less than 0 xp

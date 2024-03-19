@@ -8,14 +8,16 @@ fun Player.clearRoleEffect() {
     admin = false
 }
 
+val publicPermission = setOf(Permission.Join, Permission.Chat)
+
 @Serializable
 enum class UserRole(
     val displayName: String,
     val applyRoleEffect: mindustry.gen.Player.() -> Unit,
-    val permissions: Set<Permission> = setOf()
+    private val permissions: Set<Permission> = setOf()
 ) {
     @SerialName("Player")
-    Player("Player", { }, setOf(Permission.Join, Permission.Chat)),
+    Player("Player", { }, setOf()),
 
     @SerialName("Mod")
     Mod("Mod", { }, setOf(Permission.ViewUUID, Permission.ViewMindustryNamesHistory)),
@@ -41,6 +43,6 @@ enum class UserRole(
         get() {
             val affectingRoles = entries.filter { it <= this }
 
-            return affectingRoles.flatMap { it.permissions }.toSet()
+            return publicPermission + affectingRoles.flatMap { it.permissions }.toSet()
         }
 }
