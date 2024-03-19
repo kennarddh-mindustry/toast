@@ -20,7 +20,9 @@ class MessageHandler : Handler {
     fun whisper(player: Player, target: Player, message: String): CommandResult? {
         if (player == target) return CommandResult("Cannot whisper to yourself.", CommandResultStatus.Failed)
 
-        val computedMessage = Vars.netServer.chatFormatter.format(player, "[accent]<W> [white]$message")
+        val filteredMessage = Vars.netServer.admins.filterMessage(player, message) ?: return null
+
+        val computedMessage = Vars.netServer.chatFormatter.format(player, "[accent]<W> [white]$filteredMessage")
 
         Logger.info("${player.name} whisper(${target.name}): $computedMessage")
 
