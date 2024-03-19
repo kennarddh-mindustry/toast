@@ -91,8 +91,6 @@ class Toast : AbstractPlugin() {
 
                 try {
                     Genesis.getHandler<ShutdownHandler>()?.shutdown()
-
-                    onDispose()
                 } catch (_: CancellationException) {
                     Logger.warn("Shutdown hook cancelled.")
                 }
@@ -104,7 +102,7 @@ class Toast : AbstractPlugin() {
 
     override suspend fun onDispose() {
         if (ToastVars.state == ToastState.Disposed) return
-        
+
         Logger.info("Disposing")
 
         Messenger.publishGameEvent(
