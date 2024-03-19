@@ -13,10 +13,7 @@ import com.github.kennarddh.mindustry.genesis.standard.commands.parameters.valid
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import mindustry.Vars
 import mindustry.gen.Call
 import mindustry.gen.KickCallPacket2
@@ -60,24 +57,26 @@ class ShutdownHandler : Handler {
             }
 
             runOnMindustryThreadSuspended {
-                Call.sendMessage("[scarlet]Stopping server.")
+                runBlocking {
+                    Call.sendMessage("[scarlet]Stopping server.")
 
-                Genesis.getHandler<AutoSaveHandler>()?.autoSave()
+                    Genesis.getHandler<AutoSaveHandler>()?.autoSave()
 
-                // Kick every player
-                val packet = KickCallPacket2()
-                packet.reason = KickReason.serverRestarting
-                Vars.net.send(packet, true)
+                    // Kick every player
+                    val packet = KickCallPacket2()
+                    packet.reason = KickReason.serverRestarting
+                    Vars.net.send(packet, true)
 
-                Logger.info("Kicked all players")
+                    Logger.info("Kicked all players")
 
-                Logger.info("Gracefully exiting.")
+                    Logger.info("Gracefully exiting.")
 
-                // Exit
-                Vars.net.dispose()
-                Core.app.exit()
+                    // Exit
+                    Vars.net.dispose()
+                    Core.app.exit()
 
-                Logger.info("Gracefully exited.")
+                    Logger.info("Gracefully exited.")
+                }
             }
         }
 
