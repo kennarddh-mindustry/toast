@@ -8,7 +8,7 @@ enum class ToastState {
     Idle,
     Hosting,
     ShuttingDown,
-    Disposed
+    Disposing
 }
 
 object ToastVars {

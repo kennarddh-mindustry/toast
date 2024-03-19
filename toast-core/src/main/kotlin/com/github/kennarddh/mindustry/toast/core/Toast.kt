@@ -85,12 +85,14 @@ class Toast : AbstractPlugin() {
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run(): Unit = runBlocking {
-                if (ToastVars.state == ToastState.Disposed) return@runBlocking
+                if (ToastVars.state == ToastState.Disposing) return@runBlocking
 
                 Logger.info("Gracefully shutting down via shutdown hook.")
 
                 try {
                     Genesis.getHandler<ShutdownHandler>()?.shutdown()
+
+                    onDispose()
                 } catch (_: CancellationException) {
                     Logger.warn("Shutdown hook cancelled.")
                 }
@@ -101,7 +103,9 @@ class Toast : AbstractPlugin() {
     }
 
     override suspend fun onDispose() {
-        if (ToastVars.state == ToastState.Disposed) return
+        if (ToastVars.state == ToastState.Disposing) return
+
+        ToastVars.state = ToastState.Disposing
 
         Logger.info("Disposing")
 
@@ -121,8 +125,6 @@ class Toast : AbstractPlugin() {
         Messenger.close()
 
         TransactionManager.closeAndUnregister(Database.database)
-
-        ToastVars.state = ToastState.Disposed
 
         Logger.info("Disposed.")
     }
