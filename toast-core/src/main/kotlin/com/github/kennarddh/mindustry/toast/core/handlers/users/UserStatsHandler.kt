@@ -174,9 +174,9 @@ class UserStatsHandler : Handler {
                         }
 
                     if (mindustryUserServerData == null) {
-                        CommandResult("${target.name} doesn't have xp in ${computedServer.displayName} server.")
+                        CommandResult("${target.plainName()} doesn't have xp in ${computedServer.displayName} server.")
                     } else {
-                        CommandResult("${target.name} has ${mindustryUserServerData[MindustryUserServerData.xp]} xp.")
+                        CommandResult("${target.plainName()} has ${mindustryUserServerData[MindustryUserServerData.xp]} xp.")
                     }
                 }
 
@@ -200,9 +200,9 @@ class UserStatsHandler : Handler {
                     }
 
                     if (updatedCount == 0) {
-                        CommandResult("${target.name} doesn't have xp in ${computedServer.displayName} server.")
+                        CommandResult("${target.plainName()} doesn't have xp in ${computedServer.displayName} server.")
                     } else {
-                        CommandResult("Added $value xp to ${target.name}.")
+                        CommandResult("Added $value xp to ${target.plainName()}.")
                     }
                 }
 
@@ -224,9 +224,9 @@ class UserStatsHandler : Handler {
                     }
 
                     if (updatedCount == 0) {
-                        CommandResult("${target.name} doesn't have xp in ${computedServer.displayName} server.")
+                        CommandResult("${target.plainName()} doesn't have xp in ${computedServer.displayName} server.")
                     } else {
-                        CommandResult("Set ${target.name} xp to $value.")
+                        CommandResult("Set ${target.plainName()} xp to $value.")
                     }
                 }
 
@@ -250,9 +250,9 @@ class UserStatsHandler : Handler {
                     }
 
                     if (updatedCount == 0) {
-                        CommandResult("${target.name} doesn't have xp in ${computedServer.displayName} server.")
+                        CommandResult("${target.plainName()} doesn't have xp in ${computedServer.displayName} server.")
                     } else {
-                        CommandResult("Removed $value xp from ${target.name}.")
+                        CommandResult("Removed $value xp from ${target.plainName()}.")
                     }
                 }
             }
