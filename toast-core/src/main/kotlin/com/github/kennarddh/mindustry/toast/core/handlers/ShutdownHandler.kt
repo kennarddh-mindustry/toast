@@ -24,7 +24,12 @@ import mindustry.net.Packets.KickReason
 import kotlin.time.Duration.Companion.seconds
 
 class ShutdownHandler : Handler {
-    var gracefulStopJob: Job? = null
+    private var gracefulStopJob: Job? = null
+
+    override suspend fun onInit() {
+        Genesis.commandRegistry.removeCommand("exit")
+        Genesis.commandRegistry.removeCommand("stop")
+    }
 
     @Command(["graceful-shutdown"])
     @ServerSide
