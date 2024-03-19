@@ -43,6 +43,10 @@ object DiscoveryRedis {
         )
     }
 
+    suspend fun delete(server: Server) {
+        client.del(server.name)
+    }
+
     suspend fun get(server: Server): DiscoveryPayload? {
         val payloadEncoded = client.get(server.name) ?: return null
 

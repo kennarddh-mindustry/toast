@@ -93,6 +93,8 @@ class Toast : AbstractPlugin() {
     }
 
     override suspend fun onDispose() {
+        Genesis.getHandler<MiscCommandsHandler>()?.stop()
+
         Messenger.publishGameEvent(
             "${ToastVars.server.name}.stop",
             GameEvent(
@@ -101,13 +103,13 @@ class Toast : AbstractPlugin() {
             )
         )
 
+        DiscoveryRedis.delete(ToastVars.server)
+
         DiscoveryRedis.close()
         VerifyDiscordRedis.close()
 
         Messenger.close()
 
         TransactionManager.closeAndUnregister(Database.database)
-
-        Genesis.getHandler<MiscCommandsHandler>()?.stop()
     }
 }
