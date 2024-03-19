@@ -15,6 +15,7 @@ services:
       - "6567:6567/udp"
     volumes:
       - ./prod/maps/survival:/app/config/maps/
+      - survival-server-saves:/app/config/saves/
     networks:
       - toast
     env_file:
@@ -56,6 +57,7 @@ services:
       - "6568:6568/udp"
     volumes:
       - ./prod/maps/attack:/app/config/maps/
+      - attack-server-saves:/app/config/saves/
     networks:
       - toast
     env_file:
@@ -227,6 +229,8 @@ volumes:
   data:
   rabbitmq-data:
   portainer-data:
+  survival-server-saves:
+  attack-server-saves:
 
 networks:
   toast:
