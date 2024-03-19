@@ -9,7 +9,7 @@ class WelcomeHandler : Handler {
         Config.motd.set(
             """
             Welcome to | [red]Toast [orange]${ToastVars.server.displayName} [white]| [yellow]Owner: Bread
-            [white]Please join our discord by using [accent]/discord[white] and register by using [accent]/register, [white]we are looking for new members and staff.
+            [white]Please join our discord by using [accent]/discord[white] and register by using [accent]/register[white], we are looking for new members and staff.
             """.trimIndent()
         )
     }
