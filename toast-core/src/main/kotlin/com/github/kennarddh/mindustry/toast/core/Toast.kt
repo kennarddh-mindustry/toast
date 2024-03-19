@@ -20,13 +20,13 @@ import com.github.kennarddh.mindustry.toast.core.handlers.users.*
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.kick.VoteKickCommandHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.rtv.RTVCommandHandler
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.skip_wave.SkipWaveCommandHandler
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import mindustry.game.Team
 import mindustry.gen.Player
 import mindustry.type.UnitType
 import org.jetbrains.exposed.sql.transactions.TransactionManager
-import kotlin.system.exitProcess
 
 @Suppress("unused")
 class Toast : AbstractPlugin() {
@@ -86,11 +86,11 @@ class Toast : AbstractPlugin() {
             override fun run(): Unit = runBlocking {
                 Logger.info("Gracefully shutting down via shutdown hook.")
 
-                onDispose()
-
-                println("Gracefully shutting down via shutdown hook done.")
-                
-                exitProcess(0)
+                try {
+                    Genesis.getHandler<ShutdownHandler>()?.shutdown()
+                } catch (_: CancellationException) {
+                    // Ignore if shutdown job got canceled
+                }
             }
         })
 
@@ -98,8 +98,6 @@ class Toast : AbstractPlugin() {
     }
 
     override suspend fun onDispose() {
-        Genesis.getHandler<ShutdownHandler>()?.shutdown()
-
         Messenger.publishGameEvent(
             "${ToastVars.server.name}.stop",
             GameEvent(

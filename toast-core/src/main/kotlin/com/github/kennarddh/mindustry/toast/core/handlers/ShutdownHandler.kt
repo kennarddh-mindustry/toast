@@ -7,7 +7,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
-import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThread
+import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThreadSuspended
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.standard.commands.parameters.validations.numbers.GTE
 import com.github.kennarddh.mindustry.toast.common.UserRole
@@ -36,13 +36,13 @@ class ShutdownHandler : Handler {
     @ClientSide
     @MinimumRole(UserRole.Admin)
     @Description("Shutdown server with countdown then reconnect players.")
-    fun gracefulShutdown(player: Player? = null, @GTE(0) countdown: Int = 5) {
+    suspend fun gracefulShutdown(player: Player? = null, @GTE(0) countdown: Int = 5) {
         Logger.info("${player?.name ?: "Server"} ran graceful-shutdown command")
 
         shutdown(countdown)
     }
 
-    fun shutdown(countdown: Int = 5) {
+    suspend fun shutdown(countdown: Int = 5) {
         gracefulStopJob?.cancel()
 
         gracefulStopJob = CoroutineScopes.Main.launch {
@@ -54,7 +54,7 @@ class ShutdownHandler : Handler {
                 }
             }
 
-            runOnMindustryThread {
+            runOnMindustryThreadSuspended {
                 Call.sendMessage("[scarlet]Stopping server.")
 
                 Genesis.getHandler<AutoSaveHandler>()?.autoSave()
@@ -75,5 +75,7 @@ class ShutdownHandler : Handler {
                 Logger.info("Gracefully exited.")
             }
         }
+
+        gracefulStopJob?.join()
     }
 }
