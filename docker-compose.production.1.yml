@@ -8,6 +8,8 @@ services:
     init: true
     tty: true
     stdin_open: true
+    stop_signal: SIGTERM
+    stop_grace_period: 15s
     ports:
       - "6567:6567/tcp"
       - "6567:6567/udp"
@@ -47,6 +49,8 @@ services:
     init: true
     tty: true
     stdin_open: true
+    stop_signal: SIGTERM
+    stop_grace_period: 15s
     ports:
       - "6568:6568/tcp"
       - "6568:6568/udp"
@@ -86,6 +90,8 @@ services:
       context: .
       dockerfile: ./prod/Dockerfiles/discord.Dockerfile
     init: true
+    stop_signal: SIGTERM
+    stop_grace_period: 15s
     networks:
       - toast
     env_file:
