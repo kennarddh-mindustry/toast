@@ -99,7 +99,7 @@ class Toast : AbstractPlugin() {
     }
 
     override suspend fun onDispose() {
-        Logger.info("On dispose")
+        Logger.info("Disposing")
 
         Messenger.publishGameEvent(
             "${ToastVars.server.name}.stop",
@@ -118,7 +118,7 @@ class Toast : AbstractPlugin() {
 
         TransactionManager.closeAndUnregister(Database.database)
 
-        Logger.info("On dispose done. Exiting.")
+        Logger.info("Disposed. Exiting.")
 
         exitProcess(0)
     }
