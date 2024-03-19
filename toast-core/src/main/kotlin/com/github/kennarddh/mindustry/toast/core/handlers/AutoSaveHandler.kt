@@ -14,6 +14,8 @@ class AutoSaveHandler : Handler {
 
     @TimerTask(30f, 30f)
     fun autoSave() {
+        if (!Vars.state.isGame) return
+
         Logger.info("Running auto save.")
 
         try {
