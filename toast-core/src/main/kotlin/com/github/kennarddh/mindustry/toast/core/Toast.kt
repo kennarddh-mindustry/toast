@@ -23,6 +23,7 @@ import com.github.kennarddh.mindustry.toast.core.handlers.vote.skip_wave.SkipWav
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
+import mindustry.Vars
 import mindustry.game.Team
 import mindustry.gen.Player
 import mindustry.type.UnitType
@@ -85,6 +86,9 @@ class Toast : AbstractPlugin() {
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run(): Unit = runBlocking {
+                // Return if this was run by the shutdown command
+                if (!Vars.state.isGame) return@runBlocking
+
                 Logger.info("Gracefully shutting down via shutdown hook.")
 
                 try {
