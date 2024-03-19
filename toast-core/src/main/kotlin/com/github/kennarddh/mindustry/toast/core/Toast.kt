@@ -26,6 +26,7 @@ import mindustry.game.Team
 import mindustry.gen.Player
 import mindustry.type.UnitType
 import org.jetbrains.exposed.sql.transactions.TransactionManager
+import kotlin.system.exitProcess
 
 @Suppress("unused")
 class Toast : AbstractPlugin() {
@@ -86,6 +87,10 @@ class Toast : AbstractPlugin() {
                 Logger.info("Gracefully shutting down via shutdown hook.")
 
                 onDispose()
+
+                println("Gracefully shutting down via shutdown hook done.")
+                
+                exitProcess(0)
             }
         })
 
