@@ -14,6 +14,7 @@ import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.Toast
 import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.UnitTypeParameter
 import com.github.kennarddh.mindustry.toast.core.commands.validations.*
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
+import com.github.kennarddh.mindustry.toast.core.commons.ToastState
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.handlers.*
 import com.github.kennarddh.mindustry.toast.core.handlers.users.*
@@ -23,12 +24,10 @@ import com.github.kennarddh.mindustry.toast.core.handlers.vote.skip_wave.SkipWav
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
-import mindustry.Vars
 import mindustry.game.Team
 import mindustry.gen.Player
 import mindustry.type.UnitType
 import org.jetbrains.exposed.sql.transactions.TransactionManager
-import kotlin.system.exitProcess
 
 @Suppress("unused")
 class Toast : AbstractPlugin() {
@@ -86,15 +85,14 @@ class Toast : AbstractPlugin() {
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run(): Unit = runBlocking {
-                // Return if this was run by the shutdown command
-                if (!Vars.state.isGame) return@runBlocking
-
+                if (ToastVars.state == ToastState.Disposed) return@runBlocking
+                
                 Logger.info("Gracefully shutting down via shutdown hook.")
 
                 try {
                     Genesis.getHandler<ShutdownHandler>()?.shutdown()
 
-                    exitProcess(0)
+                    onDispose()
                 } catch (_: CancellationException) {
                     Logger.warn("Shutdown hook cancelled.")
                 }
@@ -124,8 +122,8 @@ class Toast : AbstractPlugin() {
 
         TransactionManager.closeAndUnregister(Database.database)
 
-        Logger.info("Disposed. Exiting.")
+        ToastVars.state = ToastState.Disposed
 
-        exitProcess(0)
+        Logger.info("Disposed.")
     }
 }

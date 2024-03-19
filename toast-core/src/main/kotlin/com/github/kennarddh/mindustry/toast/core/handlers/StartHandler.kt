@@ -17,6 +17,7 @@ import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStartGameEvent
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
+import com.github.kennarddh.mindustry.toast.core.commons.ToastState
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -114,6 +115,8 @@ class StartHandler : Handler {
             Vars.logic.play()
 
             Vars.netServer.openServer()
+
+            ToastVars.state = ToastState.Hosting
 
             Logger.info("Hosted")
         }

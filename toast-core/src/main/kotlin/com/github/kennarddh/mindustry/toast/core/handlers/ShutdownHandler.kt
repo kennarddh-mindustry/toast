@@ -13,6 +13,8 @@ import com.github.kennarddh.mindustry.genesis.standard.commands.parameters.valid
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
+import com.github.kennarddh.mindustry.toast.core.commons.ToastState
+import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -48,6 +50,8 @@ class ShutdownHandler : Handler {
     }
 
     suspend fun shutdown(countdown: Int = 5) {
+        ToastVars.state = ToastState.ShuttingDown
+        
         gracefulStopJob?.cancel()
 
         gracefulStopJob = CoroutineScopes.Main.launch {

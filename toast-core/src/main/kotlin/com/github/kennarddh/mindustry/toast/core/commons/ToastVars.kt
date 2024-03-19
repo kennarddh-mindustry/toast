@@ -4,6 +4,13 @@ import com.github.kennarddh.mindustry.toast.common.Server
 import mindustry.game.Rules
 import mindustry.net.Administration.Config
 
+enum class ToastState {
+    Idle,
+    Hosting,
+    ShuttingDown,
+    Disposed
+}
+
 object ToastVars {
     val server: Server
         get() {
@@ -22,4 +29,6 @@ object ToastVars {
     val applyConfigs: () -> Unit = {
         Config.messageRateLimit.set(1)
     }
+
+    var state: ToastState = ToastState.Idle
 }

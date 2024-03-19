@@ -5,6 +5,8 @@ import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThread
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
+import com.github.kennarddh.mindustry.toast.core.commons.ToastState
+import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import mindustry.Vars
 import mindustry.io.SaveIO
 
@@ -15,7 +17,7 @@ class AutoSaveHandler : Handler {
 
     @TimerTask(30f, 30f)
     fun autoSave() {
-        if (!Vars.state.isGame) return
+        if (ToastVars.state != ToastState.Hosting) return
 
         Logger.info("Running auto save.")
 
