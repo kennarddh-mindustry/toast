@@ -32,7 +32,7 @@ class RTVCommandHandler : AbstractVoteCommand<Byte>("rtv", 2.minutes) {
             return
         }
 
-        vote(player, true)
+        vote(player, vote)
     }
 
     @Command(["rtv-cancel"])
