@@ -11,10 +11,14 @@ import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandl
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask
 import com.github.kennarddh.mindustry.genesis.standard.extensions.infoPopup
-import com.github.kennarddh.mindustry.toast.common.*
+import com.github.kennarddh.mindustry.toast.common.Server
+import com.github.kennarddh.mindustry.toast.common.UserRank
+import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
+import com.github.kennarddh.mindustry.toast.common.extensions.selectOne
+import com.github.kennarddh.mindustry.toast.common.extensions.toDisplayString
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities

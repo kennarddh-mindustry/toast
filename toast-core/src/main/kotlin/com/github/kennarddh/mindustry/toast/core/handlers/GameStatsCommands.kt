@@ -8,7 +8,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSi
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
-import com.github.kennarddh.mindustry.toast.common.toDisplayString
+import com.github.kennarddh.mindustry.toast.common.extensions.toDisplayString
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import mindustry.Vars

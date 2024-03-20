@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.common
+package com.github.kennarddh.mindustry.toast.common.extensions
 
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds

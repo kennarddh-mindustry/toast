@@ -2,7 +2,7 @@ package com.github.kennarddh.mindustry.toast.discord.listeners
 
 import com.github.kennarddh.mindustry.toast.common.Server
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
-import com.github.kennarddh.mindustry.toast.common.toDisplayString
+import com.github.kennarddh.mindustry.toast.common.extensions.toDisplayString
 import com.github.kennarddh.mindustry.toast.discord.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

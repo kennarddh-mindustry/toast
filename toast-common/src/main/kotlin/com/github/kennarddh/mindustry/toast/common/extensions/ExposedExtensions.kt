@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.common
+package com.github.kennarddh.mindustry.toast.common.extensions
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.statements.InsertStatement

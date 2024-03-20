@@ -5,7 +5,7 @@ import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
-import com.github.kennarddh.mindustry.toast.common.selectOne
+import com.github.kennarddh.mindustry.toast.common.extensions.selectOne
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import com.github.kennarddh.mindustry.toast.core.commons.entities.PlayerData
 import mindustry.gen.Player

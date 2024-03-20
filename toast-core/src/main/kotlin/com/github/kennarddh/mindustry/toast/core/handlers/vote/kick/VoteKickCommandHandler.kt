@@ -13,10 +13,10 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserVoteKickVotes
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
+import com.github.kennarddh.mindustry.toast.common.extensions.toDisplayString
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerPunishedGameEvent
-import com.github.kennarddh.mindustry.toast.common.toDisplayString
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities

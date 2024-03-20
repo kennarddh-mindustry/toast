@@ -2,7 +2,7 @@ package com.github.kennarddh.mindustry.toast.discord.listeners
 
 import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
-import com.github.kennarddh.mindustry.toast.common.selectOne
+import com.github.kennarddh.mindustry.toast.common.extensions.selectOne
 import com.github.kennarddh.mindustry.toast.common.verify.discord.VerifyDiscordRedis
 import com.github.kennarddh.mindustry.toast.discord.CoroutineScopes
 import kotlinx.coroutines.launch

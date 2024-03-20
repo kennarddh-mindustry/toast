@@ -1,4 +1,4 @@
-package com.github.kennarddh.mindustry.toast.common
+package com.github.kennarddh.mindustry.toast.common.extensions
 
 class InvalidIPStringException(override val message: String) : RuntimeException(message)
 

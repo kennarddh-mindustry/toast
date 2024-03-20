@@ -4,7 +4,7 @@ import arc.util.Timer
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
-import com.github.kennarddh.mindustry.toast.common.toDisplayString
+import com.github.kennarddh.mindustry.toast.common.extensions.toDisplayString
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import com.github.kennarddh.mindustry.toast.core.handlers.users.PlayerDisconnected
 import kotlinx.coroutines.launch
