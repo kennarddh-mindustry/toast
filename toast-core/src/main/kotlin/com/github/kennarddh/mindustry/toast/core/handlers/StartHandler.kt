@@ -121,6 +121,12 @@ class StartHandler : Handler {
             val successLoadAutoSave = tryLoadAutoSave()
 
             if (!successLoadAutoSave) {
+                // Just to be safe I guess
+                // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
+                Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
+
+                Vars.logic.reset()
+
                 Logger.info("No auto save found. Using random maps.")
 
                 val map = Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
