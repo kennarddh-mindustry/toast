@@ -25,6 +25,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 import mindustry.Vars
+import mindustry.core.GameState
 import mindustry.game.EventType
 import mindustry.io.SaveIO
 import mindustry.net.Administration.Config
@@ -34,6 +35,7 @@ import kotlin.time.Duration.Companion.seconds
 class StartHandler : Handler {
     override suspend fun onInit() {
         Genesis.commandRegistry.removeCommand("host")
+        Genesis.commandRegistry.removeCommand("load")
     }
 
     @EventHandler
@@ -75,6 +77,34 @@ class StartHandler : Handler {
         }
     }
 
+    private fun tryLoadAutoSave(): Boolean {
+        if (!AutoSaveHandler.file.exists()) return false
+
+        Logger.info("Found auto save. Using it.")
+
+        if (!SaveIO.isSaveValid(AutoSaveHandler.file)) {
+            Logger.warn("Invalid auto save file.")
+
+            return false
+        }
+
+        try {
+            SaveIO.load(AutoSaveHandler.file)
+
+            Vars.state.rules.sector = null
+
+            Vars.state.set(GameState.State.playing)
+
+            Logger.info("Auto save loaded.")
+        } catch (error: Exception) {
+            Logger.error("Failed to load auto save msav file.", error)
+
+            return false
+        }
+
+        return true
+    }
+
     @Command(["host"])
     @ServerSide
     @Description("Start hosting.")
@@ -88,15 +118,9 @@ class StartHandler : Handler {
 
             Vars.logic.reset()
 
-            if (AutoSaveHandler.file.exists()) {
-                Logger.info("Found auto save. Using it.")
+            val successLoadAutoSave = tryLoadAutoSave()
 
-                try {
-                    SaveIO.load(AutoSaveHandler.file)
-                } catch (error: Exception) {
-                    Logger.error("Failed to load auto save msav file.", error)
-                }
-            } else {
+            if (!successLoadAutoSave) {
                 Logger.info("No auto save found. Using random maps.")
 
                 val map = Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
