@@ -10,11 +10,14 @@ import com.github.kennarddh.mindustry.toast.discord.serverListChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import kotlin.time.Duration.Companion.seconds
 
 object DiscoveryHandler : ListenerAdapter() {
+    lateinit var serverListMessage: Message
+
     override fun onReady(event: ReadyEvent) {
         if (
             !System.getenv("ENABLE_DEV_SERVER_LIST").toBoolean() &&
@@ -57,8 +60,14 @@ object DiscoveryHandler : ListenerAdapter() {
                 if (System.getenv("SERVER_LIST_MESSAGE_ID") == null) {
                     serverListChannel.sendMessage(message).queue()
                 } else {
-                    serverListChannel.retrieveMessageById(System.getenv("SERVER_LIST_MESSAGE_ID").toLong()).queue {
-                        it.editMessage(message).queue()
+                    if (::serverListMessage.isInitialized) {
+                        serverListMessage.editMessage(message).queue()
+                    } else {
+                        serverListChannel.retrieveMessageById(System.getenv("SERVER_LIST_MESSAGE_ID").toLong()).queue {
+                            serverListMessage = it
+
+                            it.editMessage(message).queue()
+                        }
                     }
                 }
 
