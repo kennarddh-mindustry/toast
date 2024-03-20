@@ -3,10 +3,7 @@ package com.github.kennarddh.mindustry.toast.discord.listeners
 import com.github.kennarddh.mindustry.toast.common.Server
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
 import com.github.kennarddh.mindustry.toast.common.toDisplayString
-import com.github.kennarddh.mindustry.toast.discord.CoroutineScopes
-import com.github.kennarddh.mindustry.toast.discord.DiscordConstant
-import com.github.kennarddh.mindustry.toast.discord.jda
-import com.github.kennarddh.mindustry.toast.discord.serverListChannel
+import com.github.kennarddh.mindustry.toast.discord.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -63,10 +60,15 @@ object DiscoveryHandler : ListenerAdapter() {
                     if (::serverListMessage.isInitialized) {
                         serverListMessage.editMessage(message).queue()
                     } else {
-                        serverListChannel.retrieveMessageById(System.getenv("SERVER_LIST_MESSAGE_ID").toLong()).queue {
-                            serverListMessage = it
+                        try {
+                            serverListChannel.retrieveMessageById(System.getenv("SERVER_LIST_MESSAGE_ID").toLong())
+                                .queue {
+                                    serverListMessage = it
 
-                            it.editMessage(message).queue()
+                                    it.editMessage(message).queue()
+                                }
+                        } catch (error: Exception) {
+                            Logger.error("Cannot get server list message", error)
                         }
                     }
                 }
