@@ -390,16 +390,17 @@ class UserAccountHandler : Handler {
 
             return@newTransaction CommandResult(
                 """
-            Info for ${targetUser[Users.username]}.
-            Total XP: $targetTotalXP
-            UUIDs: ${if (permissions.contains(Permission.ViewUUID)) targetUUIDs.joinToString(", ") else "No Permission"}
-            IPs: ${if (permissions.contains(Permission.ViewIP)) targetIPs.joinToString(", ") else "No Permission"}
-            Mindustry names: ${
+                Info for ${targetUser[Users.username]}.
+                Total XP: $targetTotalXP
+                UUIDs: ${if (permissions.contains(Permission.ViewUUID)) targetUUIDs.joinToString(", ") else "No Permission"}
+                IPs: ${if (permissions.contains(Permission.ViewIP)) targetIPs.joinToString(", ") else "No Permission"}
+                Mindustry names: ${
                     if (permissions.contains(Permission.ViewMindustryNamesHistory)) targetMindustryNames.joinToString(
                         ", "
                     ) else "No Permission"
                 }
-            """.trimIndent()
+                Discord ID: ${targetUser[Users.discordID]}
+                """.trimIndent()
             )
         }
     }
