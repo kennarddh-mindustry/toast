@@ -6,10 +6,14 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
+import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
+import com.github.kennarddh.mindustry.toast.common.toDisplayString
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import mindustry.Vars
-import mindustry.core.UI
 import mindustry.entities.Units
+import mindustry.game.EventType.PlayEvent
 import mindustry.game.Team
 import mindustry.gen.Player
 import mindustry.logic.GlobalVars
@@ -17,6 +21,13 @@ import mindustry.logic.LAccess
 import mindustry.type.UnitType
 
 class GameStatsCommands : Handler {
+    private var mapStartTime: Instant = Clock.System.now()
+
+    @EventHandler
+    fun onPlay(event: PlayEvent) {
+        mapStartTime = Clock.System.now()
+    }
+
     @Command(["count"])
     @ClientSide
     @ServerSide
@@ -84,7 +95,7 @@ class GameStatsCommands : Handler {
             """
             ${if (player == null) "" else "[accent]"}Name: ${map.name()}${if (player == null) "" else "[accent]"} (by: ${map.author()}${if (player == null) "" else "[accent]"})
             Team: ${computedTeam.name}
-            Map Time: ${UI.formatTime(tick.toFloat())}
+            Map Time: ${Clock.System.now().minus(mapStartTime).toDisplayString()}
             Build Speed (Unit Factories): ${rules.buildSpeed(computedTeam)}x (${rules.unitBuildSpeed(computedTeam)}x)
             Build Cost (Refund): ${rules.buildCostMultiplier}x (${rules.deconstructRefundMultiplier}x)
             Block Health (Damage): ${rules.blockHealth(computedTeam)}x (${rules.blockDamage(computedTeam)}x)
