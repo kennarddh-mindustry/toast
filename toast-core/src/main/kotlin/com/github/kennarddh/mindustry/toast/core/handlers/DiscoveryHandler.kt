@@ -40,7 +40,7 @@ class DiscoveryHandler : Handler {
             Entities.players.keys.map { it.plainName() }.toTypedArray(),
             (60 / Time.delta).toInt(),
             uptime,
-            Vars.state.map.name(),
+            Vars.state.map.plainName(),
             Vars.state.isPaused,
             if (::publicIP.isInitialized) host else null
         )
