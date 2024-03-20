@@ -8,6 +8,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSi
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
+import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThreadSuspended
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.menus.Menu
 import com.github.kennarddh.mindustry.genesis.core.menus.Menus
@@ -178,9 +179,13 @@ class UserAccountHandler : Handler {
             playerData.userID = user[Users.id].value
             playerData.userID = user[Users.id].value
 
-            user[Users.role].applyRoleEffect(player)
+            runOnMindustryThreadSuspended {
+                player.clearRoleEffect()
 
-            player.applyName(user[Users.role])
+                user[Users.role].applyRoleEffect(player)
+
+                player.applyName(user[Users.role])
+            }
 
             CommandResult(
                 "Login success. You are now logged in as ${user[Users.username]}."
@@ -209,8 +214,10 @@ class UserAccountHandler : Handler {
 
             playerData.userID = null
 
-            player.clearRoleEffect()
-            player.applyName(null)
+            runOnMindustryThreadSuspended {
+                player.clearRoleEffect()
+                player.applyName(null)
+            }
 
             CommandResult("Logout success. You are now no longer logged in.")
         }
@@ -249,9 +256,11 @@ class UserAccountHandler : Handler {
                 it[this.role] = newRole
             }
 
-            target.clearRoleEffect()
-            newRole.applyRoleEffect(target)
-            target.applyName(newRole)
+            runOnMindustryThreadSuspended {
+                target.clearRoleEffect()
+                newRole.applyRoleEffect(target)
+                target.applyName(newRole)
+            }
 
             Entities.players[target]?.role = newRole
 

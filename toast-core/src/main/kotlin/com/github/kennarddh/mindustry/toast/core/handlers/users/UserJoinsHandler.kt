@@ -2,6 +2,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import arc.util.Strings
 import com.github.kennarddh.mindustry.genesis.core.commons.priority.Priority
+import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThreadSuspended
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.server.packets.annotations.ServerPacketHandler
@@ -342,16 +343,18 @@ class UserJoinsHandler : Handler {
 
             Logger.info("Player ${event.player.name}/${event.player.uuid()} added to Entities.players")
 
-            player.clearRoleEffect()
+            runOnMindustryThreadSuspended {
+                player.clearRoleEffect()
 
-            if (userID != null) {
-                val role = userAndMindustryUserAndUserServerData[Users.role]
+                if (userID != null) {
+                    val role = userAndMindustryUserAndUserServerData[Users.role]
 
-                role.applyRoleEffect(player)
+                    role.applyRoleEffect(player)
 
-                player.applyName(role)
-            } else {
-                player.applyName(null)
+                    player.applyName(role)
+                } else {
+                    player.applyName(null)
+                }
             }
         }
     }

@@ -6,6 +6,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
+import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThreadSuspended
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
@@ -24,9 +25,13 @@ class JavascriptHandler : Handler {
     @ClientSide
     @MinimumRole(UserRole.Admin)
     @Description("Run arbitrary Javascript on the server.")
-    fun javascript(player: Player? = null, script: String): CommandResult {
+    suspend fun javascript(player: Player? = null, script: String): CommandResult {
         Logger.info("${player?.name ?: "Server"} ran \"${script}\"")
 
-        return CommandResult(Vars.mods.scripts.runConsole(script))
+        val output = runOnMindustryThreadSuspended {
+            Vars.mods.scripts.runConsole(script)
+        }
+
+        return CommandResult(output)
     }
 }
