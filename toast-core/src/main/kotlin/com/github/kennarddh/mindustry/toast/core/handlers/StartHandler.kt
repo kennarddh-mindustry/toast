@@ -84,7 +84,9 @@ class StartHandler : Handler {
             Logger.info("Found auto save. Using it.")
 
             if (!SaveIO.isSaveValid(AutoSaveHandler.file)) {
-                Logger.warn("Invalid auto save file.")
+                Logger.warn("Invalid auto save file. Deleting.")
+
+                AutoSaveHandler.file.delete()
 
                 return false
             }
