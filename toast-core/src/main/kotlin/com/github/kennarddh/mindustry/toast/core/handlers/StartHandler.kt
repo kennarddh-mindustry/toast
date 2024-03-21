@@ -78,17 +78,17 @@ class StartHandler : Handler {
     }
 
     private fun tryLoadAutoSave(): Boolean {
-        if (!AutoSaveHandler.file.exists()) return false
-
-        Logger.info("Found auto save. Using it.")
-
-        if (!SaveIO.isSaveValid(AutoSaveHandler.file)) {
-            Logger.warn("Invalid auto save file.")
-
-            return false
-        }
-
         try {
+            if (!AutoSaveHandler.file.exists()) return false
+
+            Logger.info("Found auto save. Using it.")
+
+            if (!SaveIO.isSaveValid(AutoSaveHandler.file)) {
+                Logger.warn("Invalid auto save file.")
+
+                return false
+            }
+
             SaveIO.load(AutoSaveHandler.file)
 
             Vars.state.rules.sector = null
@@ -96,13 +96,13 @@ class StartHandler : Handler {
             Vars.state.set(GameState.State.playing)
 
             Logger.info("Auto save loaded.")
+
+            return true
         } catch (error: Exception) {
             Logger.error("Failed to load auto save msav file.", error)
 
             return false
         }
-
-        return true
     }
 
     @Command(["host"])
