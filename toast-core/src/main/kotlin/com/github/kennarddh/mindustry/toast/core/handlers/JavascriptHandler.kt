@@ -27,7 +27,7 @@ class JavascriptHandler : Handler {
     @ServerSide
     @ClientSide
     @MinimumRole(UserRole.Admin)
-    @Description("Run arbitrary Javascript on the server.")
+    @Description("Run arbitrary Javascript on the server. This will run the code on the server. Please do not run code that takes long time to execute as it will blocks main thread and hang everything else.")
     suspend fun javascript(player: Player? = null, script: String): CommandResult {
         Logger.info("${player?.name ?: "Server"} ran \"${script}\"")
 
