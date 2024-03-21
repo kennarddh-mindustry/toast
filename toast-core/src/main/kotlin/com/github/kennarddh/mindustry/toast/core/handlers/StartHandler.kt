@@ -10,7 +10,7 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSi
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
 import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
-import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThread
+import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThreadSuspended
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
@@ -19,9 +19,7 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStar
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastState
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 import mindustry.Vars
@@ -30,6 +28,7 @@ import mindustry.game.EventType
 import mindustry.io.SaveIO
 import mindustry.net.Administration.Config
 import mindustry.server.ServerControl
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class StartHandler : Handler {
@@ -77,31 +76,39 @@ class StartHandler : Handler {
         }
     }
 
-    private fun tryLoadAutoSave(): Boolean {
+    private suspend fun tryLoadAutoSave(timeout: Duration = 20.seconds): Boolean {
         try {
-            if (!AutoSaveHandler.file.exists()) return false
+            return withTimeout(timeout) {
+                try {
+                    if (!AutoSaveHandler.file.exists()) return@withTimeout false
 
-            Logger.info("Found auto save. Using it.")
+                    Logger.info("Found auto save. Using it.")
 
-            if (!SaveIO.isSaveValid(AutoSaveHandler.file)) {
-                Logger.warn("Invalid auto save file. Deleting.")
+                    if (!SaveIO.isSaveValid(AutoSaveHandler.file)) {
+                        Logger.warn("Invalid auto save file. Deleting.")
 
-                AutoSaveHandler.file.delete()
+                        AutoSaveHandler.file.delete()
 
-                return false
+                        return@withTimeout false
+                    }
+
+                    SaveIO.load(AutoSaveHandler.file)
+
+                    Vars.state.rules.sector = null
+
+                    Vars.state.set(GameState.State.playing)
+
+                    Logger.info("Auto save loaded.")
+
+                    return@withTimeout true
+                } catch (error: Exception) {
+                    Logger.error("Failed to load auto save msav file.", error)
+
+                    return@withTimeout false
+                }
             }
-
-            SaveIO.load(AutoSaveHandler.file)
-
-            Vars.state.rules.sector = null
-
-            Vars.state.set(GameState.State.playing)
-
-            Logger.info("Auto save loaded.")
-
-            return true
-        } catch (error: Exception) {
-            Logger.error("Failed to load auto save msav file.", error)
+        } catch (error: TimeoutCancellationException) {
+            Logger.info("Timeout on loading auto save. Ignoring auto save.")
 
             return false
         }
@@ -110,52 +117,52 @@ class StartHandler : Handler {
     @Command(["host"])
     @ServerSide
     @Description("Start hosting.")
-    private fun host(): CommandResult? {
+    private suspend fun host(): CommandResult? {
         if (Vars.state.isGame)
             return CommandResult("Already hosting. Type 'stop' to stop hosting first.", CommandResultStatus.Failed)
 
-        runOnMindustryThread {
-            // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
-            Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
-
-            Vars.logic.reset()
-
-            val successLoadAutoSave = tryLoadAutoSave()
-
-            if (!successLoadAutoSave) {
-                // Just to be safe I guess
+        runOnMindustryThreadSuspended(30.seconds) {
+            runBlocking {
                 // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
                 Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
 
                 Vars.logic.reset()
 
-                Logger.info("No auto save found. Using random maps.")
+                val successLoadAutoSave = tryLoadAutoSave()
 
-                val map = Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
+                if (!successLoadAutoSave) {
+                    // Just to be safe I guess
+                    // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
+                    Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
 
-                ServerControl.instance.lastMode = ToastVars.server.gameMode.mindustryGameMode
+                    Vars.logic.reset()
 
-                Core.settings.put("lastServerMode", ServerControl.instance.lastMode.name)
-                Vars.world.loadMap(map, map.applyRules(ServerControl.instance.lastMode))
+                    Logger.info("No auto save found. Using random maps.")
 
-                Vars.state.rules = map.applyRules(ToastVars.server.gameMode.mindustryGameMode)
-            }
+                    val map = Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
 
-            ToastVars.applyRules(Vars.state.rules)
-            ToastVars.server.gameMode.applyRules(Vars.state.rules)
-            ToastVars.server.applyRules(Vars.state.rules)
+                    ServerControl.instance.lastMode = ToastVars.server.gameMode.mindustryGameMode
 
-            Vars.logic.play()
+                    Core.settings.put("lastServerMode", ServerControl.instance.lastMode.name)
+                    Vars.world.loadMap(map, map.applyRules(ServerControl.instance.lastMode))
 
-            Vars.netServer.openServer()
+                    Vars.state.rules = map.applyRules(ToastVars.server.gameMode.mindustryGameMode)
+                }
 
-            runBlocking {
+                ToastVars.applyRules(Vars.state.rules)
+                ToastVars.server.gameMode.applyRules(Vars.state.rules)
+                ToastVars.server.applyRules(Vars.state.rules)
+
+                Vars.logic.play()
+
+                Vars.netServer.openServer()
+
                 ToastVars.stateLock.withLock {
                     ToastVars.state = ToastState.Hosting
                 }
-            }
 
-            Logger.info("Hosted")
+                Logger.info("Hosted")
+            }
         }
 
         return null
