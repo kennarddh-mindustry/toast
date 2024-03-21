@@ -58,7 +58,13 @@ class StartHandler : Handler {
 
             Logger.info("Hosting")
 
-            host()
+            val successHost = tryHost()
+
+            if (!successHost) {
+                Logger.error("Failed to host")
+
+                return@runBlocking
+            }
 
             CoroutineScopes.Main.launch {
                 Logger.info("ServerStartGameEvent publishing")
@@ -114,15 +120,9 @@ class StartHandler : Handler {
         }
     }
 
-    @Command(["host"])
-    @ServerSide
-    @Description("Start hosting.")
-    private suspend fun host(): CommandResult? {
-        if (Vars.state.isGame)
-            return CommandResult("Already hosting. Type 'stop' to stop hosting first.", CommandResultStatus.Failed)
-
+    private suspend fun tryHost(): Boolean {
         try {
-            runOnMindustryThreadSuspended(30.seconds) {
+            return runOnMindustryThreadSuspended(30.seconds) {
                 runBlocking {
                     // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
                     Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
@@ -164,6 +164,8 @@ class StartHandler : Handler {
                     }
 
                     Logger.info("Hosted")
+
+                    return@runBlocking true
                 }
             }
         } catch (error: TimeoutCancellationException) {
@@ -172,8 +174,18 @@ class StartHandler : Handler {
             Vars.net.dispose()
             Core.app.exit()
 
-            return null
+            return false
         }
+    }
+
+    @Command(["host"])
+    @ServerSide
+    @Description("Start hosting.")
+    private suspend fun hostCommand(): CommandResult? {
+        if (Vars.state.isGame)
+            return CommandResult("Already hosting.", CommandResultStatus.Failed)
+
+        tryHost()
 
         return null
     }
