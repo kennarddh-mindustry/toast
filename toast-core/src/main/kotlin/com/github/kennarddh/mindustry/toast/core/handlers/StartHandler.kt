@@ -121,48 +121,58 @@ class StartHandler : Handler {
         if (Vars.state.isGame)
             return CommandResult("Already hosting. Type 'stop' to stop hosting first.", CommandResultStatus.Failed)
 
-        runOnMindustryThreadSuspended(30.seconds) {
-            runBlocking {
-                // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
-                Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
-
-                Vars.logic.reset()
-
-                val successLoadAutoSave = tryLoadAutoSave()
-
-                if (!successLoadAutoSave) {
-                    // Just to be safe I guess
+        try {
+            runOnMindustryThreadSuspended(30.seconds) {
+                runBlocking {
                     // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
                     Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
 
                     Vars.logic.reset()
 
-                    Logger.info("No auto save found. Using random maps.")
+                    val successLoadAutoSave = tryLoadAutoSave()
 
-                    val map = Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
+                    if (!successLoadAutoSave) {
+                        // Just to be safe I guess
+                        // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
+                        Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
 
-                    ServerControl.instance.lastMode = ToastVars.server.gameMode.mindustryGameMode
+                        Vars.logic.reset()
 
-                    Core.settings.put("lastServerMode", ServerControl.instance.lastMode.name)
-                    Vars.world.loadMap(map, map.applyRules(ServerControl.instance.lastMode))
+                        Logger.info("No auto save found. Using random maps.")
 
-                    Vars.state.rules = map.applyRules(ToastVars.server.gameMode.mindustryGameMode)
+                        val map =
+                            Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
+
+                        ServerControl.instance.lastMode = ToastVars.server.gameMode.mindustryGameMode
+
+                        Core.settings.put("lastServerMode", ServerControl.instance.lastMode.name)
+                        Vars.world.loadMap(map, map.applyRules(ServerControl.instance.lastMode))
+
+                        Vars.state.rules = map.applyRules(ToastVars.server.gameMode.mindustryGameMode)
+                    }
+
+                    ToastVars.applyRules(Vars.state.rules)
+                    ToastVars.server.gameMode.applyRules(Vars.state.rules)
+                    ToastVars.server.applyRules(Vars.state.rules)
+
+                    Vars.logic.play()
+
+                    Vars.netServer.openServer()
+
+                    ToastVars.stateLock.withLock {
+                        ToastVars.state = ToastState.Hosting
+                    }
+
+                    Logger.info("Hosted")
                 }
-
-                ToastVars.applyRules(Vars.state.rules)
-                ToastVars.server.gameMode.applyRules(Vars.state.rules)
-                ToastVars.server.applyRules(Vars.state.rules)
-
-                Vars.logic.play()
-
-                Vars.netServer.openServer()
-
-                ToastVars.stateLock.withLock {
-                    ToastVars.state = ToastState.Hosting
-                }
-
-                Logger.info("Hosted")
             }
+        } catch (error: TimeoutCancellationException) {
+            Logger.error("Timeout on starting. Exiting.")
+
+            Vars.net.dispose()
+            Core.app.exit()
+
+            return null
         }
 
         return null
