@@ -5,6 +5,7 @@ import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ChatServerControl
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerCommandServerControl
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerControl
+import com.github.kennarddh.mindustry.toast.common.preventDiscordPings
 import com.github.kennarddh.mindustry.toast.discord.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.discord.Logger
 import kotlinx.coroutines.launch
@@ -63,7 +64,7 @@ object ServerControlListener : ListenerAdapter() {
                     "${server.name}.chat",
                     ServerControl(
                         Clock.System.now().toEpochMilliseconds(),
-                        ChatServerControl(event.user.effectiveName, message)
+                        ChatServerControl(event.user.effectiveName, message.preventDiscordPings())
                     )
                 )
             }
