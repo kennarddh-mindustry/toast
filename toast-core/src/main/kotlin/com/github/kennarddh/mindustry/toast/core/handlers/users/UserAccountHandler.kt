@@ -233,54 +233,68 @@ class UserAccountHandler : Handler {
     @ServerSide
     @MinimumRole(UserRole.Admin)
     @Description("Change someone's role.")
-    suspend fun changeRole(player: Player? = null, target: Player, newRole: UserRole): CommandResult =
-        Database.newTransaction {
-            val targetUser =
-                target.getUserAndMindustryUserAndUserServerData() ?: return@newTransaction CommandResult(
-                    "Target is not logged in.",
+    suspend fun changeRole(player: Player? = null, target: Player, newRole: UserRole): CommandResult? {
+        val targetPlayerData = target.safeGetPlayerData() ?: return null
+        val targetRole = targetPlayerData.role
+            ?: return CommandResult("Target is not registered.", CommandResultStatus.Failed)
+
+        val targetUserID = targetPlayerData.userID
+
+        if (targetUserID == null) {
+            Logger.warn("ChangeRole. Invalid state, targetUserID is null.")
+
+            return CommandResult("Error Occurred. Invalid state, targetUserID is null.")
+        }
+
+        if (player != null) {
+            val playerData = player.safeGetPlayerData() ?: return null
+            val playerRole = playerData.role
+
+            if (playerRole == null) {
+                Logger.warn("Player is not registered. Check if MinimumRole annotation is correct and exist. ChangeRole.")
+
+                return CommandResult("Error Occurred. Player is not registered.", CommandResultStatus.Failed)
+            }
+
+            if (playerRole <= targetRole)
+                return CommandResult(
+                    "Your role must be higher than target's role to change target's role.",
                     CommandResultStatus.Failed
                 )
 
-            if (player != null) {
-                val playerUser = player.getUserAndMindustryUserAndUserServerData()!!
+            if (playerRole <= newRole)
+                return CommandResult(
+                    "Your role must be higher than new role.",
+                    CommandResultStatus.Failed
+                )
+        }
 
-                if (playerUser[Users.role] <= targetUser[Users.role])
-                    return@newTransaction CommandResult(
-                        "Your role must be higher than target's role to change target's role.",
-                        CommandResultStatus.Failed
-                    )
-
-                if (playerUser[Users.role] <= newRole)
-                    return@newTransaction CommandResult(
-                        "Your role must be higher than new role.",
-                        CommandResultStatus.Failed
-                    )
-            }
-
-            Users.update({ Users.id eq targetUser[Users.id] }) {
+        Database.newTransaction {
+            Users.update({ Users.id eq targetPlayerData.userID }) {
                 it[this.role] = newRole
             }
-
-            runOnMindustryThreadSuspended {
-                target.clearRoleEffect()
-                newRole.applyRoleEffect(target)
-                target.applyName(newRole)
-            }
-
-            Entities.players[target]?.role = newRole
-
-            CoroutineScopes.Main.launch {
-                Messenger.publishGameEvent(
-                    "${ToastVars.server.name}.player.role.changed",
-                    GameEvent(
-                        ToastVars.server, Clock.System.now(),
-                        PlayerRoleChangedGameEvent(targetUser[Users.id].value)
-                    )
-                )
-            }
-
-            return@newTransaction CommandResult("Successfully changed ${targetUser[Users.username]} to $newRole.")
         }
+
+        runOnMindustryThreadSuspended {
+            target.clearRoleEffect()
+            newRole.applyRoleEffect(target)
+            target.applyName(newRole)
+        }
+
+        targetPlayerData.role = newRole
+
+        CoroutineScopes.Main.launch {
+            Messenger.publishGameEvent(
+                "${ToastVars.server.name}.player.role.changed",
+                GameEvent(
+                    ToastVars.server, Clock.System.now(),
+                    PlayerRoleChangedGameEvent(targetUserID)
+                )
+            )
+        }
+
+        return CommandResult("Successfully changed ${target.plainName()} role to $newRole.")
+    }
 
     @Command(["user"])
     @ClientSide
