@@ -91,7 +91,7 @@ class UserModerationHandler : Handler {
         val playerUserID = playerData?.userID
         val targetUserID = targetPlayerData.userID
 
-        return Database.newTransaction {
+        val punishmentID = Database.newTransaction {
             val punishmentID = UserPunishments.insertAndGetId {
                 it[this.server] = ToastVars.server
                 it[this.reason] = reason
@@ -121,23 +121,25 @@ class UserModerationHandler : Handler {
                 """.trimIndent()
             )
 
-            CoroutineScopes.Main.launch {
-                Messenger.publishGameEvent(
-                    "${ToastVars.server.name}.punishment.kick",
-                    GameEvent(
-                        ToastVars.server,
-                        Clock.System.now(),
-                        PlayerPunishedGameEvent(
-                            punishmentID.value,
-                            player?.plainName() ?: "Server",
-                            target.name
-                        )
+            punishmentID
+        }
+
+        CoroutineScopes.Main.launch {
+            Messenger.publishGameEvent(
+                "${ToastVars.server.name}.punishment.kick",
+                GameEvent(
+                    ToastVars.server,
+                    Clock.System.now(),
+                    PlayerPunishedGameEvent(
+                        punishmentID.value,
+                        player?.plainName() ?: "Server",
+                        target.name
                     )
                 )
-            }
-
-            CommandResult("Successfully kicked ${target.plainName()}/${target.uuid()} for $duration with the reason \"$reason\"")
+            )
         }
+
+        return CommandResult("Successfully kicked ${target.plainName()}/${target.uuid()} for $duration with the reason \"$reason\"")
     }
 
     @Command(["ban"])
@@ -175,7 +177,7 @@ class UserModerationHandler : Handler {
         val playerUserID = playerData?.userID
         val targetUserID = targetPlayerData.userID
 
-        return Database.newTransaction {
+        val punishmentID = Database.newTransaction {
             val punishmentID = UserPunishments.insertAndGetId {
                 it[this.server] = ToastVars.server
                 it[this.reason] = reason
@@ -203,22 +205,24 @@ class UserModerationHandler : Handler {
                 """.trimIndent()
             )
 
-            CoroutineScopes.Main.launch {
-                Messenger.publishGameEvent(
-                    "${ToastVars.server.name}.punishment.ban",
-                    GameEvent(
-                        ToastVars.server,
-                        Clock.System.now(),
-                        PlayerPunishedGameEvent(
-                            punishmentID.value,
-                            player?.plainName() ?: "Server",
-                            target.name
-                        )
+            punishmentID
+        }
+
+        CoroutineScopes.Main.launch {
+            Messenger.publishGameEvent(
+                "${ToastVars.server.name}.punishment.ban",
+                GameEvent(
+                    ToastVars.server,
+                    Clock.System.now(),
+                    PlayerPunishedGameEvent(
+                        punishmentID.value,
+                        player?.plainName() ?: "Server",
+                        target.name
                     )
                 )
-            }
-
-            CommandResult("Successfully banned ${target.plainName()}/${target.uuid()} with the reason \"$reason\"")
+            )
         }
+
+        return CommandResult("Successfully banned ${target.plainName()}/${target.uuid()} with the reason \"$reason\"")
     }
 }

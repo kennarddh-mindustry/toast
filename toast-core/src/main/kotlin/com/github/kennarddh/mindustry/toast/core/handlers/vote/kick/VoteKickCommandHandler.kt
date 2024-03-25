@@ -109,7 +109,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
 
         Call.sendMessage("[#00ff00]Vote kick success. Kicked ${session.objective.target.plainName()} for ${duration.toDisplayString()}.")
 
-        Database.newTransaction {
+        val punishmentID = Database.newTransaction {
             val mindustryUser = session.initiator.getMindustryUser()!!
             val targetMindustryUser = session.objective.target.getMindustryUser()!!
             val user = session.initiator.getUserAndMindustryUserAndUserServerData()
@@ -143,20 +143,22 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
                 }
             }
 
-            CoroutineScopes.Main.launch {
-                Messenger.publishGameEvent(
-                    "${ToastVars.server.name}.punishment.vote-kick",
-                    GameEvent(
-                        ToastVars.server,
-                        Clock.System.now(),
-                        PlayerPunishedGameEvent(
-                            punishmentID.value,
-                            session.initiator.plainName(),
-                            session.objective.target.plainName()
-                        )
+            punishmentID
+        }
+
+        CoroutineScopes.Main.launch {
+            Messenger.publishGameEvent(
+                "${ToastVars.server.name}.punishment.vote-kick",
+                GameEvent(
+                    ToastVars.server,
+                    Clock.System.now(),
+                    PlayerPunishedGameEvent(
+                        punishmentID.value,
+                        session.initiator.plainName(),
+                        session.objective.target.plainName()
                     )
                 )
-            }
+            )
         }
     }
 
