@@ -108,7 +108,13 @@ object GameEventsListener : ListenerAdapter() {
                                 )
                                 .selectOne {
                                     UserPunishments.id eq data.userPunishmentID
-                                }!!
+                                }
+                        }
+
+                        if (userPunishment == null) {
+                            Logger.error("Missing UserPunishments entry with the id ${data.userPunishmentID}.")
+                            
+                            return@launch
                         }
 
                         val embed = EmbedBuilder().run {
