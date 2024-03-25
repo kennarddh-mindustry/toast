@@ -92,7 +92,7 @@ class UserModerationHandler : Handler {
         val targetUserID = targetPlayerData.userID
 
         val punishmentID = Database.newTransaction {
-            val punishmentID = UserPunishments.insertAndGetId {
+            UserPunishments.insertAndGetId {
                 it[this.server] = ToastVars.server
                 it[this.reason] = reason
                 it[this.endAt] = Clock.System.now().plus(duration).toLocalDateTime(TimeZone.UTC)
@@ -109,8 +109,6 @@ class UserModerationHandler : Handler {
                 if (targetUserID != null)
                     it[this.targetUserID] = targetUserID
             }
-
-            punishmentID
         }
 
         Logger.info("${if (player == null) "Server" else player.name} kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
@@ -178,7 +176,7 @@ class UserModerationHandler : Handler {
         val targetUserID = targetPlayerData.userID
 
         val punishmentID = Database.newTransaction {
-            val punishmentID = UserPunishments.insertAndGetId {
+            UserPunishments.insertAndGetId {
                 it[this.server] = ToastVars.server
                 it[this.reason] = reason
                 it[this.type] = PunishmentType.Ban
@@ -194,8 +192,6 @@ class UserModerationHandler : Handler {
                 if (targetUserID != null)
                     it[this.targetUserID] = targetUserID
             }
-
-            punishmentID
         }
 
         Logger.info("${if (player == null) "Server" else player.name} banned ${target.name}/${target.uuid()} with the reason \"$reason\"")
