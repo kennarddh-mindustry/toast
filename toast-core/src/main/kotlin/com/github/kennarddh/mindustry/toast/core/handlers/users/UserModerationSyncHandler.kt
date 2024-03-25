@@ -12,6 +12,7 @@ import com.github.kennarddh.mindustry.toast.common.extensions.selectOne
 import com.github.kennarddh.mindustry.toast.common.extensions.toDisplayString
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerPunishedGameEvent
+import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
 import kotlinx.coroutines.launch
@@ -48,8 +49,8 @@ class UserModerationSyncHandler : Handler {
                         )
                         .selectOne {
                             UserPunishments.id eq data.userPunishmentID
-                        }!!
-
+                        }
+                        ?: return@newTransaction Logger.error("Missing UserPunishments entry with the id ${data.userPunishmentID}.")
 
                     val punishedPlayers = Entities.players.values.filter {
                         (userPunishment[UserPunishments.targetMindustryUserID] != null && it.player.uuid() == userPunishment[targetMindustryUserAlias[MindustryUser.mindustryUUID]]) ||
