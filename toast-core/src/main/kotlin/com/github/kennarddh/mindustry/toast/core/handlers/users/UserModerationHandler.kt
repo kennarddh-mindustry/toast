@@ -110,19 +110,19 @@ class UserModerationHandler : Handler {
                     it[this.targetUserID] = targetUserID
             }
 
-            Logger.info("${if (player == null) "Server" else player.name} kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
-
-            target.kickWithoutLogging(
-                """
-                [#ff0000]You were kicked for the reason
-                []$reason
-                [#00ff00]You can join again in ${duration.toDisplayString()}.
-                [#00ff00]Appeal in Discord.
-                """.trimIndent()
-            )
-
             punishmentID
         }
+
+        Logger.info("${if (player == null) "Server" else player.name} kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
+
+        target.kickWithoutLogging(
+            """
+            [#ff0000]You were kicked for the reason
+            []$reason
+            [#00ff00]You can join again in ${duration.toDisplayString()}.
+            [#00ff00]Appeal in Discord.
+            """.trimIndent()
+        )
 
         CoroutineScopes.Main.launch {
             Messenger.publishGameEvent(
@@ -195,18 +195,18 @@ class UserModerationHandler : Handler {
                     it[this.targetUserID] = targetUserID
             }
 
-            Logger.info("${if (player == null) "Server" else player.name} banned ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
-
-            target.kickWithoutLogging(
-                """
-                [#ff0000]You were banned for the reason
-                []$reason
-                [#00ff00]Appeal in Discord.
-                """.trimIndent()
-            )
-
             punishmentID
         }
+
+        Logger.info("${if (player == null) "Server" else player.name} banned ${target.name}/${target.uuid()} with the reason \"$reason\"")
+
+        target.kickWithoutLogging(
+            """
+            [#ff0000]You were banned for the reason
+            []$reason
+            [#00ff00]Appeal in Discord.
+            """.trimIndent()
+        )
 
         CoroutineScopes.Main.launch {
             Messenger.publishGameEvent(
