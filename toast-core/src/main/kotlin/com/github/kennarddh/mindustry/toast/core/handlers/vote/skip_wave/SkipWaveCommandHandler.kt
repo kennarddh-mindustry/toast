@@ -5,6 +5,8 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
 import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThread
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
+import com.github.kennarddh.mindustry.genesis.standard.commands.parameters.validations.numbers.GTE
+import com.github.kennarddh.mindustry.genesis.standard.commands.parameters.validations.numbers.LTE
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
@@ -16,33 +18,31 @@ import mindustry.gen.Call
 import mindustry.gen.Player
 import kotlin.time.Duration.Companion.minutes
 
-class SkipWaveCommandHandler : AbstractVoteCommand<Byte>("skip wave", 1.minutes) {
-    @Command(["skip-wave", "skipwave", "next-wave", "nextwave"])
+class SkipWaveCommandHandler : AbstractVoteCommand<SkipWaveVoteObjective>("skip wave", 1.minutes) {
+    @Command(["skip-wave", "next-wave", "sw", "nw"])
     @ClientSide
-    @Description("Start a skip wave vote.")
-    suspend fun skipWave(player: Player, vote: Boolean = true) {
-        if (!getIsVoting()) {
-            if (vote) {
-                start(player, 1)
-            } else {
-                player.sendMessage("[#ff0000]Cannot vote no for '$name' because there is no '$name' vote session in progress.")
-            }
+    @Description("Start a 'skip wave' vote.")
+    suspend fun skipWave(player: Player, @LTE(5) @GTE(1) amountOfWave: Int = 1) {
+        start(player, SkipWaveVoteObjective(amountOfWave))
+    }
 
-            return
-        }
 
+    @Command(["skip-wave-vote", "next-wave-vote", "swv", "nwv"])
+    @ClientSide
+    @Description("Vote for 'skip wave' vote.")
+    suspend fun voteCommand(player: Player, vote: Boolean) {
         vote(player, vote)
     }
 
-    @Command(["skip-wave-cancel"])
+    @Command(["skip-wave-cancel", "next-wave-cancel", "swc", "nwc"])
     @ClientSide
     @MinimumRole(UserRole.Mod)
-    @Description("Cancel a skip wave vote.")
+    @Description("Cancel a 'skip wave' vote.")
     suspend fun cancelCommand(player: Player) {
         cancel(player)
     }
 
-    override fun canPlayerStart(player: Player, session: Byte): Boolean {
+    override fun canPlayerStart(player: Player, objective: SkipWaveVoteObjective): Boolean {
         if (!Vars.state.rules.waves) {
             player.sendMessage("[#ff0000]Cannot start '$name' vote because waves is disabled")
 
@@ -52,18 +52,20 @@ class SkipWaveCommandHandler : AbstractVoteCommand<Byte>("skip wave", 1.minutes)
         return true
     }
 
-    override suspend fun onSuccess(session: VoteSession<Byte>) {
+    override suspend fun onSuccess(session: VoteSession<SkipWaveVoteObjective>) {
         Call.sendMessage("[#00ff00]'$name' vote success. Skipping wave.")
 
         runOnMindustryThread {
-            Vars.logic.runWave()
+            repeat(session.objective.amountOfWave) {
+                Vars.logic.runWave()
+            }
         }
     }
 
     override fun getRequiredVotes(): Int = Entities.players.size.coerceIn(1..3)
 
-    override suspend fun getSessionDetails(session: VoteSession<Byte>): String {
-        return "Type [accent]/skip-wave y[] or [accent]/skip-wave n[] to vote."
+    override suspend fun getSessionDetails(session: VoteSession<SkipWaveVoteObjective>): String {
+        return "Type [accent]/skip-wave-vote y[] or [accent]/skip-wave-vote n[] to vote."
     }
 
     @EventHandler

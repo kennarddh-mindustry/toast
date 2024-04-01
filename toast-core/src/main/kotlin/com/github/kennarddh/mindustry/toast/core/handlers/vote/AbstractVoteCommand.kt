@@ -77,7 +77,7 @@ abstract class AbstractVoteCommand<T : Any>(
 
     protected open fun canPlayerVote(player: Player, session: VoteSession<T>): Boolean = true
 
-    protected open fun canPlayerStart(player: Player, session: T): Boolean = true
+    protected open fun canPlayerStart(player: Player, objective: T): Boolean = true
 
     protected abstract suspend fun onSuccess(session: VoteSession<T>)
 
