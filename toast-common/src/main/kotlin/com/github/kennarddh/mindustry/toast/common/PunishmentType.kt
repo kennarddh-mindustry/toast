@@ -9,7 +9,7 @@ enum class PunishmentType(val displayName: String) {
     Kick("Kick"),
 
     @SerialName("VoteKick")
-    VoteKick("VoteKIck"),
+    VoteKick("VoteKick"),
 
     @SerialName("Ban")
     Ban("Ban"),
