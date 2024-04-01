@@ -20,7 +20,7 @@ import kotlin.time.Duration.Companion.minutes
 class RTVCommandHandler : AbstractVoteCommand<Byte>("rtv", 2.minutes) {
     @Command(["rtv", "change-map"])
     @ClientSide
-    @Description("Start a rtv/change map vote.")
+    @Description("Start a 'rtv'/'change-map' vote.")
     suspend fun rtv(player: Player, vote: Boolean = true) {
         if (!getIsVoting()) {
             if (vote) {
@@ -35,10 +35,10 @@ class RTVCommandHandler : AbstractVoteCommand<Byte>("rtv", 2.minutes) {
         vote(player, vote)
     }
 
-    @Command(["rtv-cancel"])
+    @Command(["rtv-cancel", "change-map-cancel"])
     @ClientSide
     @MinimumRole(UserRole.Mod)
-    @Description("Cancel a rtv/change map vote.")
+    @Description("Cancel a 'rtv' vote.")
     suspend fun cancelCommand(player: Player) {
         cancel(player)
     }
