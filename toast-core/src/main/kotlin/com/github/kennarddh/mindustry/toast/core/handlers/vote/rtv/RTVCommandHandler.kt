@@ -49,7 +49,7 @@ class RTVCommandHandler : AbstractVoteCommand<Byte>("rtv", 2.minutes) {
         Call.sendMessage("[#00ff00]RTV success. Changing map.")
 
         runOnMindustryThread {
-            Events.fire(GameOverEvent(Team.crux))
+            Events.fire(GameOverEvent(Team.derelict))
         }
     }
 
