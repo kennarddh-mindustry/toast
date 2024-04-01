@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.utils.MarkdownSanitizer
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.alias
 
@@ -28,7 +29,13 @@ object GameEventsListener : ListenerAdapter() {
             val message = when (it.data) {
                 is PlayerJoinGameEvent -> "${(it.data as PlayerJoinGameEvent).playerMindustryName} joined."
                 is PlayerLeaveGameEvent -> "${(it.data as PlayerLeaveGameEvent).playerMindustryName} left."
-                is PlayerChatGameEvent -> "[${(it.data as PlayerChatGameEvent).playerMindustryName}]: ${(it.data as PlayerChatGameEvent).message}"
+                is PlayerChatGameEvent -> "[${(it.data as PlayerChatGameEvent).playerMindustryName}]: ${
+                    MarkdownSanitizer.sanitize(
+                        (it.data as PlayerChatGameEvent).message,
+                        MarkdownSanitizer.SanitizationStrategy.ESCAPE
+                    )
+                }"
+
                 is ServerStartGameEvent -> "Server start."
                 is ServerStopGameEvent -> "Server stop."
                 is ServerRestartGameEvent -> "Server restart."
@@ -113,7 +120,7 @@ object GameEventsListener : ListenerAdapter() {
 
                         if (userPunishment == null) {
                             Logger.error("Missing UserPunishments entry with the id ${data.userPunishmentID}.")
-                            
+
                             return@launch
                         }
 
