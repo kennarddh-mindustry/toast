@@ -14,4 +14,6 @@ object DiscordConstant {
     const val PARDON_EMBED_COLOR = 0x00ff00
     const val REPORTED_EMBED_COLOR = 0x0000ff
     const val ROLE_CHANGES_EMBED_COLOR = 0x00ff00
+
+    const val MEMBER_ROLE = 1189555975695376555L
 }

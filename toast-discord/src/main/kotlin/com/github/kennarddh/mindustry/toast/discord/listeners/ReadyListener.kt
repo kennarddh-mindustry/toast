@@ -20,6 +20,8 @@ object ReadyListener : ListenerAdapter() {
         serverListChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.SERVER_LIST_CHANNEL_ID)!!
         roleChangesChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.ROLE_CHANGES_CHANNEL_ID)!!
 
+        memberRole = toastMindustryGuild.getRoleById(DiscordConstant.MEMBER_ROLE)!!
+
         val serverOptionData = OptionData(OptionType.STRING, "server", "Server").setRequired(true)
 
         Server.entries.forEach {
