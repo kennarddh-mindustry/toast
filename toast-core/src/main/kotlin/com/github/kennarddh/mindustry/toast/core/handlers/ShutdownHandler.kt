@@ -69,8 +69,6 @@ class ShutdownHandler : Handler {
             runOnMindustryThreadSuspended {
                 Call.sendMessage("[scarlet]Stopping server.")
 
-                Genesis.getHandler<AutoSaveHandler>()?.save()
-
                 Logger.info("Kicking all players")
 
                 // Kick every player
