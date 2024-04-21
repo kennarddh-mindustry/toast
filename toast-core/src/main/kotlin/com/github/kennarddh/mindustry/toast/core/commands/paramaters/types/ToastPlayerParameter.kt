@@ -20,14 +20,8 @@ class ToastPlayerParameter : CommandParameter<Player> {
             }
         }
 
-        val inputInt = try {
-            input.toInt()
-        } catch (error: NumberFormatException) {
-            null
-        }
-
-        if (inputInt == null)
-            return Entities.players.keys.find { it.plainName() == input }
+        val inputInt = input.toIntOrNull()
+            ?: return Entities.players.keys.find { it.plainName() == input }
                 ?: throw CommandParameterParsingException("Cannot convert $input into player for parameter :parameterName:. Cannot find player with the name $input.")
 
         return Database.newTransaction {
