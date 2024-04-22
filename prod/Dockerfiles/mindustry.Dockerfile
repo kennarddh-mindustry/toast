@@ -5,8 +5,8 @@ WORKDIR /app
 ADD https://github.com/Anuken/Mindustry/releases/download/v146/server-release.jar server-release.jar
 ADD https://github.com/xpdustry/kotlin-runtime/releases/download/v3.1.1-k.1.9.22/kotlin-runtime.jar config/mods/kotlin-runtime.jar
 
-ADD https://github.com/kennarddh-mindustry/genesis/releases/download/v3.0.0-beta.18/genesis-core-3.0.0-beta.15.jar config/mods/genesis-core-3.0.0-beta.15.jar
-ADD https://github.com/kennarddh-mindustry/genesis/releases/download/v3.0.0-beta.18/genesis-standard-3.0.0-beta.15.jar config/mods/genesis-standard-3.0.0-beta.15.jar
+ADD https://github.com/kennarddh-mindustry/genesis/releases/download/v3.0.0-beta.19/genesis-core-3.0.0-beta.15.jar config/mods/genesis-core-3.0.0-beta.15.jar
+ADD https://github.com/kennarddh-mindustry/genesis/releases/download/v3.0.0-beta.19/genesis-standard-3.0.0-beta.15.jar config/mods/genesis-standard-3.0.0-beta.15.jar
 
 ADD https://github.com/kennarddh-mindustry/toast/releases/download/v0.0.63/toast-core-0.0.63.jar config/mods/toast-core.jar
 
