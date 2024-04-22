@@ -1,7 +1,11 @@
 package com.github.kennarddh.mindustry.toast.discord.listeners
 
 import com.github.kennarddh.mindustry.toast.common.Server
+import com.github.kennarddh.mindustry.toast.common.UserRole
+import com.github.kennarddh.mindustry.toast.common.database.Database
+import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.extensions.preventDiscordPings
+import com.github.kennarddh.mindustry.toast.common.extensions.selectOne
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ChatServerControl
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerCommandServerControl
@@ -17,20 +21,36 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 object ServerControlListener : ListenerAdapter() {
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (event.name == "send-server-command") {
-            val serverString = event.getOption("server")!!.asString
-            val command = event.getOption("command")!!.asString
+            CoroutineScopes.IO.launch {
+                val user = Database.newTransaction {
+                    Users.selectOne { Users.discordID eq event.user.id }
+                }
 
-            val server = try {
-                Server.valueOf(serverString)
-            } catch (error: IllegalArgumentException) {
-                event.reply("$serverString is not a valid server").queue()
+                if (user == null) {
+                    return@launch event.reply("Your must verify your discord account before using this.")
+                        .setEphemeral(true)
+                        .queue()
+                }
 
-                return
-            }
+                if (user[Users.role] < UserRole.CoOwner) {
+                    return@launch event.reply("Your role must be greater than or equal to CoOwner.")
+                        .setEphemeral(true)
+                        .queue()
+                }
 
-            Logger.info("Routing key \"${server.name}.server-command\"")
+                val serverString = event.getOption("server")!!.asString
+                val command = event.getOption("command")!!.asString
 
-            CoroutineScopes.Main.launch {
+                val server = try {
+                    Server.valueOf(serverString)
+                } catch (error: IllegalArgumentException) {
+                    event.reply("$serverString is not a valid server").queue()
+
+                    return@launch
+                }
+
+                Logger.info("Routing key \"${server.name}.server-command\"")
+
                 Messenger.publishServerControl(
                     "${server.name}.server-command",
                     ServerControl(
@@ -38,9 +58,9 @@ object ServerControlListener : ListenerAdapter() {
                         ServerCommandServerControl(command)
                     )
                 )
-            }
 
-            event.reply("Done").queue()
+                event.reply("Done").queue()
+            }
         } else if (event.name == "send-chat") {
             val serverString = event.getOption("server")!!.asString
             val message = event.getOption("message")!!.asString

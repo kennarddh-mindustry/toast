@@ -261,20 +261,32 @@ object GameEventsListener : ListenerAdapter() {
 
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
         if (event.componentId.startsWith(PARDON_BUTTON_COMPONENT_ID_PREFIX)) {
-            val userPunishmentID = event.componentId
-                .drop(PARDON_BUTTON_COMPONENT_ID_PREFIX.length)
+            CoroutineScopes.IO.launch {
+                val user = Database.newTransaction {
+                    Users.selectOne { Users.discordID eq event.user.id }
+                }
 
-            val pardonReason: TextInput = TextInput.create("pardonReason", "Pardon reason", TextInputStyle.SHORT)
-                .setPlaceholder("Pardon reason.")
-                .setMinLength(0)
-                .build()
+                if (user == null) {
+                    return@launch event.reply("Your must verify your discord account before using this.")
+                        .setEphemeral(true)
+                        .queue()
+                }
+
+                val userPunishmentID = event.componentId
+                    .drop(PARDON_BUTTON_COMPONENT_ID_PREFIX.length)
+
+                val pardonReason: TextInput = TextInput.create("pardonReason", "Pardon reason", TextInputStyle.SHORT)
+                    .setPlaceholder("Pardon reason.")
+                    .setMinLength(0)
+                    .build()
 
 
-            val modal = Modal.create("$PARDON_MODAL_ID_PREFIX$userPunishmentID", "Pardon")
-                .addComponents(ActionRow.of(pardonReason))
-                .build()
+                val modal = Modal.create("$PARDON_MODAL_ID_PREFIX$userPunishmentID", "Pardon")
+                    .addComponents(ActionRow.of(pardonReason))
+                    .build()
 
-            event.replyModal(modal).queue()
+                event.replyModal(modal).queue()
+            }
         }
     }
 
@@ -288,7 +300,7 @@ object GameEventsListener : ListenerAdapter() {
 
             val pardonReason = event.getValue("pardonReason")!!.asString
 
-            CoroutineScopes.Main.launch {
+            CoroutineScopes.IO.launch {
                 Database.newTransaction {
                     UserPunishments.update({ UserPunishments.id eq userPunishmentID }) {
                         it[this.pardonReason] = pardonReason
