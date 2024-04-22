@@ -1,11 +1,11 @@
 package com.github.kennarddh.mindustry.toast.discord.listeners
 
 import com.github.kennarddh.mindustry.toast.common.Server
+import com.github.kennarddh.mindustry.toast.common.extensions.preventDiscordPings
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ChatServerControl
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerCommandServerControl
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerControl
-import com.github.kennarddh.mindustry.toast.common.preventDiscordPings
 import com.github.kennarddh.mindustry.toast.discord.CoroutineScopes
 import com.github.kennarddh.mindustry.toast.discord.Logger
 import kotlinx.coroutines.launch

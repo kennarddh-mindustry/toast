@@ -10,18 +10,31 @@ import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.*
 import com.github.kennarddh.mindustry.toast.discord.*
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.interactions.components.ActionRow
+import net.dv8tion.jda.api.interactions.components.buttons.Button
+import net.dv8tion.jda.api.interactions.components.text.TextInput
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle
+import net.dv8tion.jda.api.interactions.modals.Modal
 import net.dv8tion.jda.api.utils.MarkdownSanitizer
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.alias
+import org.jetbrains.exposed.sql.update
 
 
 object GameEventsListener : ListenerAdapter() {
+    private const val PARDON_BUTTON_COMPONENT_ID_PREFIX = "pardon-"
+    private const val PARDON_MODAL_ID_PREFIX = "pardonModal-"
+
     override fun onReady(event: ReadyEvent) {
         Messenger.listenGameEvent("DiscordBotGameEvents", "#") {
             val channel = toastMindustryGuild.getTextChannelById(it.server.discordChannelID)!!
@@ -193,7 +206,9 @@ object GameEventsListener : ListenerAdapter() {
                             build()
                         }
 
-                        notificationChannel.sendMessageEmbeds(embed).queue()
+                        notificationChannel.sendMessageEmbeds(embed).addActionRow(
+                            Button.primary("$PARDON_BUTTON_COMPONENT_ID_PREFIX${data.userPunishmentID}", "Pardon")
+                        ).queue()
                     }
 
                     null
@@ -240,6 +255,101 @@ object GameEventsListener : ListenerAdapter() {
 
             if (message != null)
                 channel.sendMessage(message).queue()
+        }
+    }
+
+
+    override fun onButtonInteraction(event: ButtonInteractionEvent) {
+        if (event.componentId.startsWith(PARDON_BUTTON_COMPONENT_ID_PREFIX)) {
+            val userPunishmentID = event.componentId
+                .drop(PARDON_BUTTON_COMPONENT_ID_PREFIX.length)
+
+            val pardonReason: TextInput = TextInput.create("pardonReason", "Pardon reason", TextInputStyle.SHORT)
+                .setPlaceholder("Pardon reason.")
+                .setMinLength(0)
+                .build()
+
+
+            val modal = Modal.create("$PARDON_MODAL_ID_PREFIX$userPunishmentID", "Pardon")
+                .addComponents(ActionRow.of(pardonReason))
+                .build()
+
+            event.replyModal(modal).queue()
+        }
+    }
+
+    override fun onModalInteraction(event: ModalInteractionEvent) {
+        if (event.modalId.startsWith(PARDON_MODAL_ID_PREFIX)) {
+            event.deferReply(true).queue()
+
+            val userPunishmentID = event.modalId
+                .drop(PARDON_MODAL_ID_PREFIX.length)
+                .toInt()
+
+            val pardonReason = event.getValue("pardonReason")!!.asString
+
+            CoroutineScopes.Main.launch {
+
+                UserPunishments.update({ UserPunishments.id eq userPunishmentID }) {
+                    it[this.pardonReason] = pardonReason
+                    it[this.pardonedAt] = Clock.System.now().toLocalDateTime(TimeZone.UTC)
+                }
+
+                val userPunishment = UserPunishments.selectOne { UserPunishments.id eq userPunishmentID }
+
+                if (userPunishment == null) {
+                    Logger.error("Missing UserPunishments entry with the id $userPunishmentID.")
+
+                    return@launch
+                }
+
+                val embed = EmbedBuilder().run {
+                    setTitle("Pardon")
+
+                    setColor(DiscordConstant.PARDON_EMBED_COLOR)
+
+                    addField(
+                        MessageEmbed.Field(
+                            "ID",
+                            userPunishment[UserPunishments.id].value.toString(),
+                            true
+                        )
+                    )
+
+                    addField(
+                        MessageEmbed.Field(
+                            "Type",
+                            userPunishment[UserPunishments.type].displayName,
+                            false
+                        )
+                    )
+
+                    addField(
+                        MessageEmbed.Field(
+                            "Target User ID",
+                            (userPunishment[UserPunishments.targetUserID]?.value ?: "Null").toString(),
+                            false
+                        )
+                    )
+
+                    addField(
+                        MessageEmbed.Field(
+                            "Target Mindustry User ID",
+                            (userPunishment[UserPunishments.mindustryUserID]?.value ?: "Null").toString(),
+                            false
+                        )
+                    )
+
+                    addField(MessageEmbed.Field("Reason", userPunishment[UserPunishments.reason], false))
+                    addField(MessageEmbed.Field("Pardon Reason", userPunishment[UserPunishments.pardonReason], false))
+
+                    build()
+                }
+
+                notificationChannel.sendMessageEmbeds(embed).queue()
+
+                event.hook.sendMessage("Pardoned").queue()
+            }
         }
     }
 }
