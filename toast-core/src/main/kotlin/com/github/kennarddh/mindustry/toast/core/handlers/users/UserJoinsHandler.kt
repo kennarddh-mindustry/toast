@@ -316,17 +316,28 @@ class UserJoinsHandler : Handler {
                     return@newTransaction true
                 }
 
-
                 if (!user[Users.role].fullPermissions.contains(Permission.Join)) {
                     con.kickWithoutLogging("[#ff0000]You are not allowed to join")
 
                     return@newTransaction false
+                }
+
+                Users.update({ Users.id eq userID }) {
+                    with(SqlExpressionBuilder) {
+                        it[joinedTimes] = joinedTimes + 1
+                    }
                 }
             } else {
                 if (!publicPermission.contains(Permission.Join)) {
                     con.kickWithoutLogging("[#ff0000]You are not allowed to join")
 
                     return@newTransaction false
+                }
+            }
+
+            MindustryUserServerData.update({ MindustryUserServerData.id eq mindustryUserServerData[MindustryUserServerData.id] }) {
+                with(SqlExpressionBuilder) {
+                    it[joinedTimes] = joinedTimes + 1
                 }
             }
 

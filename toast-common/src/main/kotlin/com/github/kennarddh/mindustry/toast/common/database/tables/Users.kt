@@ -8,4 +8,5 @@ object Users : IntIdTable() {
     val password = varchar("password", 225)
     val role = enumerationByName<UserRole>("role", 100)
     val discordID = varchar("discordID", 255).nullable()
+    val joinedTimes = integer("kickedTimes").default(0)
 }

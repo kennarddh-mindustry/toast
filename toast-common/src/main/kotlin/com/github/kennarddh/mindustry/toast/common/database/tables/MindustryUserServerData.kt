@@ -13,4 +13,5 @@ object MindustryUserServerData : IntIdTable() {
     val activePlayTime = duration("activePlayTime").default(0.seconds)
     val mindustryUSID = varchar("mindustryUSID", 225)
     val userID = reference("userID", Users).nullable()
+    val joinedTimes = integer("kickedTimes").default(0)
 }
