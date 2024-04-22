@@ -6,9 +6,7 @@ import arc.util.Timer
 import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
-import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
-import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
-import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
+import com.github.kennarddh.mindustry.genesis.core.commands.senders.ServerCommandSender
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThreadSuspended
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
@@ -179,14 +177,11 @@ class StartHandler : Handler {
     }
 
     @Command(["host"])
-    @ServerSide
     @Description("Start hosting.")
-    private suspend fun hostCommand(): CommandResult? {
+    private suspend fun hostCommand(sender: ServerCommandSender) {
         if (Vars.state.isGame)
-            return CommandResult("Already hosting.", CommandResultStatus.Failed)
+            return sender.sendError("Already hosting.")
 
         tryHost()
-
-        return null
     }
 }

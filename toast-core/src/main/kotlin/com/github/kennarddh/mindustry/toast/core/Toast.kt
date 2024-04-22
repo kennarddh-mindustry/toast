@@ -9,9 +9,7 @@ import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStopGameEvent
 import com.github.kennarddh.mindustry.toast.common.verify.discord.VerifyDiscordRedis
-import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.TeamParameter
 import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.ToastPlayerParameter
-import com.github.kennarddh.mindustry.toast.core.commands.paramaters.types.UnitTypeParameter
 import com.github.kennarddh.mindustry.toast.core.commands.validations.*
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastState
@@ -25,9 +23,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
-import mindustry.game.Team
 import mindustry.gen.Player
-import mindustry.type.UnitType
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 
 @Suppress("unused")
@@ -46,8 +42,6 @@ class Toast : AbstractPlugin() {
         Genesis.commandRegistry.registerCommandValidationAnnotation(LoggedIn::class, ::validateLoggedIn)
         Genesis.commandRegistry.registerCommandValidationAnnotation(MinimumRank::class, ::validateMinimumRank)
         Genesis.commandRegistry.replaceParameterType(Player::class, ToastPlayerParameter())
-        Genesis.commandRegistry.registerParameterType(UnitType::class, UnitTypeParameter())
-        Genesis.commandRegistry.registerParameterType(Team::class, TeamParameter())
 
         Logger.info("Registering handlers")
 

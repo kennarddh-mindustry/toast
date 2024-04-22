@@ -1,12 +1,9 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import arc.util.Align
-import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
-import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
-import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
-import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
+import com.github.kennarddh.mindustry.genesis.core.commands.senders.CommandSender
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.genesis.core.timers.annotations.TimerTask
@@ -151,19 +148,17 @@ class UserStatsHandler : Handler {
 
     @Command(["xp"])
     @MinimumRole(UserRole.Admin)
-    @ClientSide
-    @ServerSide
     @Description("Get and update player's xp. This will always return saved data.")
     suspend fun xp(
-        player: Player? = null,
+        sender: CommandSender,
         target: Player,
         server: Server? = null,
         type: XPCommandType,
         value: Int? = null
-    ): CommandResult {
+    ) {
         val computedServer = server ?: ToastVars.server
 
-        return Database.newTransaction {
+        Database.newTransaction {
             when (type) {
                 XPCommandType.get -> {
                     val mindustryUserServerData = MindustryUserServerData
@@ -178,16 +173,15 @@ class UserStatsHandler : Handler {
                         }
 
                     if (mindustryUserServerData == null) {
-                        CommandResult("${target.plainName()} doesn't have xp in ${computedServer.displayName} server.")
+                        return@newTransaction sender.sendError("${target.plainName()} doesn't have xp in ${computedServer.displayName} server.")
                     } else {
-                        CommandResult("${target.plainName()} has ${mindustryUserServerData[MindustryUserServerData.xp]} xp.")
+                        return@newTransaction sender.sendSuccess("${target.plainName()} has ${mindustryUserServerData[MindustryUserServerData.xp]} xp.")
                     }
                 }
 
                 XPCommandType.add -> {
-                    if (value == null) return@newTransaction CommandResult(
+                    if (value == null) return@newTransaction sender.sendError(
                         "Value cannot be empty for add subcommand",
-                        CommandResultStatus.Failed
                     )
 
                     val updatedCount = MindustryUserServerData.join(
@@ -204,16 +198,15 @@ class UserStatsHandler : Handler {
                     }
 
                     if (updatedCount == 0) {
-                        CommandResult("${target.plainName()} doesn't have xp in ${computedServer.displayName} server.")
+                        return@newTransaction sender.sendError("${target.plainName()} doesn't have xp in ${computedServer.displayName} server.")
                     } else {
-                        CommandResult("Added $value xp to ${target.plainName()}.")
+                        return@newTransaction sender.sendSuccess("Added $value xp to ${target.plainName()}.")
                     }
                 }
 
                 XPCommandType.set -> {
-                    if (value == null) return@newTransaction CommandResult(
+                    if (value == null) return@newTransaction sender.sendError(
                         "Value cannot be empty for set subcommand",
-                        CommandResultStatus.Failed
                     )
 
                     val updatedCount = MindustryUserServerData.join(
@@ -228,16 +221,15 @@ class UserStatsHandler : Handler {
                     }
 
                     if (updatedCount == 0) {
-                        CommandResult("${target.plainName()} doesn't have xp in ${computedServer.displayName} server.")
+                        return@newTransaction sender.sendError("${target.plainName()} doesn't have xp in ${computedServer.displayName} server.")
                     } else {
-                        CommandResult("Set ${target.plainName()} xp to $value.")
+                        return@newTransaction sender.sendSuccess("Set ${target.plainName()} xp to $value.")
                     }
                 }
 
                 XPCommandType.remove -> {
-                    if (value == null) return@newTransaction CommandResult(
+                    if (value == null) return@newTransaction sender.sendError(
                         "Value cannot be empty for remove subcommand",
-                        CommandResultStatus.Failed
                     )
 
                     val updatedCount = MindustryUserServerData.join(
@@ -254,9 +246,9 @@ class UserStatsHandler : Handler {
                     }
 
                     if (updatedCount == 0) {
-                        CommandResult("${target.plainName()} doesn't have xp in ${computedServer.displayName} server.")
+                        return@newTransaction sender.sendError("${target.plainName()} doesn't have xp in ${computedServer.displayName} server.")
                     } else {
-                        CommandResult("Removed $value xp from ${target.plainName()}.")
+                        return@newTransaction sender.sendSuccess("Removed $value xp from ${target.plainName()}.")
                     }
                 }
             }

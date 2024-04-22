@@ -1,9 +1,9 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.vote.kick
 
 import com.github.kennarddh.mindustry.genesis.core.Genesis
-import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
+import com.github.kennarddh.mindustry.genesis.core.commands.senders.PlayerCommandSender
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
 import com.github.kennarddh.mindustry.toast.common.PunishmentType
@@ -43,25 +43,22 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
     }
 
     @Command(["votekick", "vote-kick", "vk"])
-    @ClientSide
     @Description("Start a 'vote kick' vote.")
-    suspend fun startVoteKick(player: Player, target: Player, reason: String) {
-        start(player, VoteKickVoteObjective(target, reason))
+    suspend fun startVoteKick(sender: PlayerCommandSender, target: Player, reason: String) {
+        start(sender.player, VoteKickVoteObjective(target, reason))
     }
 
     @Command(["vote", "vote-kick-vote", "vkv"])
-    @ClientSide
     @Description("Vote for 'vote kick' vote.")
-    suspend fun voteCommand(player: Player, vote: Boolean) {
-        vote(player, vote)
+    suspend fun voteCommand(sender: PlayerCommandSender, vote: Boolean) {
+        vote(sender.player, vote)
     }
 
     @Command(["vote-cancel", "vote-kick-cancel", "votekick-cancel", "vkc"])
-    @ClientSide
     @MinimumRole(UserRole.Mod)
     @Description("Cancel a 'vote kick' vote.")
-    suspend fun cancelCommand(player: Player) {
-        cancel(player)
+    suspend fun cancelCommand(sender: PlayerCommandSender) {
+        cancel(sender.player)
     }
 
     override fun getRequiredVotes(): Int = if (Entities.players.size <= 3) 2 else 3

@@ -2,10 +2,9 @@ package com.github.kennarddh.mindustry.toast.core.handlers
 
 import arc.Core
 import com.github.kennarddh.mindustry.genesis.core.Genesis
-import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
-import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
+import com.github.kennarddh.mindustry.genesis.core.commands.senders.CommandSender
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThreadSuspended
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
@@ -15,6 +14,7 @@ import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRol
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastState
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
+import com.github.kennarddh.mindustry.toast.core.commons.extensions.getName
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -23,7 +23,6 @@ import kotlinx.coroutines.sync.withLock
 import mindustry.Vars
 import mindustry.gen.Call
 import mindustry.gen.KickCallPacket2
-import mindustry.gen.Player
 import mindustry.net.Packets.KickReason
 import kotlin.time.Duration.Companion.seconds
 
@@ -36,12 +35,10 @@ class ShutdownHandler : Handler {
     }
 
     @Command(["graceful-shutdown"])
-    @ServerSide
-    @ClientSide
     @MinimumRole(UserRole.Admin)
     @Description("Shutdown server with countdown then reconnect players.")
-    suspend fun gracefulShutdown(player: Player? = null, @GTE(0) countdown: Int = 5) {
-        Logger.info("${player?.name ?: "Server"} ran graceful-shutdown command")
+    suspend fun gracefulShutdown(sender: CommandSender, @GTE(0) countdown: Int = 5) {
+        Logger.info("${sender.getName()} ran graceful-shutdown command")
 
         try {
             shutdown(countdown)

@@ -1,12 +1,10 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import com.github.kennarddh.mindustry.genesis.core.Genesis
-import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
-import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
-import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
-import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
+import com.github.kennarddh.mindustry.genesis.core.commands.senders.CommandSender
+import com.github.kennarddh.mindustry.genesis.core.commands.senders.PlayerCommandSender
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.commons.priority.Priority
 import com.github.kennarddh.mindustry.genesis.core.filters.FilterType
@@ -26,6 +24,8 @@ import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRol
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.entities.PlayerData
+import com.github.kennarddh.mindustry.toast.core.commons.extensions.getName
+import com.github.kennarddh.mindustry.toast.core.commons.extensions.getStrippedName
 import com.github.kennarddh.mindustry.toast.core.commons.safeGetPlayerData
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -58,16 +58,14 @@ class UserModerationHandler : Handler {
 
     @Command(["kick"])
     @MinimumRole(UserRole.Mod)
-    @ClientSide
-    @ServerSide
     @Description("Kick player.")
-    suspend fun kick(player: Player? = null, target: Player, duration: Duration, reason: String): CommandResult? {
-        val targetPlayerData = target.safeGetPlayerData() ?: return null
+    suspend fun kick(sender: CommandSender, target: Player, duration: Duration, reason: String) {
+        val targetPlayerData = target.safeGetPlayerData() ?: return
 
         var playerData: PlayerData? = null
 
-        if (player != null) {
-            val playerDataNonNull = player.safeGetPlayerData() ?: return null
+        if (sender is PlayerCommandSender) {
+            val playerDataNonNull = sender.player.safeGetPlayerData() ?: return
 
             val playerRole = playerDataNonNull.role
             val targetRole = targetPlayerData.role
@@ -79,9 +77,8 @@ class UserModerationHandler : Handler {
                 targetRole != null &&
                 playerRole > targetRole
             )
-                return CommandResult(
+                return sender.sendError(
                     "Your role must be higher than target's role to kick.",
-                    CommandResultStatus.Failed
                 )
 
             playerData = playerDataNonNull
@@ -111,7 +108,7 @@ class UserModerationHandler : Handler {
             }
         }
 
-        Logger.info("${if (player == null) "Server" else player.name} kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
+        Logger.info("${sender.getName()} kicked ${target.name}/${target.uuid()} for $duration with the reason \"$reason\"")
 
         target.kickWithoutLogging(
             """
@@ -130,28 +127,26 @@ class UserModerationHandler : Handler {
                     Clock.System.now(),
                     PlayerPunishedGameEvent(
                         punishmentID.value,
-                        player?.plainName() ?: "Server",
+                        sender.getStrippedName() ?: "Error",
                         target.name
                     )
                 )
             )
         }
 
-        return CommandResult("Successfully kicked ${target.plainName()}/${target.uuid()} for $duration with the reason \"$reason\"")
+        sender.sendSuccess("Successfully kicked ${target.plainName()}/${target.uuid()} for $duration with the reason \"$reason\"")
     }
 
     @Command(["ban"])
     @MinimumRole(UserRole.Admin)
-    @ClientSide
-    @ServerSide
     @Description("Ban player.")
-    suspend fun ban(player: Player? = null, target: Player, reason: String): CommandResult? {
-        val targetPlayerData = target.safeGetPlayerData() ?: return null
+    suspend fun ban(sender: CommandSender, target: Player, reason: String) {
+        val targetPlayerData = target.safeGetPlayerData() ?: return
 
         var playerData: PlayerData? = null
 
-        if (player != null) {
-            val playerDataNonNull = player.safeGetPlayerData() ?: return null
+        if (sender is PlayerCommandSender) {
+            val playerDataNonNull = sender.player.safeGetPlayerData() ?: return
 
             val playerRole = playerDataNonNull.role
             val targetRole = targetPlayerData.role
@@ -163,9 +158,8 @@ class UserModerationHandler : Handler {
                 targetRole != null &&
                 playerRole > targetRole
             )
-                return CommandResult(
+                return sender.sendError(
                     "Your role must be higher than target's role to ban.",
-                    CommandResultStatus.Failed
                 )
 
             playerData = playerDataNonNull
@@ -194,7 +188,7 @@ class UserModerationHandler : Handler {
             }
         }
 
-        Logger.info("${if (player == null) "Server" else player.name} banned ${target.name}/${target.uuid()} with the reason \"$reason\"")
+        Logger.info("${sender.getName()} banned ${target.name}/${target.uuid()} with the reason \"$reason\"")
 
         target.kickWithoutLogging(
             """
@@ -212,13 +206,13 @@ class UserModerationHandler : Handler {
                     Clock.System.now(),
                     PlayerPunishedGameEvent(
                         punishmentID.value,
-                        player?.plainName() ?: "Server",
+                        sender.getStrippedName() ?: "Error",
                         target.name
                     )
                 )
             )
         }
 
-        return CommandResult("Successfully banned ${target.plainName()}/${target.uuid()} with the reason \"$reason\"")
+        sender.sendSuccess("Successfully banned ${target.plainName()}/${target.uuid()} with the reason \"$reason\"")
     }
 }

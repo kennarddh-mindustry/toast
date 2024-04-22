@@ -1,12 +1,11 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
 import com.github.kennarddh.mindustry.genesis.core.Genesis
-import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
-import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ServerSide
-import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
-import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResultStatus
+import com.github.kennarddh.mindustry.genesis.core.commands.senders.CommandSender
+import com.github.kennarddh.mindustry.genesis.core.commands.senders.PlayerCommandSender
+import com.github.kennarddh.mindustry.genesis.core.commands.senders.ServerCommandSender
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThreadSuspended
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
@@ -26,6 +25,7 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.*
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
+import com.github.kennarddh.mindustry.toast.core.commons.extensions.getPermissions
 import com.password4j.Argon2Function
 import com.password4j.Password
 import com.password4j.SecureString
@@ -64,48 +64,43 @@ class UserAccountHandler : Handler {
     }
 
     @Command(["register"])
-    @ClientSide
     @Description("Register.")
-    suspend fun register(player: Player): CommandResult {
-        val playerData = Entities.players[player]
-            ?: return CommandResult("Cannot find user. Please try again later.", CommandResultStatus.Failed)
+    suspend fun register(sender: PlayerCommandSender) {
+        val playerData = Entities.players[sender.player]
+            ?: return sender.sendError("Cannot find user. Please try again later.")
 
         if (playerData.userID != null)
-            return CommandResult("You are already logged in.", CommandResultStatus.Failed)
+            return sender.sendError("You are already logged in.")
 
-        val output = registerMenu.open(player)
-            ?: return CommandResult("Register canceled.", CommandResultStatus.Failed)
+        val output = registerMenu.open(sender.player)
+            ?: return sender.sendError("Register canceled.")
 
         val username = output["username"]!!
         val password = output["password"]!!
         val confirmPassword = output["confirmPassword"]!!
 
         if (!username.matches(usernameRegex))
-            return CommandResult(
-                "Invalid username. Username may only contains lowercase, uppercase, and numbers. Min length is 1 and max is 50 characters.",
-                CommandResultStatus.Failed
+            return sender.sendError(
+                "Invalid username. Username may only contains lowercase, uppercase, and numbers. Min length is 1 and max is 50 characters."
             )
 
         if (!password.matches(passwordRegex))
-            return CommandResult(
+            return sender.sendError(
                 "Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers. Min length is 8 and max is 50 characters.",
-                CommandResultStatus.Failed
             )
 
         if (!confirmPassword.matches(passwordRegex))
-            return CommandResult(
+            return sender.sendError(
                 "Invalid confirm password. Confirm password may only contains lowercase, uppercase, symbols, and numbers. Min length is 8 and max is 50 characters.",
-                CommandResultStatus.Failed
             )
 
         if (confirmPassword != password)
-            return CommandResult("Confirm password is not same as password.", CommandResultStatus.Failed)
+            return sender.sendError("Confirm password is not same as password.")
 
-        return Database.newTransaction {
+        Database.newTransaction {
             if (Users.exists { Users.username eq username })
-                return@newTransaction CommandResult(
+                return@newTransaction sender.sendError(
                     "Your username is already taken.",
-                    CommandResultStatus.Failed
                 )
 
             val hashedPassword = Password.hash(SecureString(password.toCharArray()))
@@ -118,55 +113,49 @@ class UserAccountHandler : Handler {
                 it[this.role] = UserRole.Player
             }
 
-            CommandResult("Register success. Login with /login to use your account.")
+            sender.sendSuccess("Register success. Login with /login to use your account.")
         }
     }
 
     @Command(["login"])
-    @ClientSide
     @Description("Login.")
-    suspend fun login(player: Player): CommandResult {
-        val playerData = Entities.players[player]
-            ?: return CommandResult("Cannot find user. Please try again later.", CommandResultStatus.Failed)
+    suspend fun login(sender: PlayerCommandSender) {
+        val playerData = Entities.players[sender.player]
+            ?: return sender.sendError("Cannot find user. Please try again later.")
 
         if (playerData.userID != null)
-            return CommandResult("You are already logged in.", CommandResultStatus.Failed)
+            return sender.sendError("You are already logged in.")
 
-        val output = loginMenu.open(player)
-            ?: return CommandResult("Login cancelled.", CommandResultStatus.Failed)
+        val output = loginMenu.open(sender.player)
+            ?: return sender.sendError("Login cancelled.")
 
         val username = output["username"]!!
         val password = output["password"]!!
 
         if (!username.matches(usernameRegex))
-            return CommandResult(
+            return sender.sendError(
                 "Invalid username. Username may only contains lowercase, uppercase, and numbers. Min length is 1 and max is 50 characters.",
-                CommandResultStatus.Failed
             )
 
         if (!password.matches(passwordRegex))
-            return CommandResult(
+            return sender.sendError(
                 "Invalid password. Password may only contains lowercase, uppercase, symbols, and numbers. Min length is 8 and max is 50 characters.",
-                CommandResultStatus.Failed
             )
 
-        return Database.newTransaction {
+        Database.newTransaction {
             val user = Users.selectOne { Users.username eq username }
-                ?: return@newTransaction CommandResult(
-                    "User not found.", CommandResultStatus.Failed
+                ?: return@newTransaction sender.sendError(
+                    "User not found."
                 )
 
             if (Entities.players.values.find { it.userID == user[Users.id].value } != null) {
-                return@newTransaction CommandResult(
+                return@newTransaction sender.sendError(
                     "There is someone with the same user already on this server.",
-                    CommandResultStatus.Failed
                 )
             }
 
             if (!Password.check(password, user[Users.password]).with(passwordHashFunctionInstance))
-                return@newTransaction CommandResult(
-                    "Wrong password.", CommandResultStatus.Failed
-                )
+                return@newTransaction sender.sendError("Wrong password.")
 
             MindustryUserServerData
                 .join(
@@ -176,7 +165,7 @@ class UserAccountHandler : Handler {
                     otherColumn = MindustryUser.id
                 )
                 .update({
-                    (MindustryUser.mindustryUUID eq player.uuid()) and (MindustryUserServerData.server eq ToastVars.server)
+                    (MindustryUser.mindustryUUID eq sender.player.uuid()) and (MindustryUserServerData.server eq ToastVars.server)
                 }) {
                     it[MindustryUserServerData.userID] = user[Users.id]
                 }
@@ -185,87 +174,54 @@ class UserAccountHandler : Handler {
             playerData.userID = user[Users.id].value
 
             runOnMindustryThreadSuspended {
-                player.clearRoleEffect()
+                sender.player.clearRoleEffect()
 
-                user[Users.role].applyRoleEffect(player)
+                user[Users.role].applyRoleEffect(sender.player)
 
-                player.applyName(user[Users.role])
+                sender.player.applyName(user[Users.role])
             }
 
-            CommandResult(
+            sender.sendSuccess(
                 "Login success. You are now logged in as ${user[Users.username]}."
             )
         }
     }
 
-    @Command(["logout"])
-    @ClientSide
-    @Description("Logout.")
-    suspend fun logout(player: Player): CommandResult {
-        val playerData = Entities.players[player]
-            ?: return CommandResult("Cannot find user. Please try again later.", CommandResultStatus.Failed)
-
-        if (playerData.userID == null)
-            return CommandResult("You are not logged in.", CommandResultStatus.Failed)
-
-        return Database.newTransaction {
-            MindustryUserServerData
-                .update({
-                    MindustryUserServerData.userID eq playerData.userID
-                    MindustryUserServerData.server eq ToastVars.server
-                }) {
-                    it[userID] = null
-                }
-
-            playerData.userID = null
-
-            runOnMindustryThreadSuspended {
-                player.clearRoleEffect()
-                player.applyName(null)
-            }
-
-            CommandResult("Logout success. You are now no longer logged in.")
-        }
-    }
-
     @Command(["changerole", "change-role"])
-    @ClientSide
-    @ServerSide
     @MinimumRole(UserRole.Admin)
     @Description("Change someone's role.")
-    suspend fun changeRole(player: Player? = null, target: Player, newRole: UserRole): CommandResult? {
-        val targetPlayerData = target.safeGetPlayerData() ?: return null
+    suspend fun changeRole(sender: CommandSender, target: Player, newRole: UserRole) {
+        val targetPlayerData = target.safeGetPlayerData() ?: return
+
         val targetRole = targetPlayerData.role
-            ?: return CommandResult("Target is not registered.", CommandResultStatus.Failed)
+            ?: return sender.sendError("Target is not registered.")
 
         val targetUserID = targetPlayerData.userID
 
         if (targetUserID == null) {
             Logger.warn("ChangeRole. Invalid state, targetUserID is null.")
 
-            return CommandResult("Error Occurred. Invalid state, targetUserID is null.")
+            return sender.sendError("Error Occurred. Invalid state, targetUserID is null.")
         }
 
-        if (player != null) {
-            val playerData = player.safeGetPlayerData() ?: return null
+        if (sender is PlayerCommandSender) {
+            val playerData = sender.player.safeGetPlayerData() ?: return
             val playerRole = playerData.role
 
             if (playerRole == null) {
                 Logger.warn("Player is not registered. Check if MinimumRole annotation is correct and exist. ChangeRole.")
 
-                return CommandResult("Error Occurred. Player is not registered.", CommandResultStatus.Failed)
+                return sender.sendError("Error Occurred. Player is not registered.")
             }
 
             if (playerRole <= targetRole)
-                return CommandResult(
+                return sender.sendError(
                     "Your role must be higher than target's role to change target's role.",
-                    CommandResultStatus.Failed
                 )
 
             if (playerRole <= newRole)
-                return CommandResult(
+                return sender.sendError(
                     "Your role must be higher than new role.",
-                    CommandResultStatus.Failed
                 )
         }
 
@@ -293,37 +249,66 @@ class UserAccountHandler : Handler {
             )
         }
 
-        return CommandResult("Successfully changed ${target.plainName()} role to $newRole.")
+        sender.sendError("Successfully changed ${target.plainName()} role to $newRole.")
+    }
+
+    @Command(["logout"])
+    @Description("Logout.")
+    suspend fun logout(sender: PlayerCommandSender) {
+        val playerData = Entities.players[sender.player]
+            ?: return sender.sendError("Cannot find user. Please try again later.")
+
+        if (playerData.userID == null)
+            return sender.sendError("You are not logged in.")
+
+        Database.newTransaction {
+            MindustryUserServerData
+                .update({
+                    MindustryUserServerData.userID eq playerData.userID
+                    MindustryUserServerData.server eq ToastVars.server
+                }) {
+                    it[userID] = null
+                }
+
+            playerData.userID = null
+
+            runOnMindustryThreadSuspended {
+                sender.player.clearRoleEffect()
+                sender.player.applyName(null)
+            }
+
+            sender.sendSuccess("Logout success. You are now no longer logged in.")
+        }
     }
 
     @Command(["user"])
-    @ClientSide
-    @ServerSide
     @Description("Get data about a user.")
-    suspend fun getUserData(player: Player? = null, target: Player? = player): CommandResult? {
-        if (player == null && target == null) return CommandResult(
-            "Target must not be null on server",
-            CommandResultStatus.Failed
-        )
+    suspend fun getUserData(sender: CommandSender, target: Player? = null) {
+        val computedTarget = when (sender) {
+            is ServerCommandSender -> {
+                target ?: return sender.sendError(
+                    "Target must not be null on server",
+                )
+            }
 
-        if (target == null) {
-            return CommandResult(
-                "There is an error. Please report this and explain what make this happen. Error code: NULL_TARGET_COMMAND",
-                CommandResultStatus.Failed
-            )
+            is PlayerCommandSender -> {
+                target ?: sender.player
+            }
+
+            else -> {
+                Logger.error("Unknown CommandSender")
+
+                return sender.sendError("Server error occurred, please report.")
+            }
         }
 
-        return Database.newTransaction {
-            val targetUser = target.getUser()
-                ?: return@newTransaction CommandResult("Target is not logged in.", CommandResultStatus.Failed)
+        Database.newTransaction {
+            val targetUser = computedTarget.getUser()
+                ?: return@newTransaction sender.sendError("Target is not logged in.")
 
-            val targetPlayerData = target.safeGetPlayerData() ?: return@newTransaction null
+            val targetPlayerData = computedTarget.safeGetPlayerData() ?: return@newTransaction
 
-            val permissions =
-                if (player == null)
-                    Permission.all
-                else
-                    player.safeGetPlayerData()?.fullPermissions ?: return@newTransaction null
+            val permissions = sender.getPermissions() ?: return@newTransaction
 
             val targetUUIDs: Set<String> =
                 if (permissions.contains(Permission.ViewUUID)) {
@@ -407,7 +392,7 @@ class UserAccountHandler : Handler {
                 ?.get(MindustryUserServerData.xp.sum())
 
 
-            return@newTransaction CommandResult(
+            sender.sendSuccess(
                 """
                 Info for ${targetUser[Users.username]}.
                 Total XP: $targetTotalXP

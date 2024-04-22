@@ -22,6 +22,7 @@ class AutoSaveHandler : Handler {
             if (ToastVars.state != ToastState.Hosting) return
         }
 
+        // TODO: Use debug logger
         Logger.info("Running auto save.")
 
         runOnMindustryThread {

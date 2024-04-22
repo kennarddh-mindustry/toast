@@ -3,10 +3,10 @@ package com.github.kennarddh.mindustry.toast.core.handlers
 import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
+import com.github.kennarddh.mindustry.genesis.standard.extensions.stripColors
 import com.github.kennarddh.mindustry.genesis.standard.extensions.stripFooMessageInvisibleCharacters
+import com.github.kennarddh.mindustry.genesis.standard.extensions.stripGlyphs
 import com.github.kennarddh.mindustry.toast.common.extensions.preventDiscordPings
-import com.github.kennarddh.mindustry.toast.common.extensions.stripColors
-import com.github.kennarddh.mindustry.toast.common.extensions.stripGlyphs
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerChatGameEvent

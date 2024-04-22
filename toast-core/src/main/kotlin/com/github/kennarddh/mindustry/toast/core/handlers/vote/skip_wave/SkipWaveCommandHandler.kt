@@ -1,8 +1,8 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.vote.skip_wave
 
-import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
+import com.github.kennarddh.mindustry.genesis.core.commands.senders.PlayerCommandSender
 import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThread
 import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.standard.commands.parameters.validations.numbers.GTE
@@ -20,26 +20,23 @@ import kotlin.time.Duration.Companion.minutes
 
 class SkipWaveCommandHandler : AbstractVoteCommand<SkipWaveVoteObjective>("skip wave", 1.minutes) {
     @Command(["skip-wave", "next-wave", "sw", "nw"])
-    @ClientSide
     @Description("Start a 'skip wave' vote.")
-    suspend fun skipWave(player: Player, @LTE(5) @GTE(1) amountOfWave: Int = 1) {
-        start(player, SkipWaveVoteObjective(amountOfWave))
+    suspend fun skipWave(sender: PlayerCommandSender, @LTE(5) @GTE(1) amountOfWave: Int = 1) {
+        start(sender.player, SkipWaveVoteObjective(amountOfWave))
     }
 
 
     @Command(["skip-wave-vote", "next-wave-vote", "swv", "nwv"])
-    @ClientSide
     @Description("Vote for 'skip wave' vote.")
-    suspend fun voteCommand(player: Player, vote: Boolean) {
-        vote(player, vote)
+    suspend fun voteCommand(sender: PlayerCommandSender, vote: Boolean) {
+        vote(sender.player, vote)
     }
 
     @Command(["skip-wave-cancel", "next-wave-cancel", "swc", "nwc"])
-    @ClientSide
     @MinimumRole(UserRole.Mod)
     @Description("Cancel a 'skip wave' vote.")
-    suspend fun cancelCommand(player: Player) {
-        cancel(player)
+    suspend fun cancelCommand(sender: PlayerCommandSender) {
+        cancel(sender.player)
     }
 
     override fun canPlayerStart(player: Player, objective: SkipWaveVoteObjective): Boolean {

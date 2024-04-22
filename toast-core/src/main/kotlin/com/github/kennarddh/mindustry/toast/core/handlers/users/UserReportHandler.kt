@@ -1,9 +1,8 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.users
 
-import com.github.kennarddh.mindustry.genesis.core.commands.annotations.ClientSide
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
-import com.github.kennarddh.mindustry.genesis.core.commands.result.CommandResult
+import com.github.kennarddh.mindustry.genesis.core.commands.senders.PlayerCommandSender
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
@@ -15,18 +14,17 @@ import mindustry.gen.Player
 
 class UserReportHandler : Handler {
     @Command(["report"])
-    @ClientSide
     @Description("Report a player.")
-    suspend fun report(player: Player, target: Player, reason: String): CommandResult? {
-        val playerData = player.safeGetPlayerData() ?: return null
-        val targetPlayerData = player.safeGetPlayerData() ?: return null
+    suspend fun report(sender: PlayerCommandSender, target: Player, reason: String) {
+        val playerData = sender.player.safeGetPlayerData() ?: return
+        val targetPlayerData = sender.player.safeGetPlayerData() ?: return
 
         Messenger.publishGameEvent(
             "${ToastVars.server.name}.report",
             GameEvent(
                 ToastVars.server, Clock.System.now(),
                 PlayerReportedGameEvent(
-                    player.plainName(),
+                    sender.player.plainName(),
                     playerData.userID,
                     target.plainName(),
                     targetPlayerData.userID,
@@ -35,6 +33,6 @@ class UserReportHandler : Handler {
             )
         )
 
-        return CommandResult("Successfully reported ${target.name} with the reason ${reason}.")
+        sender.sendSuccess("Successfully reported ${target.name} with the reason ${reason}.")
     }
 }
