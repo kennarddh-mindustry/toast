@@ -391,7 +391,6 @@ class UserAccountHandler : Handler {
                 .firstOrNull()
                 ?.get(MindustryUserServerData.xp.sum())
 
-
             sender.sendSuccess(
                 """
                 Info for ${targetUser[Users.username]}.
@@ -404,6 +403,7 @@ class UserAccountHandler : Handler {
                     ) else "No Permission"
                 }
                 Discord ID: ${targetUser[Users.discordID]}
+                Joined Times: ${targetUser[Users.joinedTimes]}
                 """.trimIndent()
             )
         }
