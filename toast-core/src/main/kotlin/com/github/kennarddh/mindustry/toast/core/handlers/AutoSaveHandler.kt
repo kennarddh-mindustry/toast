@@ -22,8 +22,7 @@ class AutoSaveHandler : Handler {
             if (ToastVars.state != ToastState.Hosting) return
         }
 
-        // TODO: Use debug logger
-        Logger.info("Running auto save.")
+        Logger.debug("Running auto save.")
 
         runOnMindustryThread {
             save()
@@ -33,7 +32,8 @@ class AutoSaveHandler : Handler {
     fun save() {
         try {
             SaveIO.save(file)
-            Logger.info("Successfully auto saved.")
+
+            Logger.debug("Successfully auto saved.")
         } catch (error: Exception) {
             Logger.error("Failed to save auto save msav file.", error)
         }
