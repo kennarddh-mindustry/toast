@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 object UserPunishments : IntIdTable() {
     val server = enumerationByName<Server>("server", 255)
     val reason = text("reason")
+    val pardonReason = text("pardonReason").nullable()
     val punishedAt = datetime("punishedAt").defaultExpression(CurrentDateTime)
     val endAt = datetime("endAt").nullable()
     val pardonedAt = datetime("pardonedAt").nullable()
