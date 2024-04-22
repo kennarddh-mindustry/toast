@@ -79,6 +79,13 @@ class UserJoinsHandler : Handler {
             return false
         }
 
+        // Prevent invisible name
+        if (packet.name.all { it.code == 0x3164 }) {
+            con.kickWithoutLogging("Name cannot be invisible.")
+
+            return false
+        }
+
         return true
     }
 
