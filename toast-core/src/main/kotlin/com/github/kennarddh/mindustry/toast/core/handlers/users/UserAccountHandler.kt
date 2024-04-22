@@ -187,7 +187,7 @@ class UserAccountHandler : Handler {
         }
     }
 
-    @Command(["changerole", "change-role"])
+    @Command(["changerole", "change_role"])
     @MinimumRole(UserRole.Admin)
     @Description("Change someone's role.")
     suspend fun changeRole(sender: CommandSender, target: Player, newRole: UserRole) {

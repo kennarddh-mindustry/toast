@@ -34,11 +34,11 @@ class ShutdownHandler : Handler {
         Genesis.commandRegistry.removeCommand("stop")
     }
 
-    @Command(["graceful-shutdown"])
+    @Command(["graceful_shutdown"])
     @MinimumRole(UserRole.Admin)
     @Description("Shutdown server with countdown then reconnect players.")
     suspend fun gracefulShutdown(sender: CommandSender, @GTE(0) countdown: Int = 5) {
-        Logger.info("${sender.getName()} ran graceful-shutdown command")
+        Logger.info("${sender.getName()} ran graceful_shutdown command")
 
         try {
             shutdown(countdown)

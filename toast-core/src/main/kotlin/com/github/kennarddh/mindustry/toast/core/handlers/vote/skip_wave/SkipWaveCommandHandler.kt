@@ -19,20 +19,20 @@ import mindustry.gen.Player
 import kotlin.time.Duration.Companion.minutes
 
 class SkipWaveCommandHandler : AbstractVoteCommand<SkipWaveVoteObjective>("skip wave", 1.minutes) {
-    @Command(["skip-wave", "next-wave", "sw", "nw"])
+    @Command(["skip_wave", "next_wave", "sw", "nw"])
     @Description("Start a 'skip wave' vote.")
     suspend fun skipWave(sender: PlayerCommandSender, @LTE(5) @GTE(1) amountOfWave: Int = 1) {
         start(sender.player, SkipWaveVoteObjective(amountOfWave))
     }
 
 
-    @Command(["skip-wave-vote", "next-wave-vote", "swv", "nwv"])
+    @Command(["skip_wave_vote", "next_wave_vote", "swv", "nwv"])
     @Description("Vote for 'skip wave' vote.")
     suspend fun voteCommand(sender: PlayerCommandSender, vote: Boolean) {
         vote(sender.player, vote)
     }
 
-    @Command(["skip-wave-cancel", "next-wave-cancel", "swc", "nwc"])
+    @Command(["skip_wave_cancel", "next_wave_cancel", "swc", "nwc"])
     @MinimumRole(UserRole.Mod)
     @Description("Cancel a 'skip wave' vote.")
     suspend fun cancelCommand(sender: PlayerCommandSender) {

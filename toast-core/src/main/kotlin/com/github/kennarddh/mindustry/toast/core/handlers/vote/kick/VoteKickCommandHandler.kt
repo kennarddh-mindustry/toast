@@ -42,19 +42,19 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
         Genesis.commandRegistry.removeCommand("vote")
     }
 
-    @Command(["votekick", "vote-kick", "vk"])
+    @Command(["votekick", "vote_kick", "vk"])
     @Description("Start a 'vote kick' vote.")
     suspend fun startVoteKick(sender: PlayerCommandSender, target: Player, reason: String) {
         start(sender.player, VoteKickVoteObjective(target, reason))
     }
 
-    @Command(["vote", "vote-kick-vote", "vkv"])
+    @Command(["vote", "vote_kick_vote", "vkv"])
     @Description("Vote for 'vote kick' vote.")
     suspend fun voteCommand(sender: PlayerCommandSender, vote: Boolean) {
         vote(sender.player, vote)
     }
 
-    @Command(["vote-cancel", "vote-kick-cancel", "votekick-cancel", "vkc"])
+    @Command(["vote_cancel", "vote_kick_cancel", "votekick_cancel", "vkc"])
     @MinimumRole(UserRole.Mod)
     @Description("Cancel a 'vote kick' vote.")
     suspend fun cancelCommand(sender: PlayerCommandSender) {
