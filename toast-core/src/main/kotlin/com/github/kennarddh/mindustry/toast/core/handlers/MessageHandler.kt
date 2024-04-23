@@ -2,6 +2,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers
 
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.parameters.Vararg
 import com.github.kennarddh.mindustry.genesis.core.commands.senders.CommandSender
 import com.github.kennarddh.mindustry.genesis.core.commands.senders.PlayerCommandSender
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
@@ -16,7 +17,7 @@ import mindustry.gen.Player
 class MessageHandler : Handler {
     @Command(["whisper", "w"])
     @Description("Send a message to a player. Won't be logged in Discord.")
-    fun whisper(sender: CommandSender, target: Player, message: String) {
+    fun whisper(sender: CommandSender, target: Player, @Vararg message: String) {
         if (sender is PlayerCommandSender && sender.player == target) return sender.sendError("Cannot whisper to yourself.")
 
         val filteredMessage =
@@ -38,7 +39,7 @@ class MessageHandler : Handler {
 
     @Command(["broadcast", "b"])
     @Description("Send a message to nearby player. Won't be logged in Discord.")
-    fun broadcast(sender: PlayerCommandSender, @GTE(1) range: Float, message: String) {
+    fun broadcast(sender: PlayerCommandSender, @GTE(1) range: Float, @Vararg message: String) {
         val filteredMessage = Vars.netServer.admins.filterMessage(sender.player, message) ?: return
 
         val computedMessage = Vars.netServer.chatFormatter.format(sender.player, "[accent]<B> [white]$message")

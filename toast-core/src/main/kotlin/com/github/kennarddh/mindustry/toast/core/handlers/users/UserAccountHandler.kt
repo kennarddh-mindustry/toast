@@ -3,6 +3,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers.users
 import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.parameters.Vararg
 import com.github.kennarddh.mindustry.genesis.core.commands.senders.CommandSender
 import com.github.kennarddh.mindustry.genesis.core.commands.senders.PlayerCommandSender
 import com.github.kennarddh.mindustry.genesis.core.commands.senders.ServerCommandSender
@@ -190,7 +191,7 @@ class UserAccountHandler : Handler {
     @Command(["changerole", "change_role"])
     @MinimumRole(UserRole.Admin)
     @Description("Change someone's role.")
-    suspend fun changeRole(sender: CommandSender, target: Player, newRole: UserRole) {
+    suspend fun changeRole(sender: CommandSender, target: Player, @Vararg newRole: UserRole) {
         val targetPlayerData = target.safeGetPlayerData() ?: return
 
         val targetRole = targetPlayerData.role

@@ -3,6 +3,7 @@ package com.github.kennarddh.mindustry.toast.core.handlers.vote.kick
 import com.github.kennarddh.mindustry.genesis.core.Genesis
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
+import com.github.kennarddh.mindustry.genesis.core.commands.annotations.parameters.Vararg
 import com.github.kennarddh.mindustry.genesis.core.commands.senders.PlayerCommandSender
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.standard.extensions.kickWithoutLogging
@@ -44,7 +45,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
 
     @Command(["votekick", "vote_kick", "vk"])
     @Description("Start a 'vote kick' vote.")
-    suspend fun startVoteKick(sender: PlayerCommandSender, target: Player, reason: String) {
+    suspend fun startVoteKick(sender: PlayerCommandSender, target: Player, @Vararg reason: String) {
         start(sender.player, VoteKickVoteObjective(target, reason))
     }
 
