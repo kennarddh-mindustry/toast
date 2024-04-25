@@ -3,13 +3,11 @@ package com.github.kennarddh.mindustry.toast.core.commands.validations
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validations.CommandValidation
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.validations.CommandValidationDescription
 import com.github.kennarddh.mindustry.toast.common.UserRank
-import com.github.kennarddh.mindustry.toast.common.database.Database
-import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUserServerData
-import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUserAndUserServerData
+import com.github.kennarddh.mindustry.toast.core.commons.safeGetPlayerData
 import mindustry.gen.Player
 
 
-suspend fun validateMinimumRank(annotation: Annotation, player: Player?): Boolean {
+fun validateMinimumRank(annotation: Annotation, player: Player?): Boolean {
     if (player == null) {
         // On server console
         return true
@@ -17,16 +15,11 @@ suspend fun validateMinimumRank(annotation: Annotation, player: Player?): Boolea
 
     val minimumRank = (annotation as MinimumRank).minimumRank
 
-    return Database.newTransaction {
-        // If user is null it means the user is not logged in
-        val mindustryUserAndUserServerData = player.getMindustryUserAndUserServerData()!!
+    val playerData = player.safeGetPlayerData() ?: return false
 
-        val xp = mindustryUserAndUserServerData[MindustryUserServerData.xp]
+    val rank = UserRank.getRank(playerData.xp)
 
-        val rank = UserRank.getRank(xp)
-
-        return@newTransaction rank >= minimumRank
-    }
+    return rank >= minimumRank
 }
 
 @Target(AnnotationTarget.FUNCTION)
