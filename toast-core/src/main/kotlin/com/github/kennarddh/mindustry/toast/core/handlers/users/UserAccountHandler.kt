@@ -172,7 +172,7 @@ class UserAccountHandler : Handler {
                 }
 
             playerData.userID = user[Users.id].value
-            playerData.userID = user[Users.id].value
+            playerData.role = user[Users.role]
 
             runOnMindustryThreadSuspended {
                 sender.player.clearRoleEffect()
@@ -272,6 +272,7 @@ class UserAccountHandler : Handler {
                 }
 
             playerData.userID = null
+            playerData.role = null
 
             runOnMindustryThreadSuspended {
                 sender.player.clearRoleEffect()
