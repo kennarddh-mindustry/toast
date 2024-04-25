@@ -250,7 +250,7 @@ class UserAccountHandler : Handler {
             )
         }
 
-        sender.sendError("Successfully changed ${target.plainName()} role to $newRole.")
+        sender.sendSuccess("Successfully changed ${target.plainName()} role to $newRole.")
     }
 
     @Command(["logout"])
