@@ -33,6 +33,8 @@ fun Player.safeGetPlayerData(): PlayerData? {
     if (playerData == null) {
         sendMessage("There is an error. Please report this and explain what make this happen. Error code: NULL_PLAYER_ENTITY")
 
+        Logger.error("NULL_PLAYER_ENTITY for $this")
+
         return null
     }
 
