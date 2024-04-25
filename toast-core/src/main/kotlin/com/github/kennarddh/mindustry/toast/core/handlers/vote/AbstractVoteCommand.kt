@@ -112,16 +112,20 @@ abstract class AbstractVoteCommand<T : Any>(
         return true
     }
 
-    protected suspend fun silentCancel() {
+    protected open suspend fun cancel(player: Player): Boolean {
         sessionMutex.withLock {
+            if (session == null) {
+                player.sendMessage("[#ff0000]No '$name' vote is in progress.")
+
+                return false
+            }
+
+            Call.sendMessage("[#ff0000]The '$name' vote cancelled by '${player.plainName()}'.")
+
             cleanUp()
+
+            return true
         }
-    }
-
-    protected open suspend fun cancel(player: Player) {
-        Call.sendMessage("[#ff0000]The '$name' vote cancelled by '${player.plainName()}'.")
-
-        silentCancel()
     }
 
     protected open suspend fun timeout() {
@@ -139,6 +143,14 @@ abstract class AbstractVoteCommand<T : Any>(
         session?.task?.cancel()
 
         session = null
+    }
+
+    /**
+     * Must be called with locked sessionMutex
+     */
+    protected suspend fun silentCancel() {
+        sessionMutex.withLock {
+        }
     }
 
     protected suspend fun checkIsRequiredVoteReached() {
