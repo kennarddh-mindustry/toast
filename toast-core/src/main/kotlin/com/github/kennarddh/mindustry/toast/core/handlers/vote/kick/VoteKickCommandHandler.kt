@@ -94,7 +94,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
     }
 
     override suspend fun onSuccess(session: VoteSession<VoteKickVoteObjective>) {
-        val duration = 5.hours
+        val duration = 1.hours
 
         session.objective.target.kickWithoutLogging(
             """
