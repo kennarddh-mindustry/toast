@@ -113,11 +113,13 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
             val user = session.initiator.getUserAndMindustryUserAndUserServerData()
             val targetUser = session.objective.target.getUserAndMindustryUserAndUserServerData()
 
+            val now = Clock.System.now()
+
             val punishmentID = UserPunishments.insertAndGetId {
                 it[this.server] = ToastVars.server
                 it[this.reason] = session.objective.reason
-                it[this.endAt] =
-                    Clock.System.now().plus(duration).toLocalDateTime(TimeZone.UTC)
+                it[this.punishedAt] = now.toLocalDateTime(TimeZone.UTC)
+                it[this.endAt] = now.plus(duration).toLocalDateTime(TimeZone.UTC)
                 it[this.type] = PunishmentType.VoteKick
 
                 it[this.mindustryUserID] = mindustryUser[MindustryUser.id]
