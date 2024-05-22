@@ -89,11 +89,14 @@ class UserModerationHandler : Handler {
         val playerUserID = playerData?.userID
         val targetUserID = targetPlayerData.userID
 
+        val now = Clock.System.now()
+
         val punishmentID = Database.newTransaction {
             UserPunishments.insertAndGetId {
                 it[this.server] = ToastVars.server
                 it[this.reason] = reason
-                it[this.endAt] = Clock.System.now().plus(duration).toLocalDateTime(TimeZone.UTC)
+                it[this.punishedAt] = now.toLocalDateTime(TimeZone.UTC)
+                it[this.endAt] = now.plus(duration).toLocalDateTime(TimeZone.UTC)
                 it[this.type] = PunishmentType.Kick
 
                 if (playerMindustryUserID != null)
