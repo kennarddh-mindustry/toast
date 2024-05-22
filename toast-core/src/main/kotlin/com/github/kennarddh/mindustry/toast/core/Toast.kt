@@ -53,7 +53,7 @@ class Toast : AbstractPlugin() {
         Genesis.registerHandler(UserModerationSyncHandler())
         Genesis.registerHandler(UserRoleSyncHandler())
         Genesis.registerHandler(UserReportHandler())
-        Genesis.registerHandler(UserDiscordVerify())
+        Genesis.registerHandler(UserDiscord())
 
         Genesis.registerHandler(GameEventsHandler())
         Genesis.registerHandler(DiscoveryHandler())

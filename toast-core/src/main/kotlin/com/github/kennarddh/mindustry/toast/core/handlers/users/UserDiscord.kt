@@ -9,9 +9,10 @@ import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.verify.discord.VerifyDiscordRedis
 import com.github.kennarddh.mindustry.toast.core.commands.validations.LoggedIn
 import com.github.kennarddh.mindustry.toast.core.commons.getUser
+import org.jetbrains.exposed.sql.update
 import java.security.SecureRandom
 
-class UserDiscordVerify : Handler {
+class UserDiscord : Handler {
     private val pinSecureRandom = SecureRandom()
 
     @Command(["verify"])
@@ -22,7 +23,7 @@ class UserDiscordVerify : Handler {
 
         if (user[Users.discordID] != null)
             return sender.sendError(
-                "You have already verified your discord account",
+                "You have already verified your discord account.",
             )
 
         // 6 digits pin
@@ -39,5 +40,26 @@ class UserDiscordVerify : Handler {
             Do /discord to join Toast Mindustry Discord.
             """.trimIndent()
         )
+    }
+
+
+    @Command(["unlink"])
+    @LoggedIn
+    @Description("Unlink this account from the discord account.")
+    suspend fun unlink(sender: PlayerCommandSender) {
+        Database.newTransaction {
+            val user = sender.player.getUser()!!
+
+            if (user[Users.discordID] == null)
+                return@newTransaction sender.sendError(
+                    "You haven't verified your discord account.",
+                )
+
+            Users.update({ Users.id eq user[Users.id] }) {
+                it[this.discordID] = null
+            }
+
+            sender.sendSuccess("You have unlinked this account with <@${user[Users.discordID]}> discord account.")
+        }
     }
 }
