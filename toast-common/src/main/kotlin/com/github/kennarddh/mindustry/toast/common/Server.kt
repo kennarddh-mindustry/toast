@@ -14,13 +14,13 @@ enum class Server(
     val applyConfigs: () -> Unit
 ) {
     @SerialName("Survival")
-    Survival("Survival", "Toast Survival", GameMode.Survival, 1199598512162213958L, { }, { }),
+    Survival("Survival", "[yellow]Toast Survival", GameMode.Survival, 1199598512162213958L, { }, { }),
 
     @SerialName("Attack")
-    Attack("Attack", "Toast Attack", GameMode.Attack, 1209544700189610025L, { }, { }),
+    Attack("Attack", "[red]Toast Attack", GameMode.Attack, 1209544700189610025L, { }, { }),
 
     @SerialName("PvP")
-    PvP("PvP", "Toast Pvp", GameMode.PvP, 1209544729499275295L, { }, { });
+    PvP("PvP", "[blue]Toast Pvp", GameMode.PvP, 1209544729499275295L, { }, { });
 
     override fun toString(): String = this.displayName
 }
