@@ -10,17 +10,24 @@ import com.github.kennarddh.mindustry.toast.core.handlers.users.PlayerDisconnect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import mindustry.game.EventType.PlayEvent
 import mindustry.game.EventType.PlayerJoin
 import mindustry.gen.Call
 import mindustry.gen.Player
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 abstract class AbstractVoteCommand<T : Any>(
     protected val name: String,
     protected val timeout: Duration,
+    protected val minDelayBetweenStart: Duration = 5.minutes,
     protected val resetOnPlay: Boolean = true
 ) : Handler {
+    private val playersLastVoteTime: MutableMap<Player, Instant> = ConcurrentHashMap()
+
     private var session: VoteSession<T>? = null
 
     private val sessionMutex = Mutex()
@@ -32,6 +39,16 @@ abstract class AbstractVoteCommand<T : Any>(
     }
 
     protected suspend fun start(initiator: Player, objective: T): Boolean {
+        val playerLastVoteTime = playersLastVoteTime[initiator]
+
+        if (playerLastVoteTime !== null && playerLastVoteTime >= Clock.System.now() - minDelayBetweenStart) {
+            initiator.sendMessage("[#ff0000]You must wait ${minDelayBetweenStart.toDisplayString()} before starting another '$name' vote. Wait ${(Clock.System.now() - playerLastVoteTime).toDisplayString()}.")
+
+            return false
+        }
+
+        playersLastVoteTime[initiator] = Clock.System.now()
+
         sessionMutex.withLock {
             if (session != null) {
                 initiator.sendMessage("[#ff0000]There is '$name' vote in progress.")
@@ -169,6 +186,8 @@ abstract class AbstractVoteCommand<T : Any>(
 
     @EventHandler
     suspend fun onPlayerDisconnected(event: PlayerDisconnected) {
+        playersLastVoteTime.remove(event.player)
+
         sessionMutex.withLock {
             if (session == null) return
 

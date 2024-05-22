@@ -16,7 +16,7 @@ import mindustry.gen.Call
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.minutes
 
-class RTVCommandHandler : AbstractVoteCommand<Byte>("rtv", 2.minutes) {
+class RTVCommandHandler : AbstractVoteCommand<Byte>("rtv", 2.minutes, 2.minutes) {
     @Command(["rtv", "change_map"])
     @Description("Start a 'rtv'/'change-map' vote.")
     suspend fun rtv(sender: PlayerCommandSender, vote: Boolean = true) {
