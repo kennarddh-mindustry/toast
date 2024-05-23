@@ -285,7 +285,7 @@ class UserAccountHandler : Handler {
 
     @Command(["user"])
     @Description("Get data about a user.")
-    suspend fun getUserData(sender: CommandSender, target: Player? = null) {
+    suspend fun getUserData(sender: CommandSender, @Vararg target: Player? = null) {
         val computedTarget = when (sender) {
             is ServerCommandSender -> {
                 target ?: return sender.sendError(
