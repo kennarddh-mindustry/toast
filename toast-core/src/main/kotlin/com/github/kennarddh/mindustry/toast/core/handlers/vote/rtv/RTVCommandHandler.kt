@@ -8,6 +8,7 @@ import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThread
 import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
+import com.github.kennarddh.mindustry.toast.core.commons.safeGetPlayerData
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.AbstractVoteCommand
 import com.github.kennarddh.mindustry.toast.core.handlers.vote.VoteSession
 import mindustry.game.EventType.GameOverEvent
@@ -20,9 +21,11 @@ class RTVCommandHandler : AbstractVoteCommand<Byte>("rtv", 2.minutes, 2.minutes)
     @Command(["rtv", "change_map"])
     @Description("Start a 'rtv'/'change-map' vote.")
     suspend fun rtv(sender: PlayerCommandSender, vote: Boolean = true) {
+        val playerData = sender.player.safeGetPlayerData() ?: return
+
         if (!getIsVoting()) {
             if (vote) {
-                start(sender.player, 1)
+                start(playerData, 1)
             } else {
                 sender.player.sendMessage("[#ff0000]Cannot vote no for '$name' because there is no '$name' vote session in progress.")
             }
@@ -30,14 +33,16 @@ class RTVCommandHandler : AbstractVoteCommand<Byte>("rtv", 2.minutes, 2.minutes)
             return
         }
 
-        vote(sender.player, vote)
+        vote(playerData, vote)
     }
 
-    @Command(["rtv_cancel", "change_map_cancel"])
+    @Command(["rtv_cancel", "change_map_cancel", "rc"])
     @MinimumRole(UserRole.Mod)
     @Description("Cancel a 'rtv' vote.")
     suspend fun cancelCommand(sender: PlayerCommandSender) {
-        cancel(sender.player)
+        val playerData = sender.player.safeGetPlayerData() ?: return
+
+        cancel(playerData)
     }
 
     override fun getRequiredVotes(): Int = ceil(Entities.players.size * 3f / 4f).toInt()

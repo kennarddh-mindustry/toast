@@ -21,6 +21,7 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.PlayerPuni
 import com.github.kennarddh.mindustry.toast.core.commands.validations.MinimumRole
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
+import com.github.kennarddh.mindustry.toast.core.commons.entities.PlayerData
 import com.github.kennarddh.mindustry.toast.core.commons.getMindustryUser
 import com.github.kennarddh.mindustry.toast.core.commons.getUserAndMindustryUserAndUserServerData
 import com.github.kennarddh.mindustry.toast.core.commons.safeGetPlayerData
@@ -46,48 +47,50 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
     @Command(["votekick", "vote_kick", "vk"])
     @Description("Start a 'vote kick' vote.")
     suspend fun startVoteKick(sender: PlayerCommandSender, target: Player, @Vararg reason: String) {
+        val playerData = sender.player.safeGetPlayerData() ?: return
         val targetPlayerData = target.safeGetPlayerData() ?: return
 
-        start(sender.player, VoteKickVoteObjective(targetPlayerData, reason))
+        start(playerData, VoteKickVoteObjective(targetPlayerData, reason))
     }
 
     @Command(["vote", "vote_kick_vote", "vkv"])
     @Description("Vote for 'vote kick' vote.")
     suspend fun voteCommand(sender: PlayerCommandSender, vote: Boolean) {
-        vote(sender.player, vote)
+        val playerData = sender.player.safeGetPlayerData() ?: return
+
+        vote(playerData, vote)
     }
 
     @Command(["vote_cancel", "vote_kick_cancel", "votekick_cancel", "vkc"])
     @MinimumRole(UserRole.Mod)
     @Description("Cancel a 'vote kick' vote.")
     suspend fun cancelCommand(sender: PlayerCommandSender) {
-        cancel(sender.player)
+        val playerData = sender.player.safeGetPlayerData() ?: return
+
+        cancel(playerData)
     }
 
     override fun getRequiredVotes(): Int = if (Entities.players.size <= 3) 2 else 3
 
-    override fun canPlayerStart(player: Player, objective: VoteKickVoteObjective): Boolean {
+    override suspend fun canPlayerStart(playerData: PlayerData, objective: VoteKickVoteObjective): Boolean {
         if (Entities.players.size < 3) {
-            player.sendMessage("[#ff0000]Minimum of 3 players to start a '$name' vote.")
+            playerData.player.sendMessage("[#ff0000]Minimum of 3 players to start a '$name' vote.")
 
             return false
         }
 
-        if (player == objective.target.player) {
-            player.sendMessage("[#ff0000]Cannot start a '$name' vote against yourself.")
+        if (playerData.player == objective.target.player) {
+            playerData.player.sendMessage("[#ff0000]Cannot start a '$name' vote against yourself.")
 
             return false
         }
-
-        val playerData = player.safeGetPlayerData() ?: return false
-        val targetPlayerData = objective.target.player.safeGetPlayerData() ?: return false
 
         // If the player is public it's equivalent to UserRole.Player role
         val playerComputedRole = playerData.role ?: UserRole.Player
-        val targetComputedRole = targetPlayerData.role ?: UserRole.Player
+        val targetComputedRole = objective.target.role ?: UserRole.Player
 
         if (playerComputedRole < targetComputedRole) {
-            player.sendMessage("[#ff0000]Your role must be higher than target's role to vote kick them.")
+            playerData.player.sendMessage("[#ff0000]Your role must be higher than target's role to vote kick them.")
 
             return false
         }
@@ -110,9 +113,9 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
         Call.sendMessage("[#00ff00]Vote kick success. Kicked '${session.objective.target.player.plainName()}/${session.objective.target.mindustryUserID}' for ${duration.toDisplayString()}.")
 
         val punishmentID = Database.newTransaction {
-            val mindustryUser = session.initiator.getMindustryUser()!!
+            val mindustryUser = session.initiator.player.getMindustryUser()!!
             val targetMindustryUser = session.objective.target.player.getMindustryUser()!!
-            val user = session.initiator.getUserAndMindustryUserAndUserServerData()
+            val user = session.initiator.player.getUserAndMindustryUserAndUserServerData()
             val targetUser = session.objective.target.player.getUserAndMindustryUserAndUserServerData()
 
             val now = Clock.System.now()
@@ -156,7 +159,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
                     Clock.System.now(),
                     PlayerPunishedGameEvent(
                         punishmentID.value,
-                        session.initiator.plainName(),
+                        session.initiator.player.plainName(),
                         session.objective.target.player.plainName()
                     )
                 )

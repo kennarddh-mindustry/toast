@@ -6,6 +6,7 @@ import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandl
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.extensions.toDisplayString
 import com.github.kennarddh.mindustry.toast.core.commons.entities.Entities
+import com.github.kennarddh.mindustry.toast.core.commons.entities.PlayerData
 import com.github.kennarddh.mindustry.toast.core.handlers.users.PlayerDisconnected
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -38,26 +39,26 @@ abstract class AbstractVoteCommand<T : Any>(
         }
     }
 
-    protected suspend fun start(initiator: Player, objective: T): Boolean {
-        val playerLastVoteTime = playersLastVoteTime[initiator]
+    protected suspend fun start(initiator: PlayerData, objective: T): Boolean {
+        val playerLastVoteTime = playersLastVoteTime[initiator.player]
 
         if (playerLastVoteTime !== null && playerLastVoteTime >= Clock.System.now() - minDelayBetweenStart) {
-            initiator.sendMessage("[#ff0000]You must wait ${minDelayBetweenStart.toDisplayString()} before starting another '$name' vote. Wait ${(Clock.System.now() - playerLastVoteTime).toDisplayString()}.")
+            initiator.player.sendMessage("[#ff0000]You must wait ${minDelayBetweenStart.toDisplayString()} before starting another '$name' vote. Wait ${(Clock.System.now() - playerLastVoteTime).toDisplayString()}.")
 
             return false
         }
 
-        playersLastVoteTime[initiator] = Clock.System.now()
+        playersLastVoteTime[initiator.player] = Clock.System.now()
 
         if (!canPlayerStart(initiator, objective)) {
-            initiator.sendMessage("[#ff0000]You cannot start '$name' vote.")
+            initiator.player.sendMessage("[#ff0000]You cannot start '$name' vote.")
 
             return false
         }
 
         sessionMutex.withLock {
             if (session != null) {
-                initiator.sendMessage("[#ff0000]There is '$name' vote in progress.")
+                initiator.player.sendMessage("[#ff0000]There is '$name' vote in progress.")
 
                 return false
             }
@@ -71,13 +72,13 @@ abstract class AbstractVoteCommand<T : Any>(
             session = VoteSession(initiator, objective, task)
 
             if (canPlayerVote(initiator, session!!))
-                session!!.voted[initiator] = true
+                session!!.voted[initiator.player] = true
 
             val sessionDetail = getSessionDetails(session!!)
 
             Call.sendMessage(
                 """
-                [#00ff00]'${initiator.plainName()}' started '$name' vote.
+                [#00ff00]'${initiator.player.plainName()}/${initiator.mindustryUserID}' started '$name' vote.
                 ${session!!.votes}/${getRequiredVotes()} votes are required.
                 """.trimIndent() + if (sessionDetail != "") "\n${sessionDetail}" else ""
             )
@@ -90,33 +91,33 @@ abstract class AbstractVoteCommand<T : Any>(
 
     protected open fun getRequiredVotes(): Int = Entities.players.size / 2 + 1
 
-    protected open fun canPlayerVote(player: Player, session: VoteSession<T>): Boolean = true
+    protected open suspend fun canPlayerVote(playerData: PlayerData, session: VoteSession<T>): Boolean = true
 
-    protected open fun canPlayerStart(player: Player, objective: T): Boolean = true
+    protected open suspend fun canPlayerStart(playerData: PlayerData, objective: T): Boolean = true
 
     protected abstract suspend fun onSuccess(session: VoteSession<T>)
 
     protected abstract suspend fun getSessionDetails(session: VoteSession<T>): String
 
-    protected suspend fun vote(player: Player, vote: Boolean): Boolean {
+    protected suspend fun vote(playerData: PlayerData, vote: Boolean): Boolean {
         sessionMutex.withLock {
             if (session == null) {
-                player.sendMessage("[#ff0000]No '$name' vote is in progress.")
+                playerData.player.sendMessage("[#ff0000]No '$name' vote is in progress.")
 
                 return false
             }
 
-            if (!canPlayerVote(player, session!!)) {
-                player.sendMessage("[#ff0000]You cannot vote in '$name' vote.")
+            if (!canPlayerVote(playerData, session!!)) {
+                playerData.player.sendMessage("[#ff0000]You cannot vote in '$name' vote.")
 
                 return false
             }
 
-            session!!.voted[player] = vote
+            session!!.voted[playerData.player] = vote
 
             Call.sendMessage(
                 """
-                [#00ff00]'${player.plainName()}' voted ${vote.toDisplayString()} for '$name' vote.
+                [#00ff00]'${playerData.player.plainName()}/${playerData.mindustryUserID}' voted ${vote.toDisplayString()} for '$name' vote.
                 ${session!!.votes}/${getRequiredVotes()} votes are required.
                 """.trimIndent()
             )
@@ -127,15 +128,15 @@ abstract class AbstractVoteCommand<T : Any>(
         return true
     }
 
-    protected open suspend fun cancel(player: Player): Boolean {
+    protected open suspend fun cancel(playerData: PlayerData): Boolean {
         sessionMutex.withLock {
             if (session == null) {
-                player.sendMessage("[#ff0000]No '$name' vote is in progress.")
+                playerData.player.sendMessage("[#ff0000]No '$name' vote is in progress.")
 
                 return false
             }
 
-            Call.sendMessage("[#ff0000]The '$name' vote cancelled by '${player.plainName()}'.")
+            Call.sendMessage("[#ff0000]The '$name' vote cancelled by '${playerData.player.plainName()}/${playerData.mindustryUserID}'.")
 
             cleanUp()
 
