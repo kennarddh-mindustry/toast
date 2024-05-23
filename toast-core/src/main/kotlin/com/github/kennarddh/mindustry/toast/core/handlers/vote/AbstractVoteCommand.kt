@@ -49,27 +49,25 @@ abstract class AbstractVoteCommand<T : Any>(
 
         playersLastVoteTime[initiator] = Clock.System.now()
 
-        sessionMutex.withLock {
-            if (session != null) {
-                initiator.sendMessage("[#ff0000]There is '$name' vote in progress.")
-
-                return false
-            }
-        }
-
         if (!canPlayerStart(initiator, objective)) {
             initiator.sendMessage("[#ff0000]You cannot start '$name' vote.")
 
             return false
         }
 
-        val task = Timer.schedule({
-            CoroutineScopes.Main.launch {
-                timeout()
-            }
-        }, timeout.inWholeSeconds.toFloat())
-
         sessionMutex.withLock {
+            if (session != null) {
+                initiator.sendMessage("[#ff0000]There is '$name' vote in progress.")
+
+                return false
+            }
+
+            val task = Timer.schedule({
+                CoroutineScopes.Main.launch {
+                    timeout()
+                }
+            }, timeout.inWholeSeconds.toFloat())
+
             session = VoteSession(initiator, objective, task)
 
             if (canPlayerVote(initiator, session!!))
