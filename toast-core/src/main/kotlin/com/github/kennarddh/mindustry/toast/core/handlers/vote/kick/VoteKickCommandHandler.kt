@@ -46,7 +46,9 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
     @Command(["votekick", "vote_kick", "vk"])
     @Description("Start a 'vote kick' vote.")
     suspend fun startVoteKick(sender: PlayerCommandSender, target: Player, @Vararg reason: String) {
-        start(sender.player, VoteKickVoteObjective(target, reason))
+        val targetPlayerData = target.safeGetPlayerData() ?: return
+
+        start(sender.player, VoteKickVoteObjective(targetPlayerData, reason))
     }
 
     @Command(["vote", "vote_kick_vote", "vkv"])
@@ -71,14 +73,14 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
             return false
         }
 
-        if (player == objective.target) {
+        if (player == objective.target.player) {
             player.sendMessage("[#ff0000]Cannot start a '$name' vote against yourself.")
 
             return false
         }
 
         val playerData = player.safeGetPlayerData() ?: return false
-        val targetPlayerData = objective.target.safeGetPlayerData() ?: return false
+        val targetPlayerData = objective.target.player.safeGetPlayerData() ?: return false
 
         // If the player is public it's equivalent to UserRole.Player role
         val playerComputedRole = playerData.role ?: UserRole.Player
@@ -96,7 +98,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
     override suspend fun onSuccess(session: VoteSession<VoteKickVoteObjective>) {
         val duration = 1.hours
 
-        session.objective.target.kickWithoutLogging(
+        session.objective.target.player.kickWithoutLogging(
             """
             [#ff0000]You were vote kicked with the reason
             []${session.objective.reason}
@@ -105,13 +107,13 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
             """.trimIndent()
         )
 
-        Call.sendMessage("[#00ff00]Vote kick success. Kicked ${session.objective.target.plainName()} for ${duration.toDisplayString()}.")
+        Call.sendMessage("[#00ff00]Vote kick success. Kicked '${session.objective.target.player.plainName()}/${session.objective.target.mindustryUserID}' for ${duration.toDisplayString()}.")
 
         val punishmentID = Database.newTransaction {
             val mindustryUser = session.initiator.getMindustryUser()!!
-            val targetMindustryUser = session.objective.target.getMindustryUser()!!
+            val targetMindustryUser = session.objective.target.player.getMindustryUser()!!
             val user = session.initiator.getUserAndMindustryUserAndUserServerData()
-            val targetUser = session.objective.target.getUserAndMindustryUserAndUserServerData()
+            val targetUser = session.objective.target.player.getUserAndMindustryUserAndUserServerData()
 
             val now = Clock.System.now()
 
@@ -155,7 +157,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
                     PlayerPunishedGameEvent(
                         punishmentID.value,
                         session.initiator.plainName(),
-                        session.objective.target.plainName()
+                        session.objective.target.player.plainName()
                     )
                 )
             )
@@ -164,7 +166,7 @@ class VoteKickCommandHandler : AbstractVoteCommand<VoteKickVoteObjective>("vote 
 
     override suspend fun getSessionDetails(session: VoteSession<VoteKickVoteObjective>): String {
         return """
-            Voting to kick '${session.objective.target.plainName()}' with the reason '${session.objective.reason}'
+            Voting to kick '${session.objective.target.player.plainName()}/${session.objective.target.mindustryUserID}' with the reason '${session.objective.reason}'
             Type [accent]/vote y[] or [accent]/vote n[] to vote.
         """.trimIndent()
     }

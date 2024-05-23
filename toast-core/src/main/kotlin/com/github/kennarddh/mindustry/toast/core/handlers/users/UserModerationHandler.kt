@@ -138,7 +138,7 @@ class UserModerationHandler : Handler {
             )
         }
 
-        sender.sendSuccess("Successfully kicked ${target.plainName()}/${target.uuid()} for $duration with the reason \"$reason\"")
+        sender.sendSuccess("Successfully kicked ${target.plainName()}/${playerMindustryUserID} for $duration with the reason \"$reason\"")
     }
 
     @Command(["ban"])
@@ -217,6 +217,6 @@ class UserModerationHandler : Handler {
             )
         }
 
-        sender.sendSuccess("Successfully banned ${target.plainName()}/${target.uuid()} with the reason \"$reason\"")
+        sender.sendSuccess("Successfully banned ${target.plainName()}/${playerMindustryUserID} with the reason \"$reason\"")
     }
 }

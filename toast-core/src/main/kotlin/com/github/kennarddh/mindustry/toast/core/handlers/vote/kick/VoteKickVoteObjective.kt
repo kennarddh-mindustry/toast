@@ -1,5 +1,5 @@
 package com.github.kennarddh.mindustry.toast.core.handlers.vote.kick
 
-import mindustry.gen.Player
+import com.github.kennarddh.mindustry.toast.core.commons.entities.PlayerData
 
-data class VoteKickVoteObjective(val target: Player, val reason: String)
+data class VoteKickVoteObjective(val target: PlayerData, val reason: String)
