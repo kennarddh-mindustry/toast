@@ -312,7 +312,7 @@ class UserAccountHandler : Handler {
 
             val permissions = sender.getPermissions() ?: return@newTransaction
 
-            val targetUUIDs: Set<String> =
+            val targetMindustryUsersID: Set<Int> =
                 if (permissions.contains(Permission.ViewUUID)) {
                     val uuids = MindustryUser
                         .join(
@@ -324,7 +324,7 @@ class UserAccountHandler : Handler {
                         .select(MindustryUser.mindustryUUID)
                         .where { MindustryUserServerData.userID eq targetPlayerData.userID }
 
-                    uuids.map { it[MindustryUser.mindustryUUID] }.toSet()
+                    uuids.map { it[MindustryUser.id].value }.toSet()
                 } else {
                     setOf()
                 }
@@ -397,7 +397,7 @@ class UserAccountHandler : Handler {
                 """
                 Info for ${targetUser[Users.username]}.
                 Total XP: $targetTotalXP
-                UUIDs: ${if (permissions.contains(Permission.ViewUUID)) targetUUIDs.joinToString(", ") else "No Permission"}
+                UUIDs: ${targetMindustryUsersID.joinToString(", ")}
                 IPs: ${if (permissions.contains(Permission.ViewIP)) targetIPs.joinToString(", ") else "No Permission"}
                 Mindustry names: ${
                     if (permissions.contains(Permission.ViewMindustryNamesHistory)) targetMindustryNames.joinToString(
