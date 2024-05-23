@@ -69,9 +69,9 @@ abstract class AbstractVoteCommand<T : Any>(
             }
         }, timeout.inWholeSeconds.toFloat())
 
-        session = VoteSession(initiator, objective, task)
-
         sessionMutex.withLock {
+            session = VoteSession(initiator, objective, task)
+
             if (canPlayerVote(initiator, session!!))
                 session!!.voted[initiator] = true
 
