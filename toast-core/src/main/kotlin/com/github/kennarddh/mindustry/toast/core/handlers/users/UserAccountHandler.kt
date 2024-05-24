@@ -397,9 +397,9 @@ class UserAccountHandler : Handler {
                 """
                 Info for ${targetUser[Users.username]}.
                 Total XP: $targetTotalXP
-                UUIDs: ${targetMindustryUsersID.joinToString(", ")}
+                Mindustry Users ID: ${targetMindustryUsersID.joinToString(", ")}
                 IPs: ${if (permissions.contains(Permission.ViewIP)) targetIPs.joinToString(", ") else "No Permission"}
-                Mindustry names: ${
+                Mindustry Names: ${
                     if (permissions.contains(Permission.ViewMindustryNamesHistory)) targetMindustryNames.joinToString(
                         ", "
                     ) else "No Permission"
