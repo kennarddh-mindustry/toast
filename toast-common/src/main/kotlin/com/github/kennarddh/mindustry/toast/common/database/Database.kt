@@ -41,6 +41,7 @@ object Database {
             SchemaUtils.createMissingTablesAndColumns(MindustryUserMindustryNames)
             SchemaUtils.createMissingTablesAndColumns(UserPunishments)
             SchemaUtils.createMissingTablesAndColumns(UserVoteKickVotes)
+            SchemaUtils.createMissingTablesAndColumns(UserReports)
         }
     }
 
