@@ -313,21 +313,16 @@ class UserAccountHandler : Handler {
             val permissions = sender.getPermissions() ?: return@newTransaction
 
             val targetMindustryUsersID: Set<Int> =
-                if (permissions.contains(Permission.ViewUUID)) {
-                    val uuids = MindustryUser
-                        .join(
-                            MindustryUserServerData,
-                            JoinType.INNER,
-                            onColumn = MindustryUser.id,
-                            otherColumn = MindustryUserServerData.mindustryUserID
-                        )
-                        .select(MindustryUser.mindustryUUID)
-                        .where { MindustryUserServerData.userID eq targetPlayerData.userID }
-
-                    uuids.map { it[MindustryUser.id].value }.toSet()
-                } else {
-                    setOf()
-                }
+                MindustryUser
+                    .join(
+                        MindustryUserServerData,
+                        JoinType.INNER,
+                        onColumn = MindustryUser.id,
+                        otherColumn = MindustryUserServerData.mindustryUserID
+                    )
+                    .select(MindustryUser.id)
+                    .where { MindustryUserServerData.userID eq targetPlayerData.userID }
+                    .map { it[MindustryUser.id].value }.toSet()
 
             val targetIPs: Set<String> =
                 if (permissions.contains(Permission.ViewIP)) {
