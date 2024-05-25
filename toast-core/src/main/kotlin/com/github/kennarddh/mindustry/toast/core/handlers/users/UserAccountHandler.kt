@@ -395,7 +395,8 @@ class UserAccountHandler : Handler {
 
             sender.sendSuccess(
                 """
-                Info for ${targetUser[Users.username]}.
+                Info for '${targetUser[Users.username]}/${targetPlayerData.mindustryUserID}'.
+                User ID: '${targetPlayerData.userID}'.
                 Total XP: $targetTotalXP
                 Mindustry Users ID: ${targetMindustryUsersID.joinToString(", ")}
                 IPs: ${if (permissions.contains(Permission.ViewIP)) targetIPs.joinToString(", ") else "No Permission"}
