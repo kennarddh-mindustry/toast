@@ -3,6 +3,7 @@ package com.github.kennarddh.mindustry.toast.discord.listeners
 import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
+import com.github.kennarddh.mindustry.toast.common.database.tables.UserReports
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.extensions.selectOne
 import com.github.kennarddh.mindustry.toast.common.extensions.toDisplayString
@@ -55,40 +56,77 @@ object GameEventsListener : ListenerAdapter() {
                 is PlayerReportedGameEvent -> {
                     val data = it.data as PlayerReportedGameEvent
 
-                    val embed = EmbedBuilder().run {
-                        setTitle("Player Reported")
+                    CoroutineScopes.Main.launch {
+                        val userReport = Database.newTransaction {
+                            val targetUserAlias = Users.alias("targetUser")
+                            val targetMindustryUserAlias = MindustryUser.alias("targetMindustryUser")
 
-                        setColor(DiscordConstant.REPORTED_EMBED_COLOR)
+                            UserReports
+                                .join(
+                                    Users,
+                                    JoinType.LEFT,
+                                    onColumn = UserReports.userID,
+                                    otherColumn = Users.id
+                                )
+                                .join(
+                                    targetUserAlias,
+                                    JoinType.LEFT,
+                                    onColumn = UserReports.targetUserID,
+                                    otherColumn = targetUserAlias[Users.id]
+                                )
+                                .join(
+                                    MindustryUser,
+                                    JoinType.LEFT,
+                                    onColumn = UserReports.mindustryUserID,
+                                    otherColumn = MindustryUser.id
+                                )
+                                .join(
+                                    targetMindustryUserAlias,
+                                    JoinType.LEFT,
+                                    onColumn = UserReports.targetMindustryUserID,
+                                    otherColumn = targetMindustryUserAlias[MindustryUser.id]
+                                )
+                                .selectOne {
+                                    UserReports.id eq data.userReportID
+                                }
+                        }
 
-                        addField(
-                            MessageEmbed.Field(
-                                "Reporter",
-                                if (data.playerUserID != null)
-                                    "`${data.playerMindustryName}`/`${data.playerUserID}`"
-                                else
-                                    data.playerMindustryName,
-                                true
+                        if (userReport == null) {
+                            Logger.error("Missing UserReports entry with the id ${data.userReportID}.")
+
+                            return@launch
+                        }
+
+                        val embed = EmbedBuilder().run {
+                            setTitle("Player Reported")
+
+                            setColor(DiscordConstant.REPORTED_EMBED_COLOR)
+
+                            addField(
+                                MessageEmbed.Field(
+                                    "Reporter",
+                                    "`${data.name}`/`${userReport[UserReports.mindustryUserID]}`",
+                                    true
+                                )
                             )
-                        )
 
-                        addField(
-                            MessageEmbed.Field(
-                                "Target",
-                                if (data.targetUserID != null)
-                                    "`${data.targetMindustryName}`/`${data.targetUserID}`"
-                                else
-                                    data.targetMindustryName, true
+                            addField(
+                                MessageEmbed.Field(
+                                    "Target",
+                                    "`${data.targetPlayerMindustryName}`/`${userReport[UserReports.targetMindustryUserID]}`",
+                                    true
+                                )
                             )
-                        )
 
-                        addField(MessageEmbed.Field("Server", it.server.displayName, false))
+                            addField(MessageEmbed.Field("Server", it.server.displayName, false))
 
-                        addField(MessageEmbed.Field("Reason", data.reason, false))
+                            addField(MessageEmbed.Field("Reason", userReport[UserReports.reason], false))
 
-                        build()
+                            build()
+                        }
+
+                        reportsChannel.sendMessageEmbeds(embed).queue()
                     }
-
-                    reportsChannel.sendMessageEmbeds(embed).queue()
 
                     null
                 }
