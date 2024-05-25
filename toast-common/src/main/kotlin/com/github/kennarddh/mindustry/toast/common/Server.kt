@@ -17,10 +17,10 @@ enum class Server(
     Survival("Survival", "[yellow]Toast Survival", GameMode.Survival, 1199598512162213958L, { }, { }),
 
     @SerialName("Attack")
-    Attack("Attack", "[red]Toast Attack", GameMode.Attack, 1209544700189610025L, { }, { }),
+    Attack("Attack", "[red]Toast Attack", GameMode.Attack, 1209544700189610025L, { attackMode = true }, { }),
 
     @SerialName("PvP")
-    PvP("PvP", "[blue]Toast Pvp", GameMode.PvP, 1209544729499275295L, { }, { });
+    PvP("PvP", "[blue]Toast Pvp", GameMode.PvP, 1209544729499275295L, { pvp = true }, { });
 
     override fun toString(): String = this.displayName
 }
