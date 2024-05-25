@@ -391,14 +391,15 @@ class UserAccountHandler : Handler {
             sender.sendSuccess(
                 """
                 Info for '${targetUser[Users.username]}/${targetPlayerData.mindustryUserID}'.
-                User ID: '${targetPlayerData.userID}'.
                 Total XP: $targetTotalXP
-                Mindustry Users ID: ${targetMindustryUsersID.joinToString(", ")}
-                IPs: ${if (permissions.contains(Permission.ViewIP)) targetIPs.joinToString(", ") else "No Permission"}
+                User ID: '${targetPlayerData.userID}'.
+                Mindustry Users ID: ${targetMindustryUsersID.joinToString(", ") { "'$it'" }}
+                IPs: ${if (permissions.contains(Permission.ViewIP)) targetIPs.joinToString(", ") { "'$it'" } else "No Permission"}
                 Mindustry Names: ${
                     if (permissions.contains(Permission.ViewMindustryNamesHistory)) targetMindustryNames.joinToString(
                         ", "
-                    ) else "No Permission"
+                    ) { "'$it'" }
+                    else "No Permission"
                 }
                 Discord ID: ${targetUser[Users.discordID]}
                 Joined Times: ${targetUser[Users.joinedTimes]}
