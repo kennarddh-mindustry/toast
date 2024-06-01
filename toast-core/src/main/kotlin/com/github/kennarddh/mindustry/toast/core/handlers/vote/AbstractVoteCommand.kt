@@ -43,7 +43,7 @@ abstract class AbstractVoteCommand<T : Any>(
         val playerLastVoteTime = playersLastVoteTime[initiator.player]
 
         if (playerLastVoteTime !== null && playerLastVoteTime >= Clock.System.now() - minDelayBetweenStart) {
-            initiator.player.sendMessage("[#ff0000]You must wait ${minDelayBetweenStart.toDisplayString()} before starting another '$name' vote. Wait ${(Clock.System.now() - playerLastVoteTime).toDisplayString()}.")
+            initiator.player.sendMessage("[#ff0000]You must wait ${minDelayBetweenStart.toDisplayString()} before starting another '$name' vote. Wait ${(minDelayBetweenStart - (Clock.System.now() - playerLastVoteTime)).toDisplayString()}.")
 
             return false
         }
