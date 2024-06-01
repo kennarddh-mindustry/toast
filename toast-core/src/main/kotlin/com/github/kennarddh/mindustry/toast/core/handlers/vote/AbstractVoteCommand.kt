@@ -27,7 +27,7 @@ abstract class AbstractVoteCommand<T : Any>(
     protected val minDelayBetweenStart: Duration = 5.minutes,
     protected val resetOnPlay: Boolean = true
 ) : Handler {
-    private val playersLastVoteTime: MutableMap<Player, Instant> = ConcurrentHashMap()
+    private val playersLastStartTime: MutableMap<Player, Instant> = ConcurrentHashMap()
 
     private var session: VoteSession<T>? = null
 
@@ -40,15 +40,15 @@ abstract class AbstractVoteCommand<T : Any>(
     }
 
     protected suspend fun start(initiator: PlayerData, objective: T): Boolean {
-        val playerLastVoteTime = playersLastVoteTime[initiator.player]
+        val playerLastStartTime = playersLastStartTime[initiator.player]
 
-        if (playerLastVoteTime !== null && playerLastVoteTime >= Clock.System.now() - minDelayBetweenStart) {
-            initiator.player.sendMessage("[#ff0000]You must wait ${minDelayBetweenStart.toDisplayString()} before starting another '$name' vote. Wait ${(minDelayBetweenStart - (Clock.System.now() - playerLastVoteTime)).toDisplayString()}.")
+        if (playerLastStartTime !== null && playerLastStartTime >= Clock.System.now() - minDelayBetweenStart) {
+            initiator.player.sendMessage("[#ff0000]You must wait ${minDelayBetweenStart.toDisplayString()} before starting another '$name' vote. Wait ${(minDelayBetweenStart - (Clock.System.now() - playerLastStartTime)).toDisplayString()}.")
 
             return false
         }
 
-        playersLastVoteTime[initiator.player] = Clock.System.now()
+        playersLastStartTime[initiator.player] = Clock.System.now()
 
         if (!canPlayerStart(initiator, objective)) {
             initiator.player.sendMessage("[#ff0000]You cannot start '$name' vote.")
@@ -185,7 +185,7 @@ abstract class AbstractVoteCommand<T : Any>(
 
     @EventHandler
     suspend fun onPlayerDisconnected(event: PlayerDisconnected) {
-        playersLastVoteTime.remove(event.player)
+        playersLastStartTime.remove(event.player)
 
         sessionMutex.withLock {
             if (session == null) return
