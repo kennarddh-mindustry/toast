@@ -1,6 +1,7 @@
 package com.github.kennarddh.mindustry.toast.core.handlers
 
 import arc.Core
+import arc.Events
 import arc.util.Reflect
 import arc.util.Timer
 import com.github.kennarddh.mindustry.genesis.core.Genesis
@@ -9,7 +10,6 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Descript
 import com.github.kennarddh.mindustry.genesis.core.commands.senders.ServerCommandSender
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
 import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThreadSuspended
-import com.github.kennarddh.mindustry.genesis.core.events.annotations.EventHandler
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
@@ -33,49 +33,49 @@ class StartHandler : Handler {
     override suspend fun onInit() {
         Genesis.commandRegistry.removeCommand("host")
         Genesis.commandRegistry.removeCommand("load")
-    }
 
-    @EventHandler
-    suspend fun onLoad(event: EventType.ServerLoadEvent) {
-        Config.port.set(ToastVars.port)
+        // @EventHandler Annotation doesn't always work when the EventType is ServerLoadEvent
+        Events.on(EventType.ServerLoadEvent::class.java) { _ ->
+            Config.port.set(ToastVars.port)
 
-        Logger.info("Port set to ${ToastVars.port}")
+            Logger.info("Port set to ${ToastVars.port}")
 
-        Logger.info("Server load... Will host in 1 second.")
+            Logger.info("Server load... Will host in 1 second.")
 
-        runBlocking {
-            delay(1.seconds)
+            runBlocking {
+                delay(1.seconds)
 
-            Logger.info("Applying configs.")
+                Logger.info("Applying configs.")
 
-            ToastVars.applyConfigs()
-            ToastVars.server.gameMode.applyConfigs()
-            ToastVars.server.applyConfigs()
+                ToastVars.applyConfigs()
+                ToastVars.server.gameMode.applyConfigs()
+                ToastVars.server.applyConfigs()
 
-            Logger.info("Configs applied.")
+                Logger.info("Configs applied.")
 
-            Logger.info("Hosting")
+                Logger.info("Hosting")
 
-            val successHost = tryHost()
+                val successHost = tryHost()
 
-            if (!successHost) {
-                Logger.error("Failed to host")
+                if (!successHost) {
+                    Logger.error("Failed to host")
 
-                return@runBlocking
-            }
+                    return@runBlocking
+                }
 
-            CoroutineScopes.Main.launch {
-                Logger.info("ServerStartGameEvent publishing")
+                CoroutineScopes.Main.launch {
+                    Logger.info("ServerStartGameEvent publishing")
 
-                Messenger.publishGameEvent(
-                    "${ToastVars.server.name}.start",
-                    GameEvent(
-                        ToastVars.server, Clock.System.now(),
-                        ServerStartGameEvent()
+                    Messenger.publishGameEvent(
+                        "${ToastVars.server.name}.start",
+                        GameEvent(
+                            ToastVars.server, Clock.System.now(),
+                            ServerStartGameEvent()
+                        )
                     )
-                )
 
-                Logger.info("ServerStartGameEvent published")
+                    Logger.info("ServerStartGameEvent published")
+                }
             }
         }
     }
