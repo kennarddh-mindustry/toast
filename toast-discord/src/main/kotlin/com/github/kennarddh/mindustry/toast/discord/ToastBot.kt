@@ -4,6 +4,7 @@ import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.discovery.DiscoveryRedis
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.verify.discord.VerifyDiscordRedis
+import com.github.kennarddh.mindustry.toast.discord.content.AnukenMindustryContentHandler
 import com.github.kennarddh.mindustry.toast.discord.listeners.*
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -12,6 +13,8 @@ import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Role
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.requests.GatewayIntent
+import java.nio.file.Path
+import java.nio.file.Paths
 
 
 lateinit var jda: JDA
@@ -24,6 +27,10 @@ lateinit var roleChangesChannel: TextChannel
 lateinit var mapSubmissionsChannel: TextChannel
 
 lateinit var memberRole: Role
+
+val dataPath: Path = Paths.get("toast-discord").toAbsolutePath()
+
+val mindustryContentHandler = AnukenMindustryContentHandler(dataPath)
 
 suspend fun main() {
     Logger.info("Loaded")
@@ -43,6 +50,7 @@ suspend fun main() {
         .addEventListeners(DiscoveryHandler)
         .addEventListeners(VerifyDiscordHandler)
         .addEventListeners(MemberJoinListener)
+        .addEventListeners(MapListener)
         .enableIntents(
             GatewayIntent.GUILD_MESSAGES,
             GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
