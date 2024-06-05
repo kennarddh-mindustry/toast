@@ -106,18 +106,19 @@ $schema("Users") {
 $schema("Map") {
     $table("Map") {
         * $pk("id") INTEGER AUTOINCREMENT UNIQUE
-        * $column("name") VARCHAR(60)
+        * $column("name") VARCHAR(100)
         * $column("description") TEXT
-        * $column("author") VARCHAR(50)
+        * $column("author") VARCHAR(100)
         * $column("width") INTEGER
         * $column("height") INTEGER
         * $column("file") MEDIUMBLOB
         * $fk("submittedByUserID") INTEGER
-          $fk("acceptedByUserID") INTEGER
-          $fk("rejectedByUserID") INTEGER
-          $fk("amendedByUserID") INTEGER
+        * $column("active") BOOLEAN
         * $column("createdAt") DATETIME
-          $column("closedAt") DATETIME
+          $fk("reviewedByUserID") INTEGER
+        * $column("reviewStatus") VARCHAR(50) COMMENT Pending, Accepted, Rejected
+          $column("reviewedAt") DATETIME
+          $fk("obsoletedBy") INTEGER
     }
 
     $table("MapGameMode") {
@@ -136,9 +137,8 @@ $schema("Map") {
     }
 
     Map::submittedByUserID }o--|| Users.Users::id
-    Map::acceptedByUserID }o--|| Users.Users::id
-    Map::rejectedByUserID }o--|| Users.Users::id
-    Map::amendedByUserID }o--|| Users.Users::id
+    Map::reviewedByUserID }o--|| Users.Users::id
+    Map::obsoletedBy ||--|| Map::id
     MapRating::mapID }o--|| Map::id
     MapRating::userID |o--|| Users.Users::id
 
