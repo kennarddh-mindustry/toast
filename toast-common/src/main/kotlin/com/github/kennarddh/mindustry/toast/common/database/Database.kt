@@ -1,6 +1,7 @@
 package com.github.kennarddh.mindustry.toast.common.database
 
 import com.github.kennarddh.mindustry.toast.common.database.tables.*
+import com.github.kennarddh.mindustry.toast.common.database.tables.Map
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
@@ -33,7 +34,7 @@ object Database {
 
         database = Database.connect(dataSource)
 
-        newTransaction {
+        newTransaction(false) {
             SchemaUtils.createMissingTablesAndColumns(Users)
             SchemaUtils.createMissingTablesAndColumns(MindustryUser)
             SchemaUtils.createMissingTablesAndColumns(MindustryUserServerData)
@@ -42,6 +43,8 @@ object Database {
             SchemaUtils.createMissingTablesAndColumns(UserPunishments)
             SchemaUtils.createMissingTablesAndColumns(UserVoteKickVotes)
             SchemaUtils.createMissingTablesAndColumns(UserReports)
+            SchemaUtils.createMissingTablesAndColumns(Map)
+            SchemaUtils.createMissingTablesAndColumns(MapGameMode)
         }
     }
 
