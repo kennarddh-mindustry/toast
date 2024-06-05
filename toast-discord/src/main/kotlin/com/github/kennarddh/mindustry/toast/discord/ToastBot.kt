@@ -21,6 +21,7 @@ lateinit var notificationChannel: TextChannel
 lateinit var reportsChannel: TextChannel
 lateinit var serverListChannel: TextChannel
 lateinit var roleChangesChannel: TextChannel
+lateinit var mapSubmissionsChannel: TextChannel
 
 lateinit var memberRole: Role
 

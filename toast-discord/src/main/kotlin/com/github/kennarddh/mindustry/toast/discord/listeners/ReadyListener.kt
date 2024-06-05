@@ -22,6 +22,7 @@ object ReadyListener : ListenerAdapter() {
         reportsChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.REPORTS_CHANNEL_ID)!!
         serverListChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.SERVER_LIST_CHANNEL_ID)!!
         roleChangesChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.ROLE_CHANGES_CHANNEL_ID)!!
+        mapSubmissionsChannel = toastMindustryGuild.getTextChannelById(DiscordConstant.MAP_SUBMISSIONS_CHANNEL_ID)!!
 
         memberRole = toastMindustryGuild.getRoleById(DiscordConstant.MEMBER_ROLE)!!
 
