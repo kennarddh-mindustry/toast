@@ -9,7 +9,6 @@ import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Command
 import com.github.kennarddh.mindustry.genesis.core.commands.annotations.Description
 import com.github.kennarddh.mindustry.genesis.core.commands.senders.ServerCommandSender
 import com.github.kennarddh.mindustry.genesis.core.commons.CoroutineScopes
-import com.github.kennarddh.mindustry.genesis.core.commons.runOnMindustryThreadSuspended
 import com.github.kennarddh.mindustry.genesis.core.handlers.Handler
 import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.GameEvent
@@ -17,8 +16,11 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerStar
 import com.github.kennarddh.mindustry.toast.core.commons.Logger
 import com.github.kennarddh.mindustry.toast.core.commons.ToastState
 import com.github.kennarddh.mindustry.toast.core.commons.ToastVars
-import kotlinx.coroutines.*
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.Clock
 import mindustry.Vars
 import mindustry.core.GameState
@@ -40,11 +42,7 @@ class StartHandler : Handler {
 
             Logger.info("Port set to ${ToastVars.port}")
 
-            Logger.info("Server load... Will host in 1 second.")
-
             runBlocking {
-                delay(1.seconds)
-
                 Logger.info("Applying configs.")
 
                 ToastVars.applyConfigs()
@@ -120,51 +118,49 @@ class StartHandler : Handler {
 
     private suspend fun tryHost(): Boolean {
         try {
-            return runOnMindustryThreadSuspended(30.seconds) {
-                runBlocking {
+            return withTimeout(30.seconds) {
+                // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
+                Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
+
+                Vars.logic.reset()
+
+                val successLoadAutoSave = tryLoadAutoSave()
+
+                if (!successLoadAutoSave) {
+                    // Just to be safe I guess
                     // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
                     Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
 
                     Vars.logic.reset()
 
-                    val successLoadAutoSave = tryLoadAutoSave()
+                    Logger.info("No auto save found. Using random maps.")
 
-                    if (!successLoadAutoSave) {
-                        // Just to be safe I guess
-                        // TODO: When v147 released replace this with ServerControl.instance.cancelPlayTask()
-                        Reflect.get<Timer.Task>(ServerControl.instance, "lastTask")?.cancel()
+                    val map =
+                        Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
 
-                        Vars.logic.reset()
+                    ServerControl.instance.lastMode = ToastVars.server.gameMode.mindustryGameMode
 
-                        Logger.info("No auto save found. Using random maps.")
+                    Core.settings.put("lastServerMode", ServerControl.instance.lastMode.name)
+                    Vars.world.loadMap(map, map.applyRules(ServerControl.instance.lastMode))
 
-                        val map =
-                            Vars.maps.shuffleMode.next(ToastVars.server.gameMode.mindustryGameMode, Vars.state.map)
-
-                        ServerControl.instance.lastMode = ToastVars.server.gameMode.mindustryGameMode
-
-                        Core.settings.put("lastServerMode", ServerControl.instance.lastMode.name)
-                        Vars.world.loadMap(map, map.applyRules(ServerControl.instance.lastMode))
-
-                        Vars.state.rules = map.applyRules(ToastVars.server.gameMode.mindustryGameMode)
-                    }
-
-                    ToastVars.applyRules(Vars.state.rules)
-                    ToastVars.server.gameMode.applyRules(Vars.state.rules)
-                    ToastVars.server.applyRules(Vars.state.rules)
-
-                    Vars.logic.play()
-
-                    Vars.netServer.openServer()
-
-                    ToastVars.stateLock.withLock {
-                        ToastVars.state = ToastState.Hosting
-                    }
-
-                    Logger.info("Hosted")
-
-                    return@runBlocking true
+                    Vars.state.rules = map.applyRules(ToastVars.server.gameMode.mindustryGameMode)
                 }
+
+                ToastVars.applyRules(Vars.state.rules)
+                ToastVars.server.gameMode.applyRules(Vars.state.rules)
+                ToastVars.server.applyRules(Vars.state.rules)
+
+                Vars.logic.play()
+
+                Vars.netServer.openServer()
+
+                ToastVars.stateLock.withLock {
+                    ToastVars.state = ToastState.Hosting
+                }
+
+                Logger.info("Hosted")
+
+                true
             }
         } catch (error: TimeoutCancellationException) {
             Logger.error("Timeout on starting. Exiting.")
