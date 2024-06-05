@@ -20,6 +20,8 @@ class UserReportHandler : Handler {
     @Command(["report"])
     @Description("Report a player.")
     suspend fun report(sender: PlayerCommandSender, target: Player, @Vararg reason: String) {
+        if (sender.player == target) return sender.sendError("Cannot report yourself.")
+
         val playerData = sender.player.safeGetPlayerData() ?: return
         val targetPlayerData = sender.player.safeGetPlayerData() ?: return
 
