@@ -114,7 +114,7 @@ $schema("Map") {
         * $column("file") MEDIUMBLOB
         * $fk("submittedByUserID") INTEGER
         * $column("active") BOOLEAN
-        * $column("createdAt") DATETIME
+        * $column("submittedAt") DATETIME
           $fk("reviewedByUserID") INTEGER
         * $column("reviewStatus") VARCHAR(50) COMMENT Pending, Accepted, Rejected
           $column("reviewedAt") DATETIME
