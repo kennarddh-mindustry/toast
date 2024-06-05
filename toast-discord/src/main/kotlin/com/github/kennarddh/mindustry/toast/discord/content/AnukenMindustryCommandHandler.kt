@@ -65,11 +65,11 @@ import kotlin.io.path.writeText
 
 // The base code is from Anuken/CoreBot, rewritten in kotlin and modified to be able to run in a
 // multithreaded environment.
-class AnukenMindustryContentHandler(directory: Path) : MindustryContentHandler {
+class AnukenMindustryContentHandler(path: Path) : MindustryContentHandler {
     private var currentSchematicGraphics: Graphics2D? = null
     private var currentSchematicImage: BufferedImage? = null
 
-    private val directory = directory.resolve("mindustry-assets")
+    private val directory = path.resolve("mindustry-assets")
     private val images = mutableMapOf<String, Path>()
     private val regions =
         CacheBuilder.newBuilder()
@@ -81,7 +81,6 @@ class AnukenMindustryContentHandler(directory: Path) : MindustryContentHandler {
         Vars.headless = true
         Core.settings = MockSettings()
 
-        Log.logger = Log.NoopLogHandler()
         Log.logger = Log.DefaultLogHandler()
 
         Vars.content = ContentLoader()
