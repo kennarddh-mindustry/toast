@@ -1,6 +1,8 @@
 package com.github.kennarddh.mindustry.toast.discord
 
 object DiscordConstant {
+    const val MINDUSTRY_VERSION = "146"
+
     const val PRODUCTION_TOAST_BOT_USER_ID = 1199599377115791360L
 
     const val TOAST_MINDUSTRY_GUILD_ID = 1189553927843237888L

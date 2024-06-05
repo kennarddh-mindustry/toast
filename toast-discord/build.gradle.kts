@@ -20,6 +20,8 @@ dependencies {
 
     implementation("org.slf4j:slf4j-api:2.0.11")
     implementation("org.slf4j:slf4j-simple:2.0.11")
+
+    implementation("com.google.guava:guava:33.2.1-jre")
 }
 
 kotlin {
