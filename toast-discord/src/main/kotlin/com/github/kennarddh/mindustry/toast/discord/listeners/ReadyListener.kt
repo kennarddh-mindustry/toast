@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.discord.listeners
 
+import com.github.kennarddh.mindustry.toast.common.GameMode
 import com.github.kennarddh.mindustry.toast.common.Server
 import com.github.kennarddh.mindustry.toast.discord.*
 import net.dv8tion.jda.api.Permission
@@ -9,6 +10,8 @@ import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
+
 
 object ReadyListener : ListenerAdapter() {
     override fun onReady(event: ReadyEvent) {
@@ -26,6 +29,12 @@ object ReadyListener : ListenerAdapter() {
 
         Server.entries.forEach {
             serverOptionData.addChoice(it.displayName, it.name)
+        }
+
+        val gameModeOptionData = OptionData(OptionType.STRING, "game-mode", "Game Mode").setRequired(true)
+
+        GameMode.entries.forEach {
+            gameModeOptionData.addChoice(it.displayName, it.name)
         }
 
         jda.updateCommands()
@@ -46,6 +55,14 @@ object ReadyListener : ListenerAdapter() {
                 Commands.slash("verify", "Verify your mindustry account with discord")
                     .addOption(OptionType.STRING, "username", "Mindustry account username.", true)
                     .addOption(OptionType.INTEGER, "pin", "Pin.", true)
+            ).addCommands(
+                Commands.slash("map", "Map")
+                    .addSubcommands(
+                        SubcommandData("submit", "Submit a mindustry map")
+                            .addOption(OptionType.ATTACHMENT, "msav-file", "Exported MSAV file", true)
+                            .addOptions(gameModeOptionData)
+                            .addOption(OptionType.INTEGER, "obsoleted-map-id", "Obsoleted Map ID", false)
+                    )
             )
             .queue()
     }
