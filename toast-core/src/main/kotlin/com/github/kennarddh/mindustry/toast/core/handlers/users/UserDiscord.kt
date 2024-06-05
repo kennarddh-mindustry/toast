@@ -43,7 +43,7 @@ class UserDiscord : Handler {
     }
 
 
-    @Command(["unlink"])
+    @Command(["unlink", "unverify"])
     @LoggedIn
     @Description("Unlink this account from the discord account.")
     suspend fun unlink(sender: PlayerCommandSender) {
