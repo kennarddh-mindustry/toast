@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 object Map : IntIdTable() {
     val name = varchar("name", 100)
     val description = text("description")
-    val author = varchar("name", 100)
+    val author = varchar("author", 100)
     val width = integer("width")
     val height = integer("height")
     val file = mediumblob("file")
