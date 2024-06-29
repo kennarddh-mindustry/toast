@@ -107,7 +107,7 @@ object MapListener : ListenerAdapter() {
 
                                         ByteArrayInputStream(previewOutputStream.toByteArray())
                                     }
-                                    embeds += Embed() {
+                                    embeds += Embed {
                                         color = DiscordConstant.MAP_SUBMISSION_PENDING_EMBED_COLOR
                                         title = "Map Submission"
                                         author(
