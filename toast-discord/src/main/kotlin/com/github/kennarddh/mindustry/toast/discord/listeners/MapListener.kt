@@ -39,125 +39,199 @@ object MapListener : ListenerAdapter() {
     private const val MAX_MAP_HEIGHT = 1500
 
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
-        if (event.name == "map") {
-            if (event.subcommandName == "submit") {
-                CoroutineScopes.IO.launch {
-                    event.reply("Processing").setEphemeral(true).queue()
+        if (event.name != "map") return
 
-                    val mapAttachment = event.getOption("msav-file")!!.asAttachment
-                    val gameModeString = event.getOption("game-mode")!!.asString
+        if (event.subcommandName == "enable") {
+            CoroutineScopes.IO.launch {
+                val user = Database.newTransaction {
+                    Users.selectOne { Users.discordID eq event.user.id }
+                } ?: return@launch event.reply("Your must verify your discord account before using this.")
+                    .setEphemeral(true)
+                    .queue()
 
-                    val gameMode = try {
-                        GameMode.valueOf(gameModeString)
-                    } catch (error: IllegalArgumentException) {
-                        return@launch event.hook.editOriginal("$gameModeString is not a valid game mode").queue()
-                    }
+                if (user[Users.role] < UserRole.Admin) {
+                    return@launch event.reply("Your role must be greater than or equal to Admin.")
+                        .setEphemeral(true)
+                        .queue()
+                }
 
-                    if (mapAttachment.size > MAX_MAP_FILE_SIZE_IN_BYTES)
-                        return@launch event.hook.editOriginal("Map size must not be bigger than 1mb.").queue()
+                val mapID = event.getOption("map-id")!!.asInt
 
-                    val user = Database.newTransaction {
-                        Users.selectOne { Users.discordID eq event.user.id }
-                    }
+                Database.newTransaction {
+                    val map = Map.selectOne { Map.id eq mapID }
+                        ?: return@newTransaction event.reply("Map not found.")
+                            .setEphemeral(true)
+                            .queue()
 
-                    if (user == null) {
-                        return@launch event.hook.editOriginal("Your must verify your discord account before using this.")
+                    if (map[Map.reviewStatus] == MapReviewStatus.Pending) {
+                        event.reply("Map has not been reviewed.")
+                            .setEphemeral(true)
                             .queue()
                     }
 
-                    if (event.guild == null) {
-                        event.hook.editOriginal("Cannot use outside guild").queue()
-
-                        return@launch
+                    Map.update({ Map.id eq mapID }) {
+                        it[active] = true
                     }
 
-                    val bytes = mapAttachment.proxy.download().await().use(InputStream::readBytes)
+                    event.reply("Map `$mapID` enabled.")
+                        .setEphemeral(true)
+                        .queue()
+                }
+            }
+        } else if (event.subcommandName == "disable") {
+            CoroutineScopes.IO.launch {
+                val user = Database.newTransaction {
+                    Users.selectOne { Users.discordID eq event.user.id }
+                } ?: return@launch event.reply("Your must verify your discord account before using this.")
+                    .setEphemeral(true)
+                    .queue()
 
-                    val (meta, preview) = mindustryContentHandler
-                        .getMapMetadataWithPreview(bytes.inputStream())
-                        .getOrElse {
-                            event.hook
-                                .editOriginal("Error ${it.message ?: "Unknown"}")
-                                .queue()
+                if (user[Users.role] < UserRole.Admin) {
+                    return@launch event.reply("Your role must be greater than or equal to Admin.")
+                        .setEphemeral(true)
+                        .queue()
+                }
 
-                            null
-                        } ?: return@launch
+                val mapID = event.getOption("map-id")!!.asInt
 
+                Database.newTransaction {
+                    val map = Map.selectOne { Map.id eq mapID }
+                        ?: return@newTransaction event.reply("Map not found.")
+                            .setEphemeral(true)
+                            .queue()
 
-                    if (meta.width > MAX_MAP_WIDTH || meta.height > MAX_MAP_HEIGHT) {
-                        return@launch event.hook.editOriginal(
-                            "The map is bigger than ${MAX_MAP_WIDTH}x${MAX_MAP_HEIGHT}."
-                        ).queue()
+                    if (map[Map.reviewStatus] == MapReviewStatus.Pending) {
+                        event.reply("Map has not been reviewed.")
+                            .setEphemeral(true)
+                            .queue()
                     }
 
-                    val mapID = Database.newTransaction {
-                        Map.insert {
-                            it[name] = meta.name
-                            it[description] = meta.description ?: "-"
-                            it[author] = meta.author ?: "Unknown"
-                            it[width] = meta.width
-                            it[height] = meta.height
-                            it[file] = ExposedBlob(bytes)
-                            it[submittedByUserID] = user[Users.id]
-                            it[active] = false
-                            it[reviewStatus] = MapReviewStatus.Pending
-                        } get Map.id
+                    Map.update({ Map.id eq mapID }) {
+                        it[active] = false
                     }
 
-                    val message =
-                        event.channel
-                            .sendMessage(
-                                MessageCreate {
-                                    files += FileUpload.fromStreamSupplier(mapAttachment.fileName, bytes::inputStream)
-                                    files += FileUpload.fromStreamSupplier("map.png") {
-                                        val previewOutputStream = ByteArrayOutputStream()
+                    event.reply("Map `$mapID` disabled.")
+                        .setEphemeral(true)
+                        .queue()
+                }
+            }
+        } else if (event.subcommandName == "submit") {
+            CoroutineScopes.IO.launch {
+                event.reply("Processing").setEphemeral(true).queue()
 
-                                        ImageIO.write(preview, "png", previewOutputStream)
+                val mapAttachment = event.getOption("msav-file")!!.asAttachment
+                val gameModeString = event.getOption("game-mode")!!.asString
 
-                                        ByteArrayInputStream(previewOutputStream.toByteArray())
-                                    }
-                                    embeds += Embed {
-                                        color = DiscordConstant.MAP_SUBMISSION_PENDING_EMBED_COLOR
-                                        title = "Map Submission"
-                                        author(
-                                            event.user.name,
-                                            event.user.effectiveAvatarUrl,
-                                            event.user.effectiveAvatarUrl
-                                        )
-                                        field("Name", meta.name, false)
-                                        field("Game Mode", gameMode.displayName, false)
-                                        field("Author", meta.author ?: "Unknown", false)
-                                        field(
-                                            "Description",
-                                            meta.description ?: "-",
-                                            false
-                                        )
-                                        field("Size", "${meta.width}x${meta.height}", false)
-                                        image = "attachment://map.png"
-                                    }
-                                    components +=
-                                        ActionRow.of(
-                                            Button.primary(
-                                                "$MAP_SUBMIT_ACCEPT_BUTTON_COMPONENT_ID_PREFIX$mapID",
-                                                "Accept"
-                                            ),
-                                            Button.danger(
-                                                "$MAP_SUBMIT_REJECT_BUTTON_COMPONENT_ID_PREFIX$mapID",
-                                                "Reject"
-                                            )
-                                        )
-                                })
-                            .await()
+                val gameMode = try {
+                    GameMode.valueOf(gameModeString)
+                } catch (error: IllegalArgumentException) {
+                    return@launch event.hook.editOriginal("$gameModeString is not a valid game mode").queue()
+                }
 
-                    message
-                        .createThreadChannel(meta.name)
-                        .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS)
-                        .await()
+                if (mapAttachment.size > MAX_MAP_FILE_SIZE_IN_BYTES)
+                    return@launch event.hook.editOriginal("Map size must not be bigger than 1mb.").queue()
 
-                    event.hook.editOriginal(
-                        "Submitted ${message.jumpUrl}."
+                val user = Database.newTransaction {
+                    Users.selectOne { Users.discordID eq event.user.id }
+                }
+
+                if (user == null) {
+                    return@launch event.hook.editOriginal("Your must verify your discord account before using this.")
+                        .queue()
+                }
+
+                if (event.guild == null) {
+                    event.hook.editOriginal("Cannot use outside guild").queue()
+
+                    return@launch
+                }
+
+                val bytes = mapAttachment.proxy.download().await().use(InputStream::readBytes)
+
+                val (meta, preview) = mindustryContentHandler
+                    .getMapMetadataWithPreview(bytes.inputStream())
+                    .getOrElse {
+                        event.hook
+                            .editOriginal("Error ${it.message ?: "Unknown"}")
+                            .queue()
+
+                        null
+                    } ?: return@launch
+
+
+                if (meta.width > MAX_MAP_WIDTH || meta.height > MAX_MAP_HEIGHT) {
+                    return@launch event.hook.editOriginal(
+                        "The map is bigger than ${MAX_MAP_WIDTH}x${MAX_MAP_HEIGHT}."
                     ).queue()
                 }
+
+                val mapID = Database.newTransaction {
+                    Map.insert {
+                        it[name] = meta.name
+                        it[description] = meta.description ?: "-"
+                        it[author] = meta.author ?: "Unknown"
+                        it[width] = meta.width
+                        it[height] = meta.height
+                        it[file] = ExposedBlob(bytes)
+                        it[submittedByUserID] = user[Users.id]
+                        it[active] = false
+                        it[reviewStatus] = MapReviewStatus.Pending
+                    } get Map.id
+                }
+
+                val message =
+                    event.channel
+                        .sendMessage(
+                            MessageCreate {
+                                files += FileUpload.fromStreamSupplier(mapAttachment.fileName, bytes::inputStream)
+                                files += FileUpload.fromStreamSupplier("map.png") {
+                                    val previewOutputStream = ByteArrayOutputStream()
+
+                                    ImageIO.write(preview, "png", previewOutputStream)
+
+                                    ByteArrayInputStream(previewOutputStream.toByteArray())
+                                }
+                                embeds += Embed {
+                                    color = DiscordConstant.MAP_SUBMISSION_PENDING_EMBED_COLOR
+                                    title = "Map Submission"
+                                    author(
+                                        event.user.name,
+                                        event.user.effectiveAvatarUrl,
+                                        event.user.effectiveAvatarUrl
+                                    )
+                                    field("Name", meta.name, false)
+                                    field("Game Mode", gameMode.displayName, false)
+                                    field("Author", meta.author ?: "Unknown", false)
+                                    field(
+                                        "Description",
+                                        meta.description ?: "-",
+                                        false
+                                    )
+                                    field("Size", "${meta.width}x${meta.height}", false)
+                                    image = "attachment://map.png"
+                                }
+                                components +=
+                                    ActionRow.of(
+                                        Button.primary(
+                                            "$MAP_SUBMIT_ACCEPT_BUTTON_COMPONENT_ID_PREFIX$mapID",
+                                            "Accept"
+                                        ),
+                                        Button.danger(
+                                            "$MAP_SUBMIT_REJECT_BUTTON_COMPONENT_ID_PREFIX$mapID",
+                                            "Reject"
+                                        )
+                                    )
+                            })
+                        .await()
+
+                message
+                    .createThreadChannel(meta.name)
+                    .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS)
+                    .await()
+
+                event.hook.editOriginal(
+                    "Submitted ${message.jumpUrl}."
+                ).queue()
             }
         }
     }

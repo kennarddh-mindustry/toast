@@ -63,6 +63,14 @@ object ReadyListener : ListenerAdapter() {
                             .addOption(OptionType.ATTACHMENT, "msav-file", "Exported MSAV file", true)
                             .addOptions(gameModeOptionData)
                     )
+                    .addSubcommands(
+                        SubcommandData("enable", "Enable a map")
+                            .addOption(OptionType.INTEGER, "map-id", "Map id.", true)
+                    )
+                    .addSubcommands(
+                        SubcommandData("disable", "Disable a map")
+                            .addOption(OptionType.INTEGER, "map-id", "Map id.", true)
+                    )
             )
             .queue()
     }
