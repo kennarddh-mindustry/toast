@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.discord.listeners
 
+import com.github.kennarddh.mindustry.toast.common.UserRole
 import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.MindustryUser
 import com.github.kennarddh.mindustry.toast.common.database.tables.UserPunishments
@@ -302,22 +303,47 @@ object GameEventsListener : ListenerAdapter() {
             CoroutineScopes.IO.launch {
                 val user = Database.newTransaction {
                     Users.selectOne { Users.discordID eq event.user.id }
+                } ?: return@launch event.reply("Your must verify your discord account before using this.")
+                    .setEphemeral(true)
+                    .queue()
+
+                val userPunishmentID = event.componentId
+                    .drop(PARDON_BUTTON_COMPONENT_ID_PREFIX.length)
+                    .toInt()
+
+                val userPunishment = Database.newTransaction {
+                    UserPunishments.selectOne { UserPunishments.id eq userPunishmentID }
                 }
 
-                if (user == null) {
-                    return@launch event.reply("Your must verify your discord account before using this.")
+                if (userPunishment == null) {
+                    Logger.error("Missing UserPunishments entry with the id $userPunishmentID.")
+
+                    return@launch event.reply("Punishment not found.")
                         .setEphemeral(true)
                         .queue()
                 }
 
-                val userPunishmentID = event.componentId
-                    .drop(PARDON_BUTTON_COMPONENT_ID_PREFIX.length)
+                if (userPunishment[UserPunishments.pardonedAt] != null)
+                    return@launch event.reply("Punishment has already been pardoned.")
+                        .setEphemeral(true)
+                        .queue()
+
+                if (user[Users.role] < UserRole.Mod) {
+                    return@launch event.reply("Your role must be greater than or equal to Mod.")
+                        .setEphemeral(true)
+                        .queue()
+                }
+
+                if (user[Users.role] < UserRole.Admin && userPunishment[UserPunishments.userID] != user[Users.id]) {
+                    return@launch event.reply("You can only pardon your own punishment.")
+                        .setEphemeral(true)
+                        .queue()
+                }
 
                 val pardonReason: TextInput = TextInput.create("pardonReason", "Pardon reason", TextInputStyle.SHORT)
                     .setPlaceholder("Pardon reason.")
                     .setMinLength(0)
                     .build()
-
 
                 val modal = Modal.create("$PARDON_MODAL_ID_PREFIX$userPunishmentID", "Pardon")
                     .addComponents(ActionRow.of(pardonReason))
@@ -339,73 +365,98 @@ object GameEventsListener : ListenerAdapter() {
             val pardonReason = event.getValue("pardonReason")!!.asString
 
             CoroutineScopes.IO.launch {
-                Database.newTransaction {
+                val user = Database.newTransaction {
+                    Users.selectOne { Users.discordID eq event.user.id }
+                } ?: return@launch event.reply("Your must verify your discord account before using this.")
+                    .setEphemeral(true)
+                    .queue()
+
+                val userPunishment = Database.newTransaction {
                     UserPunishments.update({ UserPunishments.id eq userPunishmentID }) {
                         it[this.pardonReason] = pardonReason
                         it[this.pardonedAt] = Clock.System.now().toLocalDateTime(TimeZone.UTC)
                     }
 
-                    val userPunishment = UserPunishments.selectOne { UserPunishments.id eq userPunishmentID }
-
-                    if (userPunishment == null) {
-                        Logger.error("Missing UserPunishments entry with the id $userPunishmentID.")
-
-                        return@newTransaction
-                    }
-
-                    val embed = EmbedBuilder().run {
-                        setTitle("Pardon")
-
-                        setColor(DiscordConstant.PARDON_EMBED_COLOR)
-
-                        addField(
-                            MessageEmbed.Field(
-                                "ID",
-                                userPunishment[UserPunishments.id].value.toString(),
-                                true
-                            )
-                        )
-
-                        addField(
-                            MessageEmbed.Field(
-                                "Type",
-                                userPunishment[UserPunishments.type].displayName,
-                                false
-                            )
-                        )
-
-                        addField(
-                            MessageEmbed.Field(
-                                "Target User ID",
-                                (userPunishment[UserPunishments.targetUserID]?.value ?: "Null").toString(),
-                                false
-                            )
-                        )
-
-                        addField(
-                            MessageEmbed.Field(
-                                "Target Mindustry User ID",
-                                (userPunishment[UserPunishments.mindustryUserID]?.value ?: "Null").toString(),
-                                false
-                            )
-                        )
-
-                        addField(MessageEmbed.Field("Reason", userPunishment[UserPunishments.reason], false))
-                        addField(
-                            MessageEmbed.Field(
-                                "Pardon Reason",
-                                userPunishment[UserPunishments.pardonReason],
-                                false
-                            )
-                        )
-
-                        build()
-                    }
-
-                    notificationChannel.sendMessageEmbeds(embed).queue()
-
-                    event.hook.sendMessage("Pardoned").queue()
+                    UserPunishments.selectOne { UserPunishments.id eq userPunishmentID }
                 }
+
+                if (userPunishment == null) {
+                    Logger.error("Missing UserPunishments entry with the id $userPunishmentID.")
+
+                    return@launch event.reply("Punishment not found.")
+                        .setEphemeral(true)
+                        .queue()
+                }
+
+                if (userPunishment[UserPunishments.pardonedAt] != null)
+                    return@launch event.reply("Punishment has already been pardoned.")
+                        .setEphemeral(true)
+                        .queue()
+
+                if (user[Users.role] < UserRole.Mod) {
+                    return@launch event.reply("Your role must be greater than or equal to Mod.")
+                        .setEphemeral(true)
+                        .queue()
+                }
+
+                if (user[Users.role] < UserRole.Admin && userPunishment[UserPunishments.userID] != user[Users.id]) {
+                    return@launch event.reply("You can only pardon your own punishment.")
+                        .setEphemeral(true)
+                        .queue()
+                }
+
+                val embed = EmbedBuilder().run {
+                    setTitle("Pardon")
+
+                    setColor(DiscordConstant.PARDON_EMBED_COLOR)
+
+                    addField(
+                        MessageEmbed.Field(
+                            "ID",
+                            userPunishment[UserPunishments.id].value.toString(),
+                            true
+                        )
+                    )
+
+                    addField(
+                        MessageEmbed.Field(
+                            "Type",
+                            userPunishment[UserPunishments.type].displayName,
+                            false
+                        )
+                    )
+
+                    addField(
+                        MessageEmbed.Field(
+                            "Target User ID",
+                            (userPunishment[UserPunishments.targetUserID]?.value ?: "Null").toString(),
+                            false
+                        )
+                    )
+
+                    addField(
+                        MessageEmbed.Field(
+                            "Target Mindustry User ID",
+                            (userPunishment[UserPunishments.mindustryUserID]?.value ?: "Null").toString(),
+                            false
+                        )
+                    )
+
+                    addField(MessageEmbed.Field("Reason", userPunishment[UserPunishments.reason], false))
+                    addField(
+                        MessageEmbed.Field(
+                            "Pardon Reason",
+                            userPunishment[UserPunishments.pardonReason],
+                            false
+                        )
+                    )
+
+                    build()
+                }
+
+                notificationChannel.sendMessageEmbeds(embed).queue()
+
+                event.hook.sendMessage("Pardoned").queue()
             }
         }
     }
