@@ -1,5 +1,6 @@
 package com.github.kennarddh.mindustry.toast.common.database.tables
 
+import com.github.kennarddh.mindustry.toast.common.GameMode
 import com.github.kennarddh.mindustry.toast.common.MapReviewStatus
 import com.github.kennarddh.mindustry.toast.common.extensions.mediumblob
 import org.jetbrains.exposed.dao.id.IntIdTable
@@ -19,4 +20,5 @@ object Map : IntIdTable() {
     val reviewedByUserID = reference("reviewedByUserID", MindustryUser).nullable()
     val reviewStatus = enumerationByName<MapReviewStatus>("reviewStatus", 50)
     val reviewedAt = datetime("reviewedAt").nullable()
+    val gameMode = enumerationByName<GameMode>("gameMode", 100)
 }

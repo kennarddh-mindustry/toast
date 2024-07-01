@@ -115,6 +115,74 @@ object MapListener : ListenerAdapter() {
                         .queue()
                 }
             }
+        } else if (event.subcommandName == "info") {
+            CoroutineScopes.IO.launch {
+                event.deferReply().queue()
+
+                val mapID = event.getOption("map-id")!!.asInt
+
+                Database.newTransaction {
+                    val map = Map.selectOne { Map.id eq mapID }
+                        ?: return@newTransaction event.reply("Map not found.")
+                            .setEphemeral(true)
+                            .queue()
+
+                    val inputStream = map[Map.file].inputStream
+                    val preview = mindustryContentHandler
+                        .getMapMetadataWithPreview(inputStream)
+                        .getOrElse {
+                            event.hook
+                                .editOriginal("Error ${it.message ?: "Unknown"}")
+                                .queue()
+
+                            null
+                        }?.second ?: return@newTransaction
+
+                    val message =
+                        MessageCreate {
+                            files += FileUpload.fromStreamSupplier("${map[Map.id]}.msav") { inputStream }
+                            files += FileUpload.fromStreamSupplier("map.png") {
+                                val previewOutputStream = ByteArrayOutputStream()
+
+                                ImageIO.write(preview, "png", previewOutputStream)
+
+                                ByteArrayInputStream(previewOutputStream.toByteArray())
+                            }
+                            embeds += Embed {
+                                color = DiscordConstant.MAP_SUBMISSION_PENDING_EMBED_COLOR
+                                title = "Map Submission"
+                                author(
+                                    event.user.name,
+                                    event.user.effectiveAvatarUrl,
+                                    event.user.effectiveAvatarUrl
+                                )
+                                field("Name", map[Map.name], false)
+                                field("Game Mode", map[Map.gameMode].displayName, false)
+                                field("Author", map[Map.author], false)
+                                field(
+                                    "Description",
+                                    map[Map.description],
+                                    false
+                                )
+                                field("Size", "${map[Map.width]}x${map[Map.height]}", false)
+                                image = "attachment://map.png"
+                            }
+                            components +=
+                                ActionRow.of(
+                                    Button.primary(
+                                        "$MAP_SUBMIT_ACCEPT_BUTTON_COMPONENT_ID_PREFIX$mapID",
+                                        "Accept"
+                                    ),
+                                    Button.danger(
+                                        "$MAP_SUBMIT_REJECT_BUTTON_COMPONENT_ID_PREFIX$mapID",
+                                        "Reject"
+                                    )
+                                )
+                        }
+
+                    event.reply(message).queue()
+                }
+            }
         } else if (event.subcommandName == "submit") {
             CoroutineScopes.IO.launch {
                 event.reply("Processing").setEphemeral(true).queue()
@@ -158,7 +226,6 @@ object MapListener : ListenerAdapter() {
                         null
                     } ?: return@launch
 
-
                 if (meta.width > MAX_MAP_WIDTH || meta.height > MAX_MAP_HEIGHT) {
                     return@launch event.hook.editOriginal(
                         "The map is bigger than ${MAX_MAP_WIDTH}x${MAX_MAP_HEIGHT}."
@@ -176,6 +243,7 @@ object MapListener : ListenerAdapter() {
                         it[submittedByUserID] = user[Users.id]
                         it[active] = false
                         it[reviewStatus] = MapReviewStatus.Pending
+                        it[this.gameMode] = gameMode
                     } get Map.id
                 }
 

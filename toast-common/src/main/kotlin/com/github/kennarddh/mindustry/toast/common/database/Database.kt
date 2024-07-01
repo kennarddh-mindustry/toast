@@ -44,7 +44,6 @@ object Database {
             SchemaUtils.createMissingTablesAndColumns(UserVoteKickVotes)
             SchemaUtils.createMissingTablesAndColumns(UserReports)
             SchemaUtils.createMissingTablesAndColumns(Map)
-            SchemaUtils.createMissingTablesAndColumns(MapGameMode)
         }
     }
 

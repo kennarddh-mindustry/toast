@@ -71,6 +71,10 @@ object ReadyListener : ListenerAdapter() {
                         SubcommandData("disable", "Disable a map")
                             .addOption(OptionType.INTEGER, "map-id", "Map id.", true)
                     )
+                    .addSubcommands(
+                        SubcommandData("info", "Shows info about a map.")
+                            .addOption(OptionType.INTEGER, "map-id", "Map id.", true)
+                    )
             )
             .queue()
     }
