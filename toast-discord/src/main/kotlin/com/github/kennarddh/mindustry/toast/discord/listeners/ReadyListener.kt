@@ -62,7 +62,6 @@ object ReadyListener : ListenerAdapter() {
                         SubcommandData("submit", "Submit a mindustry map")
                             .addOption(OptionType.ATTACHMENT, "msav-file", "Exported MSAV file", true)
                             .addOptions(gameModeOptionData)
-                            .addOption(OptionType.INTEGER, "obsoleted-map-id", "Obsoleted Map ID", false)
                     )
             )
             .queue()

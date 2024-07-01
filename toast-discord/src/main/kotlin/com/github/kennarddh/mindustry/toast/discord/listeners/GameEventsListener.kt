@@ -296,9 +296,9 @@ object GameEventsListener : ListenerAdapter() {
         }
     }
 
-
     override fun onButtonInteraction(event: ButtonInteractionEvent) {
         if (event.componentId.startsWith(PARDON_BUTTON_COMPONENT_ID_PREFIX)) {
+            // TODO: Check if already ended or pardoned
             CoroutineScopes.IO.launch {
                 val user = Database.newTransaction {
                     Users.selectOne { Users.discordID eq event.user.id }
