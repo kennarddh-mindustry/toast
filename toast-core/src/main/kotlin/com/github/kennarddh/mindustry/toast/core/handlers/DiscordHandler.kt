@@ -10,6 +10,6 @@ class DiscordHandler : Handler {
     @Command(["discord"])
     @Description("Open Toast Mindustry Server Discord.")
     fun discord(sender: PlayerCommandSender) {
-        sender.player.openURI("https://discord.gg/eGD2jNAE3N")
+        sender.player.openURI("https://discord.gg/27gcRJDH23")
     }
 }
