@@ -25,6 +25,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.utils.FileUpload
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.update
 import java.io.ByteArrayInputStream
@@ -45,7 +46,39 @@ object MapListener : ListenerAdapter() {
     override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
         if (event.name != "map") return
 
-        if (event.subcommandName == "enable") {
+        if (event.subcommandName == "list") {
+            CoroutineScopes.IO.launch {
+                val gameModeString = event.getOption("game-mode")!!.asString
+
+                val gameMode = try {
+                    GameMode.valueOf(gameModeString)
+                } catch (error: IllegalArgumentException) {
+                    return@launch event.hook.editOriginal("$gameModeString is not a valid game mode").queue()
+                }
+
+                Database.newTransaction {
+                    val maps =
+                        Map.selectAll().where { Map.gameMode eq gameMode }
+
+                    val response = buildString {
+                        appendLine("## Maps for ${gameMode.displayName}")
+
+                        maps.forEachIndexed() { index, map ->
+                            appendLine("${index + 1}. ${map[Map.name]}")
+                            appendLine("\tAuthor: ${map[Map.author]}")
+                            appendLine("\tSize: ${map[Map.width]}x${map[Map.height]}")
+                            appendLine("\tStatus: ${map[Map.reviewStatus].displayName}")
+
+                            if (map[Map.reviewStatus] == MapReviewStatus.Accepted) {
+                                appendLine("\tActive: ${map[Map.active].toDisplayString()}")
+                            }
+                        }
+                    }
+
+                    event.reply(response).queue()
+                }
+            }
+        } else if (event.subcommandName == "enable") {
             CoroutineScopes.IO.launch {
                 val user = Database.newTransaction {
                     Users.selectOne { Users.discordID eq event.user.id }

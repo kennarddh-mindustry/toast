@@ -75,6 +75,10 @@ object ReadyListener : ListenerAdapter() {
                         SubcommandData("info", "Shows info about a map.")
                             .addOption(OptionType.INTEGER, "map-id", "Map id.", true)
                     )
+                    .addSubcommands(
+                        SubcommandData("list", "Shows list of maps for a game mode.")
+                            .addOptions(gameModeOptionData)
+                    )
             )
             .queue()
     }
