@@ -70,6 +70,7 @@ class Toast : AbstractPlugin() {
         Genesis.registerHandler(WelcomeHandler())
 
         Genesis.registerHandler(ServerControlHandler())
+        Genesis.registerHandler(MapUpdateHandler())
         Genesis.registerHandler(MessageHandler())
         Genesis.registerHandler(GameStatsCommands())
         Genesis.registerHandler(JavascriptHandler())

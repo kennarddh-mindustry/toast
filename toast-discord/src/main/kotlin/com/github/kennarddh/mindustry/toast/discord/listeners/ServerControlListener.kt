@@ -11,7 +11,6 @@ import com.github.kennarddh.mindustry.toast.common.messaging.messages.ChatServer
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerCommandServerControl
 import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerControl
 import com.github.kennarddh.mindustry.toast.discord.CoroutineScopes
-import com.github.kennarddh.mindustry.toast.discord.Logger
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -48,8 +47,6 @@ object ServerControlListener : ListenerAdapter() {
 
                     return@launch
                 }
-
-                Logger.info("Routing key \"${server.name}.server-command\"")
 
                 Messenger.publishServerControl(
                     "${server.name}.server-command",

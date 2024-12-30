@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.utils.messages.AbstractMessageBuilder
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
 import net.dv8tion.jda.api.utils.messages.MessageCreateData
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder
+import net.dv8tion.jda.api.utils.messages.MessageEditData
 import net.dv8tion.jda.api.utils.messages.MessageRequest
 import java.time.temporal.TemporalAccessor
 import java.util.*
@@ -55,6 +56,26 @@ inline fun MessageCreateBuilder(
         }
     }
 
+inline fun MessageEditBuilder(
+    content: String = "",
+    embeds: Collection<MessageEmbed> = emptyList(),
+    files: Collection<FileUpload> = emptyList(),
+    components: Collection<LayoutComponent> = emptyList(),
+    mentions: Mentions = Mentions.default(),
+    builder: InlineMessage<MessageEditData>.() -> Unit = {}
+) =
+    MessageEditBuilder().run {
+        mentions.apply(this)
+
+        InlineMessage(this).apply {
+            this.content = content
+            this.embeds += embeds
+            this.components += components
+            this.files += files
+            this.builder()
+        }
+    }
+
 inline fun MessageCreate(
     content: String = "",
     embeds: Collection<MessageEmbed> = emptyList(),
@@ -64,6 +85,15 @@ inline fun MessageCreate(
     mentions: Mentions = Mentions.default(),
     builder: InlineMessage<MessageCreateData>.() -> Unit = {}
 ) = MessageCreateBuilder(content, embeds, files, components, tts, mentions, builder).build()
+
+inline fun MessageEdit(
+    content: String = "",
+    embeds: Collection<MessageEmbed> = emptyList(),
+    files: Collection<FileUpload> = emptyList(),
+    components: Collection<LayoutComponent> = emptyList(),
+    mentions: Mentions = Mentions.default(),
+    builder: InlineMessage<MessageEditData>.() -> Unit = {}
+) = MessageEditBuilder(content, embeds, files, components, mentions, builder).build()
 
 class InlineMessage<T>(val builder: AbstractMessageBuilder<T, *>) {
     internal val configuredEmbeds = mutableListOf<MessageEmbed>()

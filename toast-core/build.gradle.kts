@@ -20,7 +20,7 @@ val metadata = ModMetadata.fromJson(project.file("plugin.json"))
 
 project.version = metadata.version
 
-val genesisVersion = "3.0.0-beta.26"
+val genesisVersion = "3.0.0-beta.27"
 
 dependencies {
     mindustryDependencies()

@@ -15,6 +15,10 @@ sealed class ServerControlBase
 data class ServerCommandServerControl(val command: String) : ServerControlBase()
 
 @Serializable
+@SerialName("MapUpdate")
+data object MapUpdateServerControl : ServerControlBase()
+
+@Serializable
 @SerialName("Chat")
 data class ChatServerControl(val sender: String, val message: String) : ServerControlBase()
 

@@ -7,6 +7,10 @@ import com.github.kennarddh.mindustry.toast.common.database.Database
 import com.github.kennarddh.mindustry.toast.common.database.tables.Map
 import com.github.kennarddh.mindustry.toast.common.database.tables.Users
 import com.github.kennarddh.mindustry.toast.common.extensions.selectOne
+import com.github.kennarddh.mindustry.toast.common.extensions.toDisplayString
+import com.github.kennarddh.mindustry.toast.common.messaging.Messenger
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.MapUpdateServerControl
+import com.github.kennarddh.mindustry.toast.common.messaging.messages.ServerControl
 import com.github.kennarddh.mindustry.toast.discord.*
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
@@ -76,6 +80,14 @@ object MapListener : ListenerAdapter() {
                     event.reply("Map `$mapID` enabled.")
                         .setEphemeral(true)
                         .queue()
+
+                    Messenger.publishServerControl(
+                        "map-update.${map[Map.gameMode].name}",
+                        ServerControl(
+                            Clock.System.now().toEpochMilliseconds(),
+                            MapUpdateServerControl
+                        )
+                    )
                 }
             }
         } else if (event.subcommandName == "disable") {
@@ -113,6 +125,14 @@ object MapListener : ListenerAdapter() {
                     event.reply("Map `$mapID` disabled.")
                         .setEphemeral(true)
                         .queue()
+
+                    Messenger.publishServerControl(
+                        "map-update.${map[Map.gameMode].name}",
+                        ServerControl(
+                            Clock.System.now().toEpochMilliseconds(),
+                            MapUpdateServerControl
+                        )
+                    )
                 }
             }
         } else if (event.subcommandName == "info") {
@@ -123,13 +143,20 @@ object MapListener : ListenerAdapter() {
 
                 Database.newTransaction {
                     val map = Map.selectOne { Map.id eq mapID }
-                        ?: return@newTransaction event.reply("Map not found.")
-                            .setEphemeral(true)
+                        ?: return@newTransaction event.hook.editOriginal("Map not found.")
                             .queue()
 
                     val inputStream = map[Map.file].inputStream
+
+                    val byteArrayOutputStream = ByteArrayOutputStream()
+
+                    inputStream.transferTo(byteArrayOutputStream)
+
+                    val inputStreamClone1 = ByteArrayInputStream(byteArrayOutputStream.toByteArray())
+                    val inputStreamClone2 = ByteArrayInputStream(byteArrayOutputStream.toByteArray())
+
                     val preview = mindustryContentHandler
-                        .getMapMetadataWithPreview(inputStream)
+                        .getMapMetadataWithPreview(inputStreamClone1)
                         .getOrElse {
                             event.hook
                                 .editOriginal("Error ${it.message ?: "Unknown"}")
@@ -139,8 +166,8 @@ object MapListener : ListenerAdapter() {
                         }?.second ?: return@newTransaction
 
                     val message =
-                        MessageCreate {
-                            files += FileUpload.fromStreamSupplier("${map[Map.id]}.msav") { inputStream }
+                        MessageEdit {
+                            files += FileUpload.fromStreamSupplier("${map[Map.id]}.msav") { inputStreamClone2 }
                             files += FileUpload.fromStreamSupplier("map.png") {
                                 val previewOutputStream = ByteArrayOutputStream()
 
@@ -149,8 +176,8 @@ object MapListener : ListenerAdapter() {
                                 ByteArrayInputStream(previewOutputStream.toByteArray())
                             }
                             embeds += Embed {
-                                color = DiscordConstant.MAP_SUBMISSION_PENDING_EMBED_COLOR
-                                title = "Map Submission"
+                                color = DiscordConstant.MAP_INFO_EMBED_COLOR
+                                title = "Map Info"
                                 author(
                                     event.user.name,
                                     event.user.effectiveAvatarUrl,
@@ -165,22 +192,12 @@ object MapListener : ListenerAdapter() {
                                     false
                                 )
                                 field("Size", "${map[Map.width]}x${map[Map.height]}", false)
+                                field("Active", map[Map.active].toDisplayString(), false)
                                 image = "attachment://map.png"
                             }
-                            components +=
-                                ActionRow.of(
-                                    Button.primary(
-                                        "$MAP_SUBMIT_ACCEPT_BUTTON_COMPONENT_ID_PREFIX$mapID",
-                                        "Accept"
-                                    ),
-                                    Button.danger(
-                                        "$MAP_SUBMIT_REJECT_BUTTON_COMPONENT_ID_PREFIX$mapID",
-                                        "Reject"
-                                    )
-                                )
                         }
 
-                    event.reply(message).queue()
+                    event.hook.editOriginal(message).queue()
                 }
             }
         } else if (event.subcommandName == "submit") {
@@ -345,6 +362,14 @@ object MapListener : ListenerAdapter() {
                     event.reply("Map `$mapID` accepted.")
                         .setEphemeral(true)
                         .queue()
+
+                    Messenger.publishServerControl(
+                        "map-update.${map[Map.gameMode].name}",
+                        ServerControl(
+                            Clock.System.now().toEpochMilliseconds(),
+                            MapUpdateServerControl
+                        )
+                    )
 
                     event.message.editMessageEmbeds(
                         Embed(event.message.embeds.first()) {
